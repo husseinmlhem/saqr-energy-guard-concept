@@ -3,23 +3,37 @@ import { SAQR_ASSETS } from '../assets/saqr_assets';
 
 export default function ProductHero({ onExploreClick, onBackToShowcase }) {
   return (
-    <section className="product-hero-section" style={{ backgroundColor: '#050507' }}>
+    <section 
+      style={{ 
+        backgroundColor: '#050507',
+        position: 'relative',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        padding: '0 clamp(20px, 8vw, 120px)',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        borderBottom: '1px solid var(--border-color)'
+      }}
+    >
       {/* Cinematic Background Image (full brightness and dominant) */}
       <div 
         style={{
           position: 'absolute',
           top: 0,
-          left: 0,
+          right: 0,
           width: '100%',
           height: '100%',
           backgroundImage: `url(${SAQR_ASSETS.mainHero})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.95,
+          opacity: 1.0,
           zIndex: 1
         }}
       />
-      {/* Subtle Vignette Overlay for cinematic depth & text legibility */}
+      
+      {/* Subtle Vignette & Left-Side Darkening Overlay for text legibility */}
       <div 
         style={{
           position: 'absolute',
@@ -27,28 +41,22 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'radial-gradient(circle at center, rgba(5, 5, 7, 0.1) 0%, rgba(5, 5, 7, 0.7) 90%), linear-gradient(to bottom, rgba(5,5,7,0) 50%, rgba(5,5,7,0.9) 100%)',
+          background: 'linear-gradient(to right, rgba(5, 5, 7, 0.85) 0%, rgba(5, 5, 7, 0.4) 50%, transparent 100%), linear-gradient(to bottom, transparent 60%, rgba(5, 5, 7, 0.9) 100%)',
           zIndex: 2
         }}
       />
 
-      {/* Tech HUD Line overlays */}
-      <div className="hero-overlay-hud" aria-hidden="true" style={{ zIndex: 10 }}>
-        <div>PROT_TYP: SG-02 // SYSTEM_INTEGRATION</div>
-        <div>SYS_STATUS: SIMULATION_ACTIVE</div>
-        <div>CASE_STUDY: HUSSEIN MLHEM</div>
-      </div>
-      
-      <div className="hero-overlay-hud-right" aria-hidden="true" style={{ zIndex: 10 }}>
-        <div>SYS_COORD: 24.4539° N, 54.3773° E</div>
-        <div>CREATIVE_DIRECTION_TEST</div>
-        <div>DATE: 2026.06.20</div>
-      </div>
-
-      {/* Center content container */}
-      <div className="hero-text-content" style={{ zIndex: 10, position: 'relative' }}>
+      {/* Left-aligned content container */}
+      <div 
+        style={{ 
+          zIndex: 10, 
+          position: 'relative',
+          maxWidth: '550px',
+          textAlign: 'left'
+        }}
+      >
         {/* Logo */}
-        <div style={{ marginBottom: '1.25rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
           <img 
             src={SAQR_ASSETS.logo} 
             alt="SAQR Logo" 
@@ -57,28 +65,54 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
         </div>
 
         {/* Badge */}
-        <div style={{ marginBottom: '0.75rem' }}>
-          <span className="badge-concept" style={{ letterSpacing: '2px', textTransform: 'uppercase', fontSize: '0.65rem' }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <span className="badge-concept" style={{ letterSpacing: '2.5px', textTransform: 'uppercase', fontSize: '0.65rem' }}>
             Applied Fictional Case Study
           </span>
         </div>
         
         {/* Title */}
-        <h1 className="hero-title" style={{ fontSize: '3.8rem', marginBottom: '0.75rem', lineHeight: '1.1', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}>
+        <h1 
+          style={{ 
+            fontSize: 'clamp(2.5rem, 5vw, 3.8rem)', 
+            fontWeight: 900,
+            marginBottom: '1rem', 
+            lineHeight: '1.1', 
+            color: 'var(--text-primary)',
+            textShadow: '0 4px 15px rgba(0,0,0,0.9)' 
+          }}
+        >
           SAQR Energy Guard
         </h1>
 
         {/* Subtitle */}
-        <p className="hero-subtitle" style={{ fontSize: '1.15rem', fontWeight: 300, maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: '1.5', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+        <p 
+          style={{ 
+            fontSize: '1.15rem', 
+            fontWeight: 300, 
+            color: 'var(--text-secondary)',
+            marginBottom: '3rem', 
+            lineHeight: '1.6', 
+            textShadow: '0 2px 10px rgba(0,0,0,0.9)' 
+          }}
+        >
           A fictional dual-device concept for futuristic environmental intelligence.
         </p>
         
         {/* CTAs */}
-        <div className="cta-group" style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <button onClick={onExploreClick} className="btn-primary" style={{ padding: '0.9rem 2.2rem', fontSize: '0.85rem' }}>
+        <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
+          <button 
+            onClick={onExploreClick} 
+            className="btn-primary" 
+            style={{ padding: '1rem 2.5rem', fontSize: '0.85rem', letterSpacing: '1px' }}
+          >
             Begin Experience
           </button>
-          <button onClick={onBackToShowcase} className="btn-secondary" style={{ padding: '0.9rem 2.2rem', fontSize: '0.85rem' }}>
+          <button 
+            onClick={onBackToShowcase} 
+            className="btn-secondary" 
+            style={{ padding: '1rem 2.5rem', fontSize: '0.85rem', letterSpacing: '1px' }}
+          >
             Back to Showcase
           </button>
         </div>

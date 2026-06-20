@@ -6,53 +6,26 @@ export default function DefenderBlueprint() {
     <section 
       style={{
         position: 'relative',
-        backgroundColor: '#bcbcbd', // Soft product environment background
+        backgroundColor: '#050507', // Dark black page background
         overflow: 'hidden',
-        padding: '8rem 2rem'
+        padding: '6rem 2rem'
       }}
     >
-      {/* Top Black Fade Overlay */}
       <div 
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '25%',
-          background: 'linear-gradient(to bottom, #050507 0%, transparent 100%)',
-          zIndex: 2,
-          pointerEvents: 'none'
-        }}
-      />
-      {/* Bottom Black Fade Overlay */}
-      <div 
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          width: '100%',
-          height: '25%',
-          background: 'linear-gradient(to top, #050507 0%, transparent 100%)',
-          zIndex: 2,
-          pointerEvents: 'none'
-        }}
-      />
-
-      <div 
-        style={{
-          maxWidth: '1200px',
+          maxWidth: '1100px',
           margin: '0 auto',
           position: 'relative',
           zIndex: 5,
-          color: '#1a1d20' // Dark text for contrast against soft gray background
+          color: 'var(--text-primary)'
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
           <span 
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.75rem',
-              color: '#3b434c',
+              color: 'var(--accent-blue)',
               textTransform: 'uppercase',
               letterSpacing: '3px',
               fontWeight: 'bold',
@@ -65,19 +38,19 @@ export default function DefenderBlueprint() {
           <h2 
             style={{
               fontFamily: 'var(--font-hud)',
-              fontSize: '2.2rem',
+              fontSize: '2rem',
               fontWeight: 900,
               margin: '0 0 1rem',
-              color: '#0d1117'
+              color: 'var(--text-primary)'
             }}
           >
-            Defender System Blueprint
+            Defender: close-range intelligence module
           </h2>
           <p 
             style={{
-              color: '#475569',
+              color: 'var(--text-secondary)',
               fontSize: '0.95rem',
-              fontWeight: 400,
+              fontWeight: 300,
               maxWidth: '650px',
               margin: '0 auto',
               lineHeight: '1.6'
@@ -87,28 +60,33 @@ export default function DefenderBlueprint() {
           </p>
         </div>
 
-        {/* Blueprint Layout Grid */}
+        {/* 2. Dark graphite stage wrapper */}
         <div 
           style={{
+            backgroundColor: '#111317', // Dark graphite stage
+            border: '1px solid rgba(255, 255, 255, 0.05)',
+            borderRadius: '12px',
+            padding: '2.5rem',
+            boxShadow: '0 30px 60px rgba(0, 0, 0, 0.6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '4rem',
+            gap: '3rem',
             flexWrap: 'wrap'
           }}
         >
-          {/* Left panel: Product image with HUD blueprint lines */}
+          {/* Left panel: Controlled product image frame with light gray background */}
           <div 
             style={{
               position: 'relative',
-              width: 'min(480px, 90vw)',
+              width: 'min(450px, 90vw)',
               height: '350px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.15)',
+              backgroundColor: '#bcbcbd', // Product frame environment background
               borderRadius: '8px',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               overflow: 'visible'
             }}
           >
@@ -171,34 +149,34 @@ export default function DefenderBlueprint() {
             </div>
           </div>
 
-          {/* Right panel: Details sheet */}
+          {/* Right panel: Details sheet inside dark glass panel */}
           <div 
             className="glass-panel"
             style={{
               flex: '1',
               minWidth: '300px',
               maxWidth: '500px',
-              padding: '2.5rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.4)',
-              border: '1px solid rgba(0, 0, 0, 0.08)',
+              padding: '2rem',
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.05)',
               backdropFilter: 'blur(20px)'
             }}
           >
-            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: '#0d1117', marginBottom: '1.5rem', fontWeight: 800 }}>
+            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '1.5rem', fontWeight: 800 }}>
               Speculative Module Breakdown
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <li style={{ borderLeft: '3px solid #2563eb', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: '#0f172a' }}>Optical Core</strong>
-                <span style={{ fontSize: '0.8rem', color: '#475569' }}>High-fidelity lens array designed to track proximity thermal anomalies.</span>
+              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Optical Core</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>High-fidelity lens array designed to track proximity thermal anomalies.</span>
               </li>
-              <li style={{ borderLeft: '3px solid #2563eb', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: '#0f172a' }}>Stabilized Base</strong>
-                <span style={{ fontSize: '0.8rem', color: '#475569' }}>Rotational motor matrix offering 360-degree environmental scan sweeps.</span>
+              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Stabilized Base</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Rotational motor matrix offering 360-degree environmental scan sweeps.</span>
               </li>
-              <li style={{ borderLeft: '3px solid #2563eb', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: '#0f172a' }}>Modular Side Plates</strong>
-                <span style={{ fontSize: '0.8rem', color: '#475569' }}>Detachable sand-beige composite shells protecting key computation nodes.</span>
+              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Modular Side Plates</strong>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Detachable sand-beige composite shells protecting key computation nodes.</span>
               </li>
             </ul>
           </div>

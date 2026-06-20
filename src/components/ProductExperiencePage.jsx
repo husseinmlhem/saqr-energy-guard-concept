@@ -182,16 +182,6 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         <DefenderBlueprint />
       </div>
 
-      {/* Soft black-to-gray transition before Defender scroll reveal */}
-      <div 
-        style={{ 
-          height: '25vh', 
-          background: 'linear-gradient(to bottom, #050507 0%, #bcbcbd 100%)',
-          position: 'relative',
-          zIndex: 1
-        }} 
-      />
-
       {/* 4. Defender GSAP Pinned Reveal */}
       <FrameSequenceScroll
         productName="Defender"
@@ -203,30 +193,10 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         backgroundColor="#bcbcbd"
       />
 
-      {/* Soft gray-to-black transition after Defender scroll reveal */}
-      <div 
-        style={{ 
-          height: '25vh', 
-          background: 'linear-gradient(to bottom, #bcbcbd 0%, #050507 100%)',
-          position: 'relative',
-          zIndex: 1
-        }} 
-      />
-
       {/* 5. Sentinel Vertical Coverage Cone */}
       <div ref={sentinelRef}>
         <SentinelCoverageCone />
       </div>
-
-      {/* Soft black-to-gray transition before Sentinel scroll reveal */}
-      <div 
-        style={{ 
-          height: '25vh', 
-          background: 'linear-gradient(to bottom, #050507 0%, #b8babb 100%)',
-          position: 'relative',
-          zIndex: 1
-        }} 
-      />
 
       {/* 6. Sentinel GSAP Pinned Reveal */}
       <FrameSequenceScroll
@@ -237,16 +207,6 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         stages={sentinelStages}
         callouts={sentinelCallouts}
         backgroundColor="#b8babb"
-      />
-
-      {/* Soft gray-to-black transition after Sentinel scroll reveal */}
-      <div 
-        style={{ 
-          height: '25vh', 
-          background: 'linear-gradient(to bottom, #b8babb 0%, #050507 100%)',
-          position: 'relative',
-          zIndex: 1
-        }} 
       />
 
       {/* 7. Signal Routing Mesh */}
