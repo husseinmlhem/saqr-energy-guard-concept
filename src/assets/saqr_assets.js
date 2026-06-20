@@ -2,6 +2,7 @@ const BASE_URL = import.meta.env.BASE_URL || '/';
 
 export const SAQR_ASSETS = {
   logo: `${BASE_URL}assets/saqr/Logo.png`,
+  mainHero: `${BASE_URL}assets/saqr/Main.png`,
   defenderPoster: `${BASE_URL}assets/saqr/Defender.png`,
   sentinelPoster: `${BASE_URL}assets/saqr/Senetial.png`,
   defenderFramesPath: `${BASE_URL}assets/saqr/Defender/frames`,

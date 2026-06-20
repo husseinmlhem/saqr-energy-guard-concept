@@ -19,7 +19,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         boxSizing: 'border-box'
       }}
     >
-      {/* SAQR Logo - Subtle Brand Mark */}
+      {/* 1. Small Centered SAQR Logo */}
       <div style={{ marginBottom: '1rem' }}>
         <img 
           src={SAQR_ASSETS.logo} 
@@ -28,7 +28,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         />
       </div>
 
-      {/* Case Study Header */}
+      {/* 2. One short line under the logo */}
       <p 
         style={{
           fontFamily: 'var(--font-mono)',
@@ -42,12 +42,12 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         An applied fictional case study by Hussein Mlhem.
       </p>
 
-      {/* Project Title */}
+      {/* 3. Main Title */}
       <h1 
         className="intro-title" 
         style={{ 
-          fontSize: '2.5rem', 
-          margin: '0 0 0.75rem 0', 
+          fontSize: '2.8rem', 
+          margin: '0 0 2rem 0', 
           fontWeight: 900, 
           letterSpacing: '0.5px',
           lineHeight: '1.2'
@@ -56,21 +56,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         SAQR Energy Guard
       </h1>
 
-      {/* Short Support Line */}
-      <p 
-        style={{
-          fontSize: '1.05rem',
-          color: 'var(--text-secondary)',
-          lineHeight: '1.5',
-          margin: '0 0 2rem 0',
-          fontWeight: 300,
-          maxWidth: '650px'
-        }}
-      >
-        Built to demonstrate creative direction, product storytelling, presentation design, video production, and interactive web execution.
-      </p>
-
-      {/* Clean Compact Heading */}
+      {/* 4. Small Heading */}
       <h2 
         style={{
           fontFamily: 'var(--font-mono)',
@@ -82,10 +68,10 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
           fontWeight: 500
         }}
       >
-        Review the complete concept package
+        Review three deliverables
       </h2>
 
-      {/* Three Minimal Cards */}
+      {/* 5. Three Minimal Items/Cards */}
       <div 
         style={{
           display: 'grid',
@@ -135,7 +121,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </div>
       </div>
 
-      {/* Main CTA */}
+      {/* 6. One Main CTA Button */}
       <div style={{ marginBottom: '3rem' }}>
         <button 
           onClick={onEnterExperience} 
@@ -146,7 +132,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </button>
       </div>
 
-      {/* Small Muted Disclaimer at the Bottom */}
+      {/* 7. Tiny Muted Bottom Note */}
       <div 
         style={{
           position: 'absolute',
@@ -160,7 +146,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
           opacity: 0.7
         }}
       >
-        Fictional concept — created for portfolio and job evaluation purposes.
+        Fictional concept created for portfolio and job evaluation.
       </div>
     </div>
   );

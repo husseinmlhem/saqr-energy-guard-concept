@@ -1184,3 +1184,31 @@ html, body {
     gap: 1rem;
   }
 }
+
+/* Dual Device Beam Pulse Animation */
+@keyframes pulse-beam {
+  0% {
+    left: 0%;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+.beam-animation-container {
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .beam-animation-container {
+    display: none; /* hide animation line on mobile as devices stack vertically */
+  }
+}
