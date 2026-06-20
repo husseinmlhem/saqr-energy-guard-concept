@@ -5,7 +5,7 @@ export default function SignalRoutingMesh() {
   return (
     <section 
       style={{
-        padding: '8rem 2rem',
+        padding: '6rem 2rem',
         position: 'relative',
         background: 'linear-gradient(to bottom, #050507 0%, #0d1017 50%, #050507 100%)',
         borderBottom: '1px solid var(--border-color)',

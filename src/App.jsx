@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ShowcaseIntroPage from './components/ShowcaseIntroPage';
 import ProductExperiencePage from './components/ProductExperiencePage';
 import CinematicBackground from './components/CinematicBackground';
+import CursorGlow from './components/CursorGlow';
 
 function App() {
   const [currentPath, setCurrentPath] = useState(window.location.pathname);
@@ -64,6 +65,9 @@ function App() {
     <>
       {/* Tech HUD overlay lines & scanlines globally */}
       <CinematicBackground />
+      
+      {/* Premium custom mouse glow trail */}
+      <CursorGlow />
       
       {/* Active Page Component */}
       {renderPage()}

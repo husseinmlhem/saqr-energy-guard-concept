@@ -24,6 +24,7 @@ export default function FrameSequenceScroll({
   const [currentFrameIndex, setCurrentFrameIndex] = useState(1);
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [loadError, setLoadError] = useState(null);
+  const [aspectRatio, setAspectRatio] = useState(16 / 9);
 
   // Keep track of loaded images and current index in Refs to avoid re-triggering ScrollTrigger
   const loadedImagesRef = useRef({});
@@ -47,6 +48,18 @@ export default function FrameSequenceScroll({
 
     return () => observer.disconnect();
   }, []);
+
+  // Pre-load poster to determine dynamic aspect ratio of the frames
+  useEffect(() => {
+    if (!posterPath) return;
+    const img = new Image();
+    img.src = posterPath;
+    img.onload = () => {
+      if (img.width && img.height) {
+        setAspectRatio(img.width / img.height);
+      }
+    };
+  }, [posterPath]);
 
   // 2. Canvas rendering function with contain scale logic to prevent cropping
   const drawFrame = (frameIndex) => {
@@ -135,6 +148,9 @@ export default function FrameSequenceScroll({
             loaded = 1;
             setLoadCount(1);
             setIsCanvasReady(true);
+            if (firstFrameImg.width && firstFrameImg.height) {
+              setAspectRatio(firstFrameImg.width / firstFrameImg.height);
+            }
             drawFrame(1);
           }
           resolve(true);
@@ -264,21 +280,24 @@ export default function FrameSequenceScroll({
           alignItems: 'center'
         }}
       >
-        {/* Centered Product Stage (restricting viewport height and width) */}
+        {/* Centered Product Stage (restricting viewport height and width dynamically using aspect ratio to prevent side blocks) */}
         <div 
           className="product-stage"
           style={{
             position: 'relative',
-            width: 'min(92vw, 1500px)',
-            height: 'min(78vh, 860px)',
+            aspectRatio: aspectRatio,
+            width: '92vw',
+            maxWidth: `calc(min(78vh, 860px) * ${aspectRatio})`,
+            height: 'auto',
+            maxHeight: 'min(78vh, 860px)',
             backgroundColor: backgroundColor,
             border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '12px',
+            borderRadius: '8px',
             overflow: 'hidden',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.65)',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
             zIndex: 5
           }}
         >
@@ -334,28 +353,6 @@ export default function FrameSequenceScroll({
             ))}
           </div>
 
-          {/* Corner HUD Data Logs relative to stage */}
-          {hasStartedLoading && (
-            <div 
-              style={{
-                position: 'absolute',
-                top: '30px',
-                right: '30px',
-                fontFamily: 'var(--font-mono)',
-                fontSize: '0.6rem',
-                color: 'rgba(0, 0, 0, 0.45)', // dark text for light gray background
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
-                textAlign: 'right',
-                zIndex: 25
-              }}
-            >
-              <div>SYS_LNK: OPERATIONAL</div>
-              <div>BUFF_BUFFERS: {loadCount} / {frameCount} F</div>
-              <div>ACTIVE_IDX: 0x{currentFrameIndex.toString(16).toUpperCase().padStart(2, '0')}</div>
-            </div>
-          )}
 
           {/* Sentinel measurement scale overlay relative to stage */}
           {productName === 'Sentinel' && (
@@ -447,12 +444,12 @@ export default function FrameSequenceScroll({
           className="glass-panel"
           style={{
             position: 'absolute',
-            bottom: '6vh',
-            left: 'clamp(20px, 5vw, 72px)',
+            bottom: '5vh',
+            left: 'clamp(20px, 5vw, 60px)',
             zIndex: 30,
-            maxWidth: '360px',
+            maxWidth: '280px',
             width: 'calc(100% - 40px)',
-            padding: '1.25rem',
+            padding: '0.85rem',
             textAlign: 'left',
             boxShadow: '0 15px 35px rgba(0,0,0,0.6)',
             borderRadius: '6px',
@@ -462,19 +459,19 @@ export default function FrameSequenceScroll({
             WebkitBackdropFilter: 'blur(20px)'
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.2rem' }}>
             <span 
               style={{ 
                 fontFamily: 'var(--font-mono)', 
-                fontSize: '0.65rem', 
+                fontSize: '0.55rem', 
                 color: 'var(--accent-blue)', 
                 textTransform: 'uppercase', 
-                letterSpacing: '2px'
+                letterSpacing: '1.5px'
               }}
             >
               {productName === 'Sentinel' ? 'Sentinel // SNT-V1' : 'Defender // DFN-V1'}
             </span>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-muted)' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5rem', color: 'var(--text-muted)' }}>
               F: {currentFrameIndex.toString().padStart(2, '0')} / {frameCount}
             </span>
           </div>
@@ -482,9 +479,9 @@ export default function FrameSequenceScroll({
           <h3 
             style={{ 
               fontFamily: 'var(--font-hud)', 
-              fontSize: '1.15rem', 
+              fontSize: '0.95rem', 
               fontWeight: 700, 
-              margin: '0 0 0.5rem', 
+              margin: '0 0 0.4rem', 
               color: 'var(--text-primary)' 
             }}
           >
@@ -494,10 +491,10 @@ export default function FrameSequenceScroll({
           <p 
             style={{ 
               color: 'var(--text-secondary)', 
-              fontSize: '0.8rem', 
+              fontSize: '0.75rem', 
               fontWeight: 300, 
               lineHeight: '1.4',
-              marginBottom: '1rem',
+              marginBottom: '0.75rem',
               minHeight: '2.8em' // maintain height to prevent jumps
             }}
           >

@@ -4,7 +4,7 @@ export default function TacticalTimeline() {
   return (
     <section 
       style={{
-        padding: '8rem 2rem',
+        padding: '6rem 2rem',
         position: 'relative',
         background: 'linear-gradient(to bottom, #050507 0%, #101016 50%, #050507 100%)',
         borderBottom: '1px solid var(--border-color)',

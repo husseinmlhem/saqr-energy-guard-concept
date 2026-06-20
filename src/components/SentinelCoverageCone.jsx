@@ -6,41 +6,42 @@ export default function SentinelCoverageCone() {
     <section 
       style={{
         position: 'relative',
-        backgroundColor: '#050507', // Dark black page background
+        backgroundColor: '#050507', // Dark cinematic background
         overflow: 'hidden',
-        padding: '6rem 2rem'
+        padding: '5rem 2rem'
       }}
     >
       <div 
         style={{
-          maxWidth: '1100px',
+          maxWidth: '1000px',
           margin: '0 auto',
           position: 'relative',
           zIndex: 5,
           color: 'var(--text-primary)'
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
+        {/* Section Header */}
+        <div style={{ textAlign: 'left', marginBottom: '3rem', borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1.25rem' }}>
           <span 
             style={{
               fontFamily: 'var(--font-mono)',
-              fontSize: '0.75rem',
-              color: 'var(--accent-cyan)', // Unified cyan HUD brand color
+              fontSize: '0.7rem',
+              color: 'var(--accent-cyan)',
               textTransform: 'uppercase',
               letterSpacing: '3px',
               fontWeight: 'bold',
               display: 'block',
-              marginBottom: '0.5rem'
+              marginBottom: '0.25rem'
             }}
           >
-            COVERAGE ZONE // RADIAL CONE
+            Post-Assembly Analysis // Wide-Area Monitoring
           </span>
           <h2 
             style={{
               fontFamily: 'var(--font-hud)',
-              fontSize: '2.2rem',
-              fontWeight: 900,
-              margin: '0 0 1rem',
+              fontSize: '1.75rem',
+              fontWeight: 800,
+              margin: 0,
               color: 'var(--text-primary)'
             }}
           >
@@ -49,65 +50,61 @@ export default function SentinelCoverageCone() {
           <p 
             style={{
               color: 'var(--text-secondary)',
-              fontSize: '0.95rem',
+              fontSize: '0.85rem',
               fontWeight: 300,
-              maxWidth: '650px',
-              margin: '0 auto',
-              lineHeight: '1.6'
+              marginTop: '0.5rem',
+              lineHeight: '1.5'
             }}
           >
             An elevated fictional layer for range, height, and environmental mapping.
           </p>
         </div>
 
-        {/* Dark graphite stage wrapper */}
+        {/* Two-column layout directly in section context (no card wrappers) */}
         <div 
           style={{
-            backgroundColor: '#111317', // Dark graphite stage
-            border: '1px solid rgba(255, 255, 255, 0.05)',
-            borderRadius: '12px',
-            padding: '2.5rem',
-            boxShadow: '0 30px 60px rgba(0, 0, 0, 0.6)',
             display: 'flex',
-            alignItems: 'center',
+            alignItems: 'stretch',
             justifyContent: 'center',
-            gap: '3rem',
+            gap: '2.5rem',
             flexWrap: 'wrap'
           }}
         >
-          {/* Left panel: Details sheet inside dark glass panel */}
+          {/* Left panel: Details sheet inside technical HUD panel */}
           <div 
-            className="glass-panel"
             style={{
               flex: '1',
               minWidth: '300px',
               maxWidth: '500px',
-              padding: '2rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.01)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(20px)'
+              padding: '1.75rem',
+              backgroundColor: 'rgba(10, 12, 16, 0.35)',
+              border: '1px dashed rgba(255, 255, 255, 0.08)',
+              borderRadius: '6px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
             }}
           >
-            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.15rem', color: 'var(--text-primary)', marginBottom: '1.5rem', fontWeight: 800 }}>
+            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1rem', color: 'var(--text-primary)', marginBottom: '1.25rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
               Vertical Elevation Reach
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Sensor Crown</strong>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Top-mounted visual indicator mapping out localized telemetry.</span>
+              <li style={{ borderLeft: '2px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-primary)' }}>Sensor Crown</strong>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Top-mounted visual indicator mapping out localized telemetry.</span>
               </li>
-              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Vertical Core</strong>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Heavy duty support column hoisting visual sensors to surveillance heights.</span>
+              <li style={{ borderLeft: '2px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-primary)' }}>Vertical Core</strong>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Heavy duty support column hoisting visual sensors to surveillance heights.</span>
               </li>
-              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
-                <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Coverage Cone</strong>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Broad scan coverage mapping coastal ranges up to fictional 12.4M altitude.</span>
+              <li style={{ borderLeft: '2px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
+                <strong style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-primary)' }}>Coverage Cone</strong>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Broad scan coverage mapping coastal ranges up to fictional 12.4M altitude.</span>
               </li>
             </ul>
           </div>
 
-          {/* Right panel: Sentinel rendering inside controlled product image frame with dark graphite background */}
+          {/* Right panel: Sentinel rendering inside refined dark stage */}
           <div 
             style={{
               position: 'relative',
@@ -116,9 +113,9 @@ export default function SentinelCoverageCone() {
               display: 'flex',
               alignItems: 'flex-end',
               justifyContent: 'center',
-              backgroundColor: '#16191f', // Dark graphite frame
-              borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
+              backgroundColor: '#0d0f12', // Refined dark stage frame
+              borderRadius: '6px',
+              border: '1px solid rgba(0, 255, 213, 0.15)', // Cyan border
               overflow: 'hidden',
               paddingBottom: '20px'
             }}
@@ -150,28 +147,28 @@ export default function SentinelCoverageCone() {
               }}
             >
               {/* Coverage cone projection lines in cyan */}
-              <polygon points="225,110 45,30 405,30" fill="rgba(0, 255, 213, 0.04)" stroke="var(--accent-cyan)" strokeWidth="1" strokeDasharray="3,3" />
-              <line x1="225" y1="110" x2="225" y2="20" stroke="rgba(0, 255, 213, 0.15)" strokeWidth="1" strokeDasharray="5,5" />
+              <polygon points="225,110 45,30 405,30" fill="rgba(0, 255, 213, 0.03)" stroke="var(--accent-cyan)" strokeWidth="1" strokeDasharray="2,2" style={{ opacity: 0.6 }} />
+              <line x1="225" y1="110" x2="225" y2="20" stroke="rgba(0, 255, 213, 0.15)" strokeWidth="1" strokeDasharray="4,4" />
               
               {/* Scan indicator line */}
-              <line x1="45" y1="30" x2="405" y2="30" stroke="#00ffd5" strokeWidth="1.5" style={{ opacity: 0.7 }} />
+              <line x1="45" y1="30" x2="405" y2="30" stroke="#00ffd5" strokeWidth="1" style={{ opacity: 0.5 }} />
 
               {/* Height tags */}
-              <text x="235" y="25" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+12.4M</text>
-              <text x="235" y="70" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+6.2M</text>
+              <text x="235" y="25" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" style={{ opacity: 0.8 }}>+12.4M</text>
+              <text x="235" y="70" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" style={{ opacity: 0.8 }}>+6.2M</text>
             </svg>
 
-            {/* Labels overlay in cyan/white */}
-            <div style={{ position: 'absolute', top: '105px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
+            {/* Labels overlay in cyan */}
+            <div style={{ position: 'absolute', top: '105px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-cyan)', opacity: 0.85 }}>
               SENSOR CROWN
             </div>
-            <div style={{ position: 'absolute', top: '240px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '240px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-cyan)', opacity: 0.85 }}>
               VERTICAL CORE
             </div>
-            <div style={{ position: 'absolute', top: '340px', right: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '340px', right: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-cyan)', opacity: 0.85 }}>
               BASE ANCHOR
             </div>
-            <div style={{ position: 'absolute', top: '40px', right: '10%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '40px', right: '10%', fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-cyan)', opacity: 0.85 }}>
               COVERAGE FIELD
             </div>
           </div>

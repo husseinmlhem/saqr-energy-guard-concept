@@ -14,7 +14,6 @@ import { SAQR_ASSETS, PROJECT_LINKS } from '../assets/saqr_assets';
 export default function ProductExperiencePage({ onBackToShowcase }) {
   const defenderRef = useRef(null);
   const sentinelRef = useRef(null);
-  const systemRef = useRef(null);
   const videoRef = useRef(null);
   const presentationRef = useRef(null);
   const contactRef = useRef(null);
@@ -137,8 +136,6 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
             <img src={SAQR_ASSETS.experienceLogoVariant} alt="SAQR Logo" className="logo-img" />
           </div>
           
-          <span className="badge-concept">Concept Project</span>
-          
           <nav>
             <ul className="nav-menu">
               <li className="nav-item">
@@ -146,9 +143,6 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
               </li>
               <li className="nav-item">
                 <a onClick={() => scrollToSection(sentinelRef)}>Sentinel</a>
-              </li>
-              <li className="nav-item">
-                <a onClick={() => scrollToSection(systemRef)}>System</a>
               </li>
               <li className="nav-item">
                 <a onClick={() => scrollToSection(videoRef)}>Video</a>
@@ -176,42 +170,40 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
       {/* 2. Orbital Radar Sweep Console */}
       <OrbitalRadarConsole />
 
-      {/* 3. Defender System Blueprint */}
+      {/* 3. Defender Scroll Reveal */}
       <div ref={defenderRef}>
-        <DefenderBlueprint />
+        <FrameSequenceScroll
+          productName="Defender"
+          posterPath={SAQR_ASSETS.defenderPoster}
+          frameCount={SAQR_ASSETS.defenderFrameCount}
+          getFramePath={SAQR_ASSETS.getDefenderFramePath}
+          stages={defenderStages}
+          callouts={defenderCallouts}
+          backgroundColor="#bcbcbd"
+        />
       </div>
 
-      {/* 4. Defender GSAP Pinned Reveal */}
-      <FrameSequenceScroll
-        productName="Defender"
-        posterPath={SAQR_ASSETS.defenderPoster}
-        frameCount={SAQR_ASSETS.defenderFrameCount}
-        getFramePath={SAQR_ASSETS.getDefenderFramePath}
-        stages={defenderStages}
-        callouts={defenderCallouts}
-        backgroundColor="#bcbcbd"
-      />
+      {/* 4. Defender Blueprint / close-range intelligence section */}
+      <DefenderBlueprint />
 
-      {/* 5. Sentinel Vertical Coverage Cone */}
+      {/* 5. Sentinel Scroll Reveal */}
       <div ref={sentinelRef}>
-        <SentinelCoverageCone />
+        <FrameSequenceScroll
+          productName="Sentinel"
+          posterPath={SAQR_ASSETS.sentinelPoster}
+          frameCount={SAQR_ASSETS.sentinelFrameCount}
+          getFramePath={SAQR_ASSETS.getSentinelFramePath}
+          stages={sentinelStages}
+          callouts={sentinelCallouts}
+          backgroundColor="#b8babb"
+        />
       </div>
 
-      {/* 6. Sentinel GSAP Pinned Reveal */}
-      <FrameSequenceScroll
-        productName="Sentinel"
-        posterPath={SAQR_ASSETS.sentinelPoster}
-        frameCount={SAQR_ASSETS.sentinelFrameCount}
-        getFramePath={SAQR_ASSETS.getSentinelFramePath}
-        stages={sentinelStages}
-        callouts={sentinelCallouts}
-        backgroundColor="#b8babb"
-      />
+      {/* 6. Sentinel Vertical Coverage section */}
+      <SentinelCoverageCone />
 
       {/* 7. Signal Routing Mesh */}
-      <div ref={systemRef}>
-        <SignalRoutingMesh />
-      </div>
+      <SignalRoutingMesh />
 
       {/* 8. Tactical Interface Timeline */}
       <TacticalTimeline />
