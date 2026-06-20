@@ -25,7 +25,7 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
           right: 0,
           width: '100%',
           height: '100%',
-          backgroundImage: `url(${SAQR_ASSETS.mainHero})`,
+          backgroundImage: `url(${SAQR_ASSETS.experienceMainVisual})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           opacity: 1.0,
@@ -58,7 +58,7 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
         {/* Logo */}
         <div style={{ marginBottom: '1.5rem' }}>
           <img 
-            src={SAQR_ASSETS.logo} 
+            src={SAQR_ASSETS.experienceLogoVariant} 
             alt="SAQR Logo" 
             style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
           />

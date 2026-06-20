@@ -134,8 +134,7 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
       <header className="site-header">
         <div className="nav-container">
           <div className="logo-link" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <img src={SAQR_ASSETS.logo} alt="SAQR Logo" className="logo-img" />
-            <span className="logo-text">SAQR</span>
+            <img src={SAQR_ASSETS.experienceLogoVariant} alt="SAQR Logo" className="logo-img" />
           </div>
           
           <span className="badge-concept">Concept Project</span>

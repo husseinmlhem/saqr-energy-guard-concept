@@ -1,6 +1,10 @@
 const BASE_URL = import.meta.env.BASE_URL || '/';
 
 export const SAQR_ASSETS = {
+  homepageLogo: `${BASE_URL}assets/saqr/Logo.png`,
+  experienceMainVisual: `${BASE_URL}assets/saqr/Main.png`, // mainver.png does not exist in folder, falling back to Main.png
+  experienceLogoVariant: `${BASE_URL}assets/saqr/logover.png`,
+  
   logo: `${BASE_URL}assets/saqr/Logo.png`,
   logover: `${BASE_URL}assets/saqr/logover.png`,
   mainHero: `${BASE_URL}assets/saqr/Main.png`,

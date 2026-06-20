@@ -19,10 +19,10 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         boxSizing: 'border-box'
       }}
     >
-      {/* 1. SAQR Brand Logo (logover.png - Moved to the very top and made larger) */}
+      {/* 1. SAQR Brand Logo (Logo.png - Moved to the very top and made larger) */}
       <div style={{ marginTop: '10px', marginBottom: '1.5rem' }}>
         <img 
-          src={SAQR_ASSETS.logover} 
+          src={SAQR_ASSETS.homepageLogo} 
           alt="SAQR Logo" 
           style={{ height: '100px', width: 'auto', objectFit: 'contain' }} 
         />
