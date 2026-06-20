@@ -17,16 +17,34 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const getNormalizedPath = (path) => {
+    const base = import.meta.env.BASE_URL || '/';
+    let res = path;
+    if (res.startsWith(base)) {
+      res = '/' + res.substring(base.length);
+    }
+    if (res !== '/' && res.endsWith('/')) {
+      res = res.slice(0, -1);
+    }
+    return res;
+  };
+
   // Custom client-side router navigation helper
   const navigateTo = (path) => {
-    window.history.pushState(null, '', path);
-    setCurrentPath(path);
+    const base = import.meta.env.BASE_URL || '/';
+    let targetPath = path;
+    if (targetPath.startsWith('/')) {
+      targetPath = (base + targetPath.substring(1)).replace(/\/+/g, '/');
+    }
+    window.history.pushState(null, '', targetPath);
+    setCurrentPath(window.location.pathname);
     window.scrollTo(0, 0);
   };
 
   // Select the appropriate component to render based on current path
   const renderPage = () => {
-    if (currentPath === '/experience') {
+    const normalized = getNormalizedPath(currentPath);
+    if (normalized === '/experience') {
       return (
         <ProductExperiencePage 
           onBackToShowcase={() => navigateTo('/')} 

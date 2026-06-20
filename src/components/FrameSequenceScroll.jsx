@@ -11,7 +11,8 @@ export default function FrameSequenceScroll({
   frameCount,
   getFramePath,
   stages,
-  callouts = []
+  callouts = [],
+  backgroundColor = '#bcbcbd' // Default to #bcbcbd
 }) {
   const containerRef = useRef(null);
   const stickyRef = useRef(null);
@@ -47,7 +48,7 @@ export default function FrameSequenceScroll({
     return () => observer.disconnect();
   }, []);
 
-  // 2. Canvas rendering function with custom scale zoom logic
+  // 2. Canvas rendering function with contain scale logic to prevent cropping
   const drawFrame = (frameIndex) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -73,21 +74,13 @@ export default function FrameSequenceScroll({
     if (img) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Calculate cover scale (no black bars / letterboxing in canvas)
+      // Calculate contain scale to prevent cropping
       const scaleX = canvas.width / img.width;
       const scaleY = canvas.height / img.height;
-      const coverScale = Math.max(scaleX, scaleY);
+      const containScale = Math.min(scaleX, scaleY);
       
-      // Zoom factor for immersive presentation
-      let productScale = 1.0;
-      if (productName === 'Defender') {
-        productScale = 1.45; // zoom in on Defender to feel wide and dominant
-      } else {
-        productScale = 1.35; // zoom in on Sentinel to feel vertical and powerful
-      }
-      
-      const drawWidth = img.width * coverScale * productScale;
-      const drawHeight = img.height * coverScale * productScale;
+      const drawWidth = img.width * containScale;
+      const drawHeight = img.height * containScale;
 
       // Re-center drawing coordinates
       const xOffset = (canvas.width - drawWidth) / 2;
@@ -248,7 +241,15 @@ export default function FrameSequenceScroll({
   const showFallback = !isCanvasReady;
 
   return (
-    <section ref={containerRef} className="sequence-shell" style={{ position: 'relative', width: '100%' }}>
+    <section 
+      ref={containerRef} 
+      className="sequence-shell" 
+      style={{ 
+        position: 'relative', 
+        width: '100%',
+        backgroundColor: '#050507' // outer page container remains dark
+      }}
+    >
       <div 
         ref={stickyRef}
         className="sequence-sticky"
@@ -257,23 +258,27 @@ export default function FrameSequenceScroll({
           width: '100%',
           height: '100vh',
           overflow: 'hidden',
-          backgroundColor: 'var(--bg-primary)',
+          backgroundColor: '#050507',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center'
         }}
       >
-        {/* Full-width and height canvas container */}
+        {/* Centered Product Stage (restricting viewport height and width) */}
         <div 
+          className="product-stage"
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
+            position: 'relative',
+            width: 'min(92vw, 1500px)',
+            height: 'min(78vh, 860px)',
+            backgroundColor: backgroundColor,
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: '12px',
+            overflow: 'hidden',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            boxShadow: '0 25px 60px rgba(0,0,0,0.65)',
             zIndex: 5
           }}
         >
@@ -285,7 +290,7 @@ export default function FrameSequenceScroll({
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: 'contain',
               position: 'absolute',
               top: 0,
               left: 0
@@ -300,11 +305,11 @@ export default function FrameSequenceScroll({
               width: '100%', 
               height: '100%',
               display: 'block',
-              objectFit: 'cover'
+              objectFit: 'contain'
             }}
           />
 
-          {/* Floating Technical HUD Callouts */}
+          {/* Floating Technical HUD Callouts relative to centered stage */}
           <div 
             className="visual-hud-overlay"
             style={{
@@ -329,16 +334,16 @@ export default function FrameSequenceScroll({
             ))}
           </div>
 
-          {/* Corner HUD Data Logs */}
+          {/* Corner HUD Data Logs relative to stage */}
           {hasStartedLoading && (
             <div 
               style={{
                 position: 'absolute',
-                top: '100px',
-                right: '40px',
+                top: '30px',
+                right: '30px',
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.6rem',
-                color: 'var(--text-muted)',
+                color: 'rgba(0, 0, 0, 0.45)', // dark text for light gray background
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '4px',
@@ -352,7 +357,7 @@ export default function FrameSequenceScroll({
             </div>
           )}
 
-          {/* Sentinel measurement grid lines */}
+          {/* Sentinel measurement scale overlay relative to stage */}
           {productName === 'Sentinel' && (
             <>
               <div 
@@ -362,8 +367,7 @@ export default function FrameSequenceScroll({
                   left: '15%',
                   height: '80%',
                   width: '1px',
-                  background: 'linear-gradient(to bottom, transparent, var(--accent-cyan), transparent)',
-                  opacity: 0.2,
+                  background: 'linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.15), transparent)',
                   zIndex: 10
                 }} 
               />
@@ -371,11 +375,10 @@ export default function FrameSequenceScroll({
                 style={{
                   position: 'absolute',
                   top: '15%',
-                  left: '16%',
+                  left: '17%',
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.55rem',
-                  color: 'var(--accent-cyan)',
-                  opacity: 0.4,
+                  color: 'rgba(0, 0, 0, 0.4)',
                   zIndex: 10
                 }}
               >
@@ -385,11 +388,10 @@ export default function FrameSequenceScroll({
                 style={{
                   position: 'absolute',
                   top: '50%',
-                  left: '16%',
+                  left: '17%',
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.55rem',
-                  color: 'var(--accent-cyan)',
-                  opacity: 0.4,
+                  color: 'rgba(0, 0, 0, 0.4)',
                   zIndex: 10
                 }}
               >
@@ -399,28 +401,15 @@ export default function FrameSequenceScroll({
                 style={{
                   position: 'absolute',
                   top: '85%',
-                  left: '16%',
+                  left: '17%',
                   fontFamily: 'var(--font-mono)',
                   fontSize: '0.55rem',
-                  color: 'var(--accent-cyan)',
-                  opacity: 0.4,
+                  color: 'rgba(0, 0, 0, 0.4)',
                   zIndex: 10
                 }}
               >
                 +0.0M
               </div>
-              <div 
-                className="scanning-beam" 
-                style={{
-                  position: 'absolute',
-                  left: '20%',
-                  width: '60%',
-                  height: '1px',
-                  background: 'linear-gradient(90deg, transparent, var(--accent-cyan), transparent)',
-                  opacity: 0.1,
-                  zIndex: 10
-                }} 
-              />
             </>
           )}
 
@@ -453,7 +442,7 @@ export default function FrameSequenceScroll({
           )}
         </div>
 
-        {/* Minimal Floating Stage Text Overlay (Bottom Left) */}
+        {/* Minimal Floating Stage Text Overlay (Bottom Left, relative to viewport stickyRef) */}
         <div 
           className="glass-panel"
           style={{
