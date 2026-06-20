@@ -10,124 +10,133 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        padding: '3rem 2rem',
+        padding: '2rem 1.5rem',
         position: 'relative',
         zIndex: 10,
-        maxWidth: '850px',
+        maxWidth: '800px',
         margin: '0 auto',
         textAlign: 'center',
         boxSizing: 'border-box'
       }}
     >
       {/* SAQR Logo - Subtle Brand Mark */}
-      <div style={{ marginBottom: '1.5rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
         <img 
           src={SAQR_ASSETS.logo} 
           alt="SAQR Logo" 
-          style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
+          style={{ height: '32px', width: 'auto', objectFit: 'contain' }} 
         />
       </div>
+
+      {/* Case Study Header */}
+      <p 
+        style={{
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.8rem',
+          color: 'var(--accent-blue)',
+          letterSpacing: '1px',
+          margin: '0 0 0.5rem 0',
+          textTransform: 'uppercase'
+        }}
+      >
+        An applied fictional case study by Hussein Mlhem.
+      </p>
 
       {/* Project Title */}
       <h1 
         className="intro-title" 
         style={{ 
-          fontSize: '3rem', 
-          margin: '0 0 1rem', 
+          fontSize: '2.5rem', 
+          margin: '0 0 0.75rem 0', 
           fontWeight: 900, 
-          letterSpacing: '1px',
+          letterSpacing: '0.5px',
           lineHeight: '1.2'
         }}
       >
         SAQR Energy Guard
       </h1>
 
-      {/* Clear Statement */}
+      {/* Short Support Line */}
       <p 
         style={{
-          fontSize: '1.25rem',
+          fontSize: '1.05rem',
           color: 'var(--text-secondary)',
-          lineHeight: '1.6',
-          marginBottom: '1.5rem',
-          fontWeight: 300
+          lineHeight: '1.5',
+          margin: '0 0 2rem 0',
+          fontWeight: 300,
+          maxWidth: '650px'
         }}
       >
-        A fictional product concept created by Hussein Mlhem as a capability test for a job opportunity.
+        Built to demonstrate creative direction, product storytelling, presentation design, video production, and interactive web execution.
       </p>
 
-      {/* Disclaimer Badge */}
-      <div style={{ marginBottom: '2rem' }}>
-        <span className="badge-warning" style={{ fontSize: '0.7rem', padding: '6px 14px', borderRadius: '30px' }}>
-          Concept project only — not an official commercial product.
-        </span>
-      </div>
-
-      {/* Clear Statement Line */}
-      <p 
+      {/* Clean Compact Heading */}
+      <h2 
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.85rem',
-          color: 'var(--text-secondary)',
-          letterSpacing: '0.5px',
-          marginBottom: '3rem',
-          fontWeight: 400
+          fontSize: '0.8rem',
+          color: 'var(--text-muted)',
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          margin: '0 0 1rem 0',
+          fontWeight: 500
         }}
       >
-        Three things to review: Interactive Website • Product Presentation • Cinematic Product Video
-      </p>
+        Review the complete concept package
+      </h2>
 
       {/* Three Minimal Cards */}
       <div 
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gap: '0.75rem',
           width: '100%',
-          marginBottom: '3.5rem'
+          marginBottom: '2.5rem'
         }}
       >
         <div 
           style={{
-            padding: '1.5rem 1rem',
+            padding: '1.25rem 1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             backgroundColor: 'rgba(10, 10, 15, 0.4)',
             textAlign: 'center'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>01 // WEB</span>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px' }}>Interactive Website</h3>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>01 // WEB</span>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Interactive Website</h3>
         </div>
 
         <div 
           style={{
-            padding: '1.5rem 1rem',
+            padding: '1.25rem 1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             backgroundColor: 'rgba(10, 10, 15, 0.4)',
             textAlign: 'center'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>02 // DECK</span>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px' }}>Product Presentation</h3>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>02 // DECK</span>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Product Presentation</h3>
         </div>
 
         <div 
           style={{
-            padding: '1.5rem 1rem',
+            padding: '1.25rem 1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             backgroundColor: 'rgba(10, 10, 15, 0.4)',
             textAlign: 'center'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.5rem' }}>03 // MOTION</span>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px' }}>Cinematic Product Video</h3>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>03 // MOTION</span>
+          <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Cinematic Product Video</h3>
         </div>
       </div>
 
       {/* Main CTA */}
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '3rem' }}>
         <button 
           onClick={onEnterExperience} 
           className="btn-primary" 
@@ -135,6 +144,23 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         >
           Enter Product Experience
         </button>
+      </div>
+
+      {/* Small Muted Disclaimer at the Bottom */}
+      <div 
+        style={{
+          position: 'absolute',
+          bottom: '1.5rem',
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          fontFamily: 'var(--font-mono)',
+          fontSize: '0.65rem',
+          color: 'var(--text-muted)',
+          opacity: 0.7
+        }}
+      >
+        Fictional concept — created for portfolio and job evaluation purposes.
       </div>
     </div>
   );

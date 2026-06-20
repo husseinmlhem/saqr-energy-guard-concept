@@ -142,23 +142,21 @@ export default function FrameSequenceScroll({
       const canvasRatio = canvas.width / canvas.height;
       const imgRatio = img.width / img.height;
       
-      let drawWidth, drawHeight;
+      // Calculate cover scale (no black bars / letterboxing in canvas)
+      const scaleX = canvas.width / img.width;
+      const scaleY = canvas.height / img.height;
+      const coverScale = Math.max(scaleX, scaleY);
       
-      // Determine scaling factor to fill the screen dominantly (avoiding gaps)
-      let scale = 1.0;
+      // Zoom factor for immersive presentation
+      let productScale = 1.0;
       if (productName === 'Defender') {
-        scale = 1.35; // scale up Defender frames to make it look full cinematic width
+        productScale = 1.45; // zoom in on Defender to feel wide and dominant
       } else {
-        scale = 1.25; // scale up Sentinel tower to make it feel tall and powerful
+        productScale = 1.35; // zoom in on Sentinel to feel vertical and powerful
       }
-
-      if (imgRatio > canvasRatio) {
-        drawWidth = canvas.width * scale;
-        drawHeight = (canvas.width / imgRatio) * scale;
-      } else {
-        drawHeight = canvas.height * scale;
-        drawWidth = (canvas.height * imgRatio) * scale;
-      }
+      
+      const drawWidth = img.width * coverScale * productScale;
+      const drawHeight = img.height * coverScale * productScale;
 
       // Re-center drawing coordinates
       const xOffset = (canvas.width - drawWidth) / 2;
@@ -297,9 +295,9 @@ export default function FrameSequenceScroll({
             className={`scroll-canvas ${showFallback ? '' : 'loaded'}`}
             style={{ 
               width: '100%', 
-              height: '100vh',
+              height: '100%',
               display: 'block',
-              objectFit: 'contain'
+              objectFit: 'cover'
             }}
           />
 
