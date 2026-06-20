@@ -62,18 +62,18 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </span>
       </div>
 
-      {/* Concise Line */}
+      {/* Clear Statement Line */}
       <p 
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.8rem',
           color: 'var(--accent-blue)',
           textTransform: 'uppercase',
-          letterSpacing: '2px',
+          letterSpacing: '1.5px',
           marginBottom: '3rem'
         }}
       >
-        Created as a complete showcase: Website • Product Presentation • Cinematic Product Video
+        Three things to review: Interactive Website • Product Presentation • Cinematic Product Video
       </p>
 
       {/* Three Minimal Cards */}
@@ -126,8 +126,8 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </div>
       </div>
 
-      {/* One Main Button */}
-      <div style={{ marginBottom: '5rem' }}>
+      {/* Main CTA & Secondary Links */}
+      <div style={{ marginBottom: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
         <button 
           onClick={onEnterExperience} 
           className="btn-primary" 
@@ -135,6 +135,42 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         >
           Enter Product Experience
         </button>
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          <a 
+            href={PROJECT_LINKS.youtubeWatchUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={{ 
+              color: 'var(--text-secondary)', 
+              textDecoration: 'none', 
+              fontSize: '0.75rem', 
+              fontFamily: 'var(--font-mono)',
+              borderBottom: '1px solid transparent',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--accent-blue)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+          >
+            Watch Video
+          </a>
+          <a 
+            href={PROJECT_LINKS.presentationViewUrl} 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            style={{ 
+              color: 'var(--text-secondary)', 
+              textDecoration: 'none', 
+              fontSize: '0.75rem', 
+              fontFamily: 'var(--font-mono)',
+              borderBottom: '1px solid transparent',
+              transition: 'all 0.3s'
+            }}
+            onMouseEnter={(e) => e.target.style.color = 'var(--accent-blue)'}
+            onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
+          >
+            View Presentation
+          </a>
+        </div>
       </div>
 
       {/* Small Footer */}

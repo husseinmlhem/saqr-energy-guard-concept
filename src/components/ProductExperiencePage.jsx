@@ -16,11 +16,13 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
 
   const [pdfExists, setPdfExists] = useState(false);
 
-  // Auto-detect if presentation PDF exists in the assets directory
+  // Auto-detect if presentation PDF exists in the assets directory using range request
   useEffect(() => {
-    fetch(PROJECT_LINKS.presentationViewUrl, { method: 'HEAD' })
+    fetch(PROJECT_LINKS.presentationViewUrl, {
+      headers: { Range: 'bytes=0-0' }
+    })
       .then((res) => {
-        if (res.ok) {
+        if (res.status === 200 || res.status === 206) {
           setPdfExists(true);
         } else {
           setPdfExists(false);

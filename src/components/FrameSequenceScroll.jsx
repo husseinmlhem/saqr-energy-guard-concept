@@ -18,6 +18,7 @@ export default function FrameSequenceScroll({
   const [loadCount, setLoadCount] = useState(0);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(1);
   const [isCanvasReady, setIsCanvasReady] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
   // 1. Trigger lazy-loading when container approaches viewport
   useEffect(() => {
@@ -38,7 +39,7 @@ export default function FrameSequenceScroll({
     return () => observer.disconnect();
   }, []);
 
-  // 2. Progressive background preloader
+  // 2. Progressive background preloader with error detection
   useEffect(() => {
     if (!hasStartedLoading) return;
 
@@ -64,10 +65,32 @@ export default function FrameSequenceScroll({
     };
 
     const preload = async () => {
-      // Preload first frame immediately to display to the user
-      await loadImage(1);
+      const firstFrameUrl = getFramePath(1);
       
-      if (!isMounted) return;
+      // Load frame 1 immediately to transition from poster
+      const firstFrameImg = new Image();
+      firstFrameImg.src = firstFrameUrl;
+      
+      const success = await new Promise((resolve) => {
+        firstFrameImg.onload = () => {
+          if (isMounted) {
+            setLoadedImages(prev => ({ ...prev, 1: firstFrameImg }));
+            setLoadCount(1);
+          }
+          resolve(true);
+        };
+        firstFrameImg.onerror = () => {
+          console.error("Frame not found:", firstFrameUrl);
+          if (isMounted) {
+            setLoadError(firstFrameUrl);
+          }
+          resolve(false);
+        };
+      });
+
+      if (!success || !isMounted) {
+        return; // stop execution and show error overlay
+      }
 
       // Preload remaining frames in batches of 4
       const batchSize = 4;
@@ -398,6 +421,34 @@ export default function FrameSequenceScroll({
                 }} 
               />
             </>
+          )}
+
+          {/* Visible Error Overlay if First Frame Fails to Load */}
+          {loadError && (
+            <div 
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                border: '2px solid rgba(239, 68, 68, 0.8)',
+                padding: '2rem',
+                borderRadius: '8px',
+                color: '#ef4444',
+                fontFamily: 'var(--font-mono)',
+                zIndex: 99,
+                maxWidth: '90%',
+                textAlign: 'center',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.8)'
+              }}
+            >
+              <h3 style={{ marginBottom: '1rem', fontWeight: 'bold' }}>[ FRAME_LOAD_ERROR ]</h3>
+              <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>Failed to load the initial animation frame.</p>
+              <code style={{ display: 'block', wordBreak: 'break-all', backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: '0.5rem', borderRadius: '4px', fontSize: '0.75rem', marginTop: '1rem', color: '#fca5a5' }}>
+                {loadError}
+              </code>
+            </div>
           )}
         </div>
 
