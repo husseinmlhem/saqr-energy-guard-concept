@@ -25,7 +25,7 @@ export default function SentinelCoverageCone() {
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.75rem',
-              color: 'var(--accent-cyan)',
+              color: 'var(--accent-cyan)', // Unified cyan HUD brand color
               textTransform: 'uppercase',
               letterSpacing: '3px',
               fontWeight: 'bold',
@@ -60,7 +60,7 @@ export default function SentinelCoverageCone() {
           </p>
         </div>
 
-        {/* 2. Dark graphite stage wrapper */}
+        {/* Dark graphite stage wrapper */}
         <div 
           style={{
             backgroundColor: '#111317', // Dark graphite stage
@@ -83,7 +83,7 @@ export default function SentinelCoverageCone() {
               minWidth: '300px',
               maxWidth: '500px',
               padding: '2rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: 'rgba(255, 255, 255, 0.01)',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               backdropFilter: 'blur(20px)'
             }}
@@ -107,7 +107,7 @@ export default function SentinelCoverageCone() {
             </ul>
           </div>
 
-          {/* Right panel: Sentinel rendering inside controlled product image frame with light gray background */}
+          {/* Right panel: Sentinel rendering inside controlled product image frame with dark graphite background */}
           <div 
             style={{
               position: 'relative',
@@ -116,10 +116,10 @@ export default function SentinelCoverageCone() {
               display: 'flex',
               alignItems: 'flex-end',
               justifyContent: 'center',
-              backgroundColor: '#b8babb', // Product frame environment background
+              backgroundColor: '#16191f', // Dark graphite frame
               borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              overflow: 'visible',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              overflow: 'hidden',
               paddingBottom: '20px'
             }}
           >
@@ -132,8 +132,7 @@ export default function SentinelCoverageCone() {
                 width: 'auto',
                 objectFit: 'contain',
                 position: 'relative',
-                zIndex: 3,
-                filter: 'drop-shadow(0 15px 30px rgba(0, 0, 0, 0.25))'
+                zIndex: 3
               }}
             />
 
@@ -150,29 +149,29 @@ export default function SentinelCoverageCone() {
                 zIndex: 4
               }}
             >
-              {/* Coverage cone projection lines */}
-              <polygon points="225,110 45,30 405,30" fill="rgba(0, 255, 213, 0.04)" stroke="rgba(0, 255, 213, 0.2)" strokeWidth="1" strokeDasharray="3,3" />
+              {/* Coverage cone projection lines in cyan */}
+              <polygon points="225,110 45,30 405,30" fill="rgba(0, 255, 213, 0.04)" stroke="var(--accent-cyan)" strokeWidth="1" strokeDasharray="3,3" />
               <line x1="225" y1="110" x2="225" y2="20" stroke="rgba(0, 255, 213, 0.15)" strokeWidth="1" strokeDasharray="5,5" />
               
               {/* Scan indicator line */}
               <line x1="45" y1="30" x2="405" y2="30" stroke="#00ffd5" strokeWidth="1.5" style={{ opacity: 0.7 }} />
 
               {/* Height tags */}
-              <text x="235" y="25" fill="#334155" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+12.4M</text>
-              <text x="235" y="70" fill="#334155" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+6.2M</text>
+              <text x="235" y="25" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+12.4M</text>
+              <text x="235" y="70" fill="var(--text-secondary)" fontFamily="var(--font-mono)" fontSize="8" fontWeight="bold">+6.2M</text>
             </svg>
 
-            {/* Labels overlay */}
-            <div style={{ position: 'absolute', top: '105px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#042f2e', fontWeight: 'bold' }}>
+            {/* Labels overlay in cyan/white */}
+            <div style={{ position: 'absolute', top: '105px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               SENSOR CROWN
             </div>
-            <div style={{ position: 'absolute', top: '240px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#042f2e', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '240px', left: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               VERTICAL CORE
             </div>
-            <div style={{ position: 'absolute', top: '340px', right: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#042f2e', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '340px', right: '15%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               BASE ANCHOR
             </div>
-            <div style={{ position: 'absolute', top: '40px', right: '10%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#0f766e', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '40px', right: '10%', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               COVERAGE FIELD
             </div>
           </div>

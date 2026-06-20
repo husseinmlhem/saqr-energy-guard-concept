@@ -25,7 +25,7 @@ export default function DefenderBlueprint() {
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.75rem',
-              color: 'var(--accent-blue)',
+              color: 'var(--accent-cyan)', // Unified cyan HUD brand color
               textTransform: 'uppercase',
               letterSpacing: '3px',
               fontWeight: 'bold',
@@ -60,7 +60,7 @@ export default function DefenderBlueprint() {
           </p>
         </div>
 
-        {/* 2. Dark graphite stage wrapper */}
+        {/* Dark graphite stage wrapper */}
         <div 
           style={{
             backgroundColor: '#111317', // Dark graphite stage
@@ -75,7 +75,7 @@ export default function DefenderBlueprint() {
             flexWrap: 'wrap'
           }}
         >
-          {/* Left panel: Controlled product image frame with light gray background */}
+          {/* Left panel: Controlled product image frame inside dark graphite container */}
           <div 
             style={{
               position: 'relative',
@@ -84,10 +84,10 @@ export default function DefenderBlueprint() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              backgroundColor: '#bcbcbd', // Product frame environment background
+              backgroundColor: '#16191f', // Dark graphite frame to match the theme
               borderRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              overflow: 'visible'
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              overflow: 'hidden'
             }}
           >
             {/* Main Product Image (Defender) */}
@@ -99,12 +99,11 @@ export default function DefenderBlueprint() {
                 width: 'auto',
                 objectFit: 'contain',
                 position: 'relative',
-                zIndex: 3,
-                filter: 'drop-shadow(0 15px 30px rgba(0, 0, 0, 0.25))'
+                zIndex: 3
               }}
             />
 
-            {/* SVG HUD Blueprint overlay lines */}
+            {/* SVG HUD Blueprint overlay lines in cyan */}
             <svg 
               style={{
                 position: 'absolute',
@@ -118,33 +117,33 @@ export default function DefenderBlueprint() {
               }}
             >
               {/* Line to Optical Core */}
-              <path d="M 200 120 L 100 120 L 70 140" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="3,3" />
-              <circle cx="200" cy="120" r="3" fill="#2563eb" />
+              <path d="M 225 120 L 125 120 L 95 140" fill="none" stroke="var(--accent-cyan)" strokeWidth="1.5" strokeDasharray="3,3" />
+              <circle cx="225" cy="120" r="3" fill="var(--accent-cyan)" />
               
               {/* Line to Side Module */}
-              <path d="M 330 160 L 400 160 L 430 140" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="3,3" />
-              <circle cx="330" cy="160" r="3" fill="#2563eb" />
+              <path d="M 310 160 L 360 160 L 390 140" fill="none" stroke="var(--accent-cyan)" strokeWidth="1.5" strokeDasharray="3,3" />
+              <circle cx="310" cy="160" r="3" fill="var(--accent-cyan)" />
 
               {/* Line to Stabilized Base */}
-              <path d="M 240 280 L 320 280 L 360 300" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="3,3" />
-              <circle cx="240" cy="280" r="3" fill="#2563eb" />
+              <path d="M 230 280 L 310 280 L 340 300" fill="none" stroke="var(--accent-cyan)" strokeWidth="1.5" strokeDasharray="3,3" />
+              <circle cx="230" cy="280" r="3" fill="var(--accent-cyan)" />
 
               {/* Line to Power Layer */}
-              <path d="M 230 200 L 120 200 L 90 220" fill="none" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="3,3" />
-              <circle cx="230" cy="200" r="3" fill="#2563eb" />
+              <path d="M 220 200 L 140 200 L 110 220" fill="none" stroke="var(--accent-cyan)" strokeWidth="1.5" strokeDasharray="3,3" />
+              <circle cx="220" cy="200" r="3" fill="var(--accent-cyan)" />
             </svg>
 
-            {/* Labels overlay */}
-            <div style={{ position: 'absolute', top: '135px', left: '10px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#1e3a8a', fontWeight: 'bold' }}>
+            {/* Labels overlay in cyan/white */}
+            <div style={{ position: 'absolute', top: '135px', left: '25px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               OPTICAL CORE
             </div>
-            <div style={{ position: 'absolute', top: '215px', left: '30px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#1e3a8a', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '215px', left: '45px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               POWER LAYER
             </div>
-            <div style={{ position: 'absolute', top: '135px', right: '10px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#1e3a8a', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '135px', right: '35px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               SIDE MODULE
             </div>
-            <div style={{ position: 'absolute', top: '295px', right: '40px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#1e3a8a', fontWeight: 'bold' }}>
+            <div style={{ position: 'absolute', top: '295px', right: '70px', fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', fontWeight: 'bold' }}>
               STABILIZED BASE
             </div>
           </div>
@@ -157,7 +156,7 @@ export default function DefenderBlueprint() {
               minWidth: '300px',
               maxWidth: '500px',
               padding: '2rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              backgroundColor: 'rgba(255, 255, 255, 0.01)',
               border: '1px solid rgba(255, 255, 255, 0.05)',
               backdropFilter: 'blur(20px)'
             }}
@@ -166,15 +165,15 @@ export default function DefenderBlueprint() {
               Speculative Module Breakdown
             </h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
                 <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Optical Core</strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>High-fidelity lens array designed to track proximity thermal anomalies.</span>
               </li>
-              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
                 <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Stabilized Base</strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Rotational motor matrix offering 360-degree environmental scan sweeps.</span>
               </li>
-              <li style={{ borderLeft: '3px solid var(--accent-blue)', paddingLeft: '1rem' }}>
+              <li style={{ borderLeft: '3px solid var(--accent-cyan)', paddingLeft: '1rem' }}>
                 <strong style={{ display: 'block', fontSize: '0.85rem', color: 'var(--text-primary)' }}>Modular Side Plates</strong>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Detachable sand-beige composite shells protecting key computation nodes.</span>
               </li>

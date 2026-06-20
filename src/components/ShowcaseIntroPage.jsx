@@ -20,19 +20,19 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
       }}
     >
       {/* 1. SAQR Brand Logo (Moved higher and larger) */}
-      <div style={{ marginBottom: '3.5rem', marginTop: '-4vh' }}>
+      <div style={{ marginBottom: '4rem', marginTop: '-10vh' }}>
         <img 
           src={SAQR_ASSETS.logo} 
           alt="SAQR Logo" 
-          style={{ height: '48px', width: 'auto', objectFit: 'contain' }} 
+          style={{ height: '56px', width: 'auto', objectFit: 'contain' }} 
         />
       </div>
 
-      {/* 2. One line creator credit */}
+      {/* 2. One line creator credit (increased size and highlighted creator name) */}
       <p 
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.85rem',
+          fontSize: '1rem',
           color: 'var(--text-secondary)',
           letterSpacing: '1.5px',
           margin: '0 0 3rem 0',
@@ -40,7 +40,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
           lineHeight: '1.6'
         }}
       >
-        An applied fictional case study by <span style={{ color: 'var(--accent-cyan)', fontWeight: 'bold', textShadow: '0 0 12px rgba(0, 255, 213, 0.45)' }}>Hussein Mlhem</span>.
+        An applied fictional case study by <span style={{ color: '#00ffd5', fontWeight: '700', textShadow: '0 0 15px rgba(0, 255, 213, 0.8), 0 0 25px rgba(0, 255, 213, 0.5)' }}>Hussein Mlhem</span>.
       </p>
 
       {/* 4. Single Inline Deliverable List */}
@@ -61,7 +61,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
       >
         <span>Interactive Website</span>
         <span style={{ color: 'var(--text-muted)' }}>•</span>
-        <span style={{ color: 'var(--accent-cyan)', fontWeight: 'bold', textShadow: '0 0 10px rgba(0, 255, 213, 0.4)' }}>Cinematic Product Video</span>
+        <span style={{ color: '#00ffd5', fontWeight: 'bold', textShadow: '0 0 10px rgba(0, 255, 213, 0.4)' }}>Cinematic Product Video</span>
         <span style={{ color: 'var(--text-muted)' }}>•</span>
         <span>Product Presentation</span>
       </div>
