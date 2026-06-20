@@ -70,28 +70,28 @@ export default function ContactSection({ className = '' }) {
         {/* Email */}
         {renderContactCard(
           "Email Address",
-          email,
+          "Hussein.mlhem@gmail.com",
           `mailto:${email}`,
           "MAIL // 02",
-          !!email
+          true
         )}
 
         {/* Phone / WhatsApp */}
         {renderContactCard(
           "Phone / WhatsApp",
-          phone,
-          `https://wa.me/${phone?.replace(/[^0-9]/g, '')}`,
+          "+971 54 288 2950",
+          `tel:${phone}`,
           "TEL // 03",
-          !!phone
+          true
         )}
 
         {/* LinkedIn */}
         {renderContactCard(
           "LinkedIn Profile",
-          "View LinkedIn",
+          "linkedin.com/in/hussein-mlhem",
           linkedin,
           "LNKD // 04",
-          !!linkedin
+          true
         )}
 
       </div>

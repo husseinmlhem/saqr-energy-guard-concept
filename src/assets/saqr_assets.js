@@ -34,7 +34,7 @@ export const PROJECT_LINKS = {
   // Creative director contact information and social profiles
   portfolioWebsite: "https://www.husseinmlhem.com",
   githubRepo: "https://github.com/husseinmlhem/saqr-energy-guard-concept",
-  email: "",
-  phone: "",
-  linkedin: ""
+  email: "Hussein.mlhem@gmail.com",
+  phone: "+971542882950",
+  linkedin: "https://www.linkedin.com/in/hussein-mlhem"
 };

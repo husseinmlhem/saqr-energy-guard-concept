@@ -1,5 +1,5 @@
 import React from 'react';
-import { SAQR_ASSETS, PROJECT_LINKS } from '../assets/saqr_assets';
+import { SAQR_ASSETS } from '../assets/saqr_assets';
 
 export default function ShowcaseIntroPage({ onEnterExperience }) {
   return (
@@ -19,12 +19,12 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         boxSizing: 'border-box'
       }}
     >
-      {/* SAQR Logo - Dominant Visual */}
-      <div style={{ marginBottom: '2.5rem' }}>
+      {/* SAQR Logo - Subtle Brand Mark */}
+      <div style={{ marginBottom: '1.5rem' }}>
         <img 
           src={SAQR_ASSETS.logo} 
           alt="SAQR Logo" 
-          style={{ height: '80px', width: 'auto', objectFit: 'contain' }} 
+          style={{ height: '36px', width: 'auto', objectFit: 'contain' }} 
         />
       </div>
 
@@ -66,11 +66,11 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
       <p 
         style={{
           fontFamily: 'var(--font-mono)',
-          fontSize: '0.8rem',
-          color: 'var(--accent-blue)',
-          textTransform: 'uppercase',
-          letterSpacing: '1.5px',
-          marginBottom: '3rem'
+          fontSize: '0.85rem',
+          color: 'var(--text-secondary)',
+          letterSpacing: '0.5px',
+          marginBottom: '3rem',
+          fontWeight: 400
         }}
       >
         Three things to review: Interactive Website • Product Presentation • Cinematic Product Video
@@ -126,8 +126,8 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </div>
       </div>
 
-      {/* Main CTA & Secondary Links */}
-      <div style={{ marginBottom: '5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+      {/* Main CTA */}
+      <div style={{ marginBottom: '2rem' }}>
         <button 
           onClick={onEnterExperience} 
           className="btn-primary" 
@@ -135,72 +135,8 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         >
           Enter Product Experience
         </button>
-        <div style={{ display: 'flex', gap: '2rem' }}>
-          <a 
-            href={PROJECT_LINKS.youtubeWatchUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            style={{ 
-              color: 'var(--text-secondary)', 
-              textDecoration: 'none', 
-              fontSize: '0.75rem', 
-              fontFamily: 'var(--font-mono)',
-              borderBottom: '1px solid transparent',
-              transition: 'all 0.3s'
-            }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--accent-blue)'}
-            onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
-          >
-            Watch Video
-          </a>
-          <a 
-            href={PROJECT_LINKS.presentationViewUrl} 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            style={{ 
-              color: 'var(--text-secondary)', 
-              textDecoration: 'none', 
-              fontSize: '0.75rem', 
-              fontFamily: 'var(--font-mono)',
-              borderBottom: '1px solid transparent',
-              transition: 'all 0.3s'
-            }}
-            onMouseEnter={(e) => e.target.style.color = 'var(--accent-blue)'}
-            onMouseLeave={(e) => e.target.style.color = 'var(--text-secondary)'}
-          >
-            View Presentation
-          </a>
-        </div>
       </div>
-
-      {/* Small Footer */}
-      <footer 
-        style={{
-          fontFamily: 'var(--font-mono)',
-          fontSize: '0.75rem',
-          color: 'var(--text-muted)',
-          width: '100%',
-          borderTop: '1px solid var(--border-color)',
-          paddingTop: '2rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem'
-        }}
-      >
-        <span>Created by Hussein Mlhem</span>
-        <a 
-          href={PROJECT_LINKS.portfolioWebsite} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          style={{ color: 'var(--text-muted)', textDecoration: 'none', transition: 'color 0.3s' }}
-          onMouseEnter={(e) => e.target.style.color = 'var(--accent-blue)'}
-          onMouseLeave={(e) => e.target.style.color = 'var(--text-muted)'}
-        >
-          www.husseinmlhem.com
-        </a>
-      </footer>
     </div>
   );
 }
+
