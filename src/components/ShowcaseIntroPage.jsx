@@ -20,7 +20,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
       }}
     >
       {/* 1. Small Centered SAQR Logo */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1.25rem' }}>
         <img 
           src={SAQR_ASSETS.logo} 
           alt="SAQR Logo" 
@@ -28,35 +28,21 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         />
       </div>
 
-      {/* 2. One short line under the logo */}
+      {/* 2. One Short Line */}
       <p 
         style={{
           fontFamily: 'var(--font-mono)',
           fontSize: '0.8rem',
           color: 'var(--accent-blue)',
-          letterSpacing: '1px',
-          margin: '0 0 0.5rem 0',
+          letterSpacing: '1.5px',
+          margin: '0 0 2rem 0',
           textTransform: 'uppercase'
         }}
       >
         An applied fictional case study by Hussein Mlhem.
       </p>
 
-      {/* 3. Main Title */}
-      <h1 
-        className="intro-title" 
-        style={{ 
-          fontSize: '2.8rem', 
-          margin: '0 0 2rem 0', 
-          fontWeight: 900, 
-          letterSpacing: '0.5px',
-          lineHeight: '1.2'
-        }}
-      >
-        SAQR Energy Guard
-      </h1>
-
-      {/* 4. Small Heading */}
+      {/* 3. Small Heading */}
       <h2 
         style={{
           fontFamily: 'var(--font-mono)',
@@ -71,58 +57,67 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         Review three deliverables
       </h2>
 
-      {/* 5. Three Minimal Items/Cards */}
-      <div 
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '0.75rem',
-          width: '100%',
-          marginBottom: '2.5rem'
-        }}
-      >
+      {/* 4. Three Deliverables in ONE row on desktop */}
+      <div className="showcase-deliverables-grid">
+        {/* Interactive Website */}
         <div 
           style={{
-            padding: '1.25rem 1rem',
+            padding: '1.5rem 1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             backgroundColor: 'rgba(10, 10, 15, 0.4)',
-            textAlign: 'center'
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: '110px'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>01 // WEB</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>01 // WEB</span>
           <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Interactive Website</h3>
         </div>
 
+        {/* Product Presentation */}
         <div 
           style={{
-            padding: '1.25rem 1rem',
+            padding: '1.5rem 1rem',
             border: '1px solid var(--border-color)',
             borderRadius: '6px',
             backgroundColor: 'rgba(10, 10, 15, 0.4)',
-            textAlign: 'center'
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: '110px'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>02 // DECK</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>02 // DECK</span>
           <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Product Presentation</h3>
         </div>
 
+        {/* Cinematic Product Video (Highlighted) */}
         <div 
           style={{
-            padding: '1.25rem 1rem',
-            border: '1px solid var(--border-color)',
+            padding: '1.5rem 1rem',
+            border: '1px solid rgba(0, 255, 213, 0.3)',
             borderRadius: '6px',
-            backgroundColor: 'rgba(10, 10, 15, 0.4)',
-            textAlign: 'center'
+            backgroundColor: 'rgba(10, 10, 15, 0.5)',
+            boxShadow: '0 0 15px rgba(0, 255, 213, 0.08)',
+            textAlign: 'center',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            height: '110px',
+            position: 'relative'
           }}
         >
-          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.4rem' }}>03 // MOTION</span>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.4rem', fontWeight: 'bold' }}>03 // Featured</span>
           <h3 style={{ fontSize: '0.9rem', fontWeight: 500, color: 'var(--text-primary)', letterSpacing: '0.5px', margin: 0 }}>Cinematic Product Video</h3>
         </div>
       </div>
 
-      {/* 6. One Main CTA Button */}
-      <div style={{ marginBottom: '3rem' }}>
+      {/* 5. One Main CTA Button */}
+      <div style={{ marginBottom: '3.5rem' }}>
         <button 
           onClick={onEnterExperience} 
           className="btn-primary" 
@@ -132,7 +127,7 @@ export default function ShowcaseIntroPage({ onEnterExperience }) {
         </button>
       </div>
 
-      {/* 7. Tiny Muted Bottom Note */}
+      {/* 6. Tiny Muted Bottom Note */}
       <div 
         style={{
           position: 'absolute',

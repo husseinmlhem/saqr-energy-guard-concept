@@ -3,8 +3,8 @@ import { SAQR_ASSETS } from '../assets/saqr_assets';
 
 export default function ProductHero({ onExploreClick, onBackToShowcase }) {
   return (
-    <section className="product-hero-section">
-      {/* Cinematic Background Image */}
+    <section className="product-hero-section" style={{ backgroundColor: '#050507' }}>
+      {/* Cinematic Background Image (full brightness and dominant) */}
       <div 
         style={{
           position: 'absolute',
@@ -15,11 +15,11 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
           backgroundImage: `url(${SAQR_ASSETS.mainHero})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          opacity: 0.45,
+          opacity: 0.95,
           zIndex: 1
         }}
       />
-      {/* Gradient Vignette Overlay */}
+      {/* Subtle Vignette Overlay for cinematic depth & text legibility */}
       <div 
         style={{
           position: 'absolute',
@@ -27,7 +27,7 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'radial-gradient(circle at center, transparent 30%, rgba(5, 5, 7, 0.95) 90%), linear-gradient(to bottom, rgba(5,5,7,0.5) 0%, rgba(5,5,7,1) 100%)',
+          background: 'radial-gradient(circle at center, rgba(5, 5, 7, 0.1) 0%, rgba(5, 5, 7, 0.7) 90%), linear-gradient(to bottom, rgba(5,5,7,0) 50%, rgba(5,5,7,0.9) 100%)',
           zIndex: 2
         }}
       />
@@ -64,12 +64,12 @@ export default function ProductHero({ onExploreClick, onBackToShowcase }) {
         </div>
         
         {/* Title */}
-        <h1 className="hero-title" style={{ fontSize: '3.8rem', marginBottom: '0.75rem', lineHeight: '1.1' }}>
+        <h1 className="hero-title" style={{ fontSize: '3.8rem', marginBottom: '0.75rem', lineHeight: '1.1', textShadow: '0 4px 12px rgba(0,0,0,0.8)' }}>
           SAQR Energy Guard
         </h1>
 
         {/* Subtitle */}
-        <p className="hero-subtitle" style={{ fontSize: '1.15rem', fontWeight: 300, maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: '1.5' }}>
+        <p className="hero-subtitle" style={{ fontSize: '1.15rem', fontWeight: 300, maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: '1.5', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
           A fictional dual-device concept for futuristic environmental intelligence.
         </p>
         

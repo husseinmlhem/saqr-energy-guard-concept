@@ -169,56 +169,142 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         onBackToShowcase={onBackToShowcase}
       />
 
-      {/* 2. Mission / Concept Statement */}
+      {/* 2. Threat Simulation Field */}
       <section 
-        className="mission-section" 
+        className="simulation-field-section" 
         style={{ 
-          padding: '8rem 2rem', 
-          maxWidth: '1000px', 
+          padding: '6rem 2rem', 
+          maxWidth: '1200px', 
           margin: '0 auto', 
           textAlign: 'center',
           position: 'relative'
         }}
       >
-        <div style={{ marginBottom: '3rem' }}>
-          <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Speculative Vision</p>
-          <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2.2rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>Two devices. One speculative protection system.</h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', fontWeight: 300, lineHeight: '1.7', maxWidth: '800px', margin: '0 auto' }}>
-            SAQR Energy Guard explores how product storytelling, visual identity, motion, presentation design, and interactive web experience can merge into one complete fictional launch concept.
-          </p>
-        </div>
+        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Simulated Threat Field</p>
+        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2.2rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Threat Simulation Field</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 300, marginBottom: '3rem', maxWidth: '800px', margin: '0 auto 3rem' }}>
+          Abstract scenario mapping for a fictional protection concept.
+        </p>
 
-        {/* Abstract indicators and connections */}
-        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginTop: '4rem', flexWrap: 'wrap', gap: '2rem' }}>
-          <div style={{ textAlign: 'center', flex: '1', minWidth: '200px' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.5rem' }}>01 // SYSTEM</span>
-            <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Concept System</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Strategic device positioning and facility integration.</p>
-          </div>
-          
-          <div style={{ width: '80px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--accent-blue), transparent)', display: 'block', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '-2px', left: '50%', width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue)' }} />
+        {/* Digital Terrain Grid */}
+        <div 
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '350px',
+            backgroundColor: '#07070a',
+            border: '1px solid var(--border-color)',
+            borderRadius: '8px',
+            backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px)',
+            backgroundSize: '30px 30px',
+            overflow: 'hidden',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.5)'
+          }}
+        >
+          {/* Scanning Sweeping Laser Line */}
+          <div 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(to right, transparent, rgba(0, 240, 255, 0.05) 50%, transparent 100%)',
+              animation: 'sweep-laser 8s linear infinite',
+              pointerEvents: 'none'
+            }}
+          />
+
+          {/* SVG paths and markers */}
+          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
+            <path d="M 150 120 L 450 220 L 750 100" fill="none" stroke="rgba(0, 240, 255, 0.2)" strokeWidth="1" strokeDasharray="5,5" />
+            <path d="M 450 220 L 880 280" fill="none" stroke="rgba(0, 255, 213, 0.2)" strokeWidth="1" strokeDasharray="3,3" />
+          </svg>
+
+          {/* Sentinel Node */}
+          <div style={{ position: 'absolute', top: '100px', left: '15%', transform: 'translate(-50%, -50%)', textAlign: 'left' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--accent-cyan)', boxShadow: '0 0 10px var(--accent-cyan)', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--text-primary)', marginLeft: '10px', verticalAlign: 'middle', textTransform: 'uppercase' }}>SENTINEL_NODE // SNT-V1</span>
           </div>
 
-          <div style={{ textAlign: 'center', flex: '1', minWidth: '200px' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.5rem' }}>02 // MOTION</span>
-            <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Motion Reveal</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Modular parts and telescopic lift animations.</p>
+          {/* Defender Node */}
+          <div style={{ position: 'absolute', top: '220px', left: '45%', transform: 'translate(-50%, -50%)', textAlign: 'left' }}>
+            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue)', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-primary)', marginLeft: '10px', verticalAlign: 'middle', textTransform: 'uppercase' }}>DEFENDER_UNIT // DFN-V1</span>
           </div>
 
-          <div style={{ width: '80px', height: '1px', background: 'linear-gradient(90deg, transparent, var(--accent-blue), transparent)', display: 'block', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: '-2px', left: '50%', width: '5px', height: '5px', borderRadius: '50%', backgroundColor: 'var(--accent-blue)', boxShadow: '0 0 10px var(--accent-blue)' }} />
+          {/* Threat Point A */}
+          <div style={{ position: 'absolute', top: '80px', left: '75%', transform: 'translate(-50%, -50%)', textAlign: 'left' }} className="threat-blink">
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 10px #ef4444', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#ef4444', marginLeft: '8px', verticalAlign: 'middle' }}>ANOMALY_01: THERMAL_SPIKE</span>
           </div>
 
-          <div style={{ textAlign: 'center', flex: '1', minWidth: '200px' }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.5rem' }}>03 // EXECUTION</span>
-            <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1rem', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Interactive Experience</h4>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Scroll-driven web execution and assembly rendering.</p>
+          {/* Threat Point B */}
+          <div style={{ position: 'absolute', top: '280px', left: '85%', transform: 'translate(-50%, -50%)', textAlign: 'left' }} className="threat-blink">
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444', boxShadow: '0 0 10px #ef4444', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: '#ef4444', marginLeft: '8px', verticalAlign: 'middle' }}>ANOMALY_02: SIGNAL_CORRUPT</span>
           </div>
         </div>
       </section>
 
-      {/* 3. Defender Immersive Scroll Assembly */}
+      {/* 3. Intelligence Layer Stack */}
+      <section 
+        className="layer-stack-section" 
+        style={{ 
+          padding: '6rem 2rem', 
+          maxWidth: '1000px', 
+          margin: '0 auto', 
+          textAlign: 'center'
+        }}
+      >
+        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Modular Architecture</p>
+        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2.2rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Intelligence Layer Stack</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 300, marginBottom: '3rem', maxWidth: '800px', margin: '0 auto 3rem' }}>
+          Four visual layers combine into one speculative awareness model.
+        </p>
+
+        {/* Stacked Panels */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+          {[
+            { step: "01", name: "Visual Layer", desc: "Real-time high-fidelity rendering and visual asset management.", color: 'var(--accent-blue)' },
+            { step: "02", name: "Signal Layer", desc: "Speculative environmental radar sweeps and sensor arrays.", color: 'var(--accent-cyan)' },
+            { step: "03", name: "Motion Layer", desc: "Cinematic motion reveals and dual-device transition sequences.", color: 'var(--accent-blue)' },
+            { step: "04", name: "Decision Layer", desc: "Fictional telemetry, coordinated threat containment models.", color: 'var(--accent-cyan)' }
+          ].map((layer, index) => (
+            <div 
+              key={index}
+              style={{
+                width: '100%',
+                maxWidth: '800px',
+                padding: '1.75rem 2rem',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                background: 'rgba(10, 10, 15, 0.7)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                textAlign: 'left',
+                boxShadow: `0 ${index * 8}px ${index * 12}px rgba(0,0,0,0.4)`,
+                transform: `translateY(-${index * 4}px)`,
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.25rem', color: layer.color, fontWeight: 'bold' }}>{layer.step}</span>
+                <div>
+                  <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.1rem', color: 'var(--text-primary)', margin: 0 }}>{layer.name}</h4>
+                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: '0.25rem 0 0 0', fontWeight: 300 }}>{layer.desc}</p>
+                </div>
+              </div>
+              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: '4px', backgroundColor: layer.color }} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. Defender GSAP Pinned Fullscreen Sequence */}
       <div ref={defenderRef}>
         <FrameSequenceScroll
           productName="Defender"
@@ -230,7 +316,7 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         />
       </div>
 
-      {/* 4. Sentinel Immersive Scroll Assembly */}
+      {/* 5. Sentinel GSAP Pinned Fullscreen Sequence */}
       <div ref={sentinelRef}>
         <FrameSequenceScroll
           productName="Sentinel"
@@ -242,73 +328,10 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
         />
       </div>
 
-      {/* 5. Dual-System Interaction Section */}
+      {/* 6. Split-Brain System Logic */}
       <section 
         ref={systemRef}
-        className="dual-system-section" 
-        style={{ 
-          padding: '8rem 2rem', 
-          maxWidth: '1100px', 
-          margin: '0 auto', 
-          textAlign: 'center',
-          overflow: 'hidden'
-        }}
-      >
-        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Operational Network</p>
-        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2rem', fontWeight: 700, marginBottom: '3rem', color: 'var(--text-primary)' }}>Connected Speculative Ecosystem</h2>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', minHeight: '400px', flexWrap: 'wrap', gap: '3rem' }}>
-          
-          {/* Left Device: Defender */}
-          <div style={{ flex: '1', minWidth: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 10 }}>
-            <img 
-              src={SAQR_ASSETS.defenderPoster} 
-              alt="SAQR Defender" 
-              style={{ width: '240px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 15px 30px rgba(0, 180, 216, 0.2))' }} 
-            />
-            <div style={{ marginTop: '1.5rem' }}>
-              <span className="badge-concept" style={{ color: 'var(--accent-blue)', borderColor: 'var(--accent-blue)' }}>DFN-V1</span>
-              <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.1rem', color: 'var(--text-primary)', marginTop: '0.5rem' }}>SAQR Defender</h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.25rem' }}>Close-range response module</p>
-            </div>
-          </div>
-
-          {/* Center Animated Connection Line & Scanning Beams */}
-          <div style={{ position: 'absolute', top: '40%', left: '20%', width: '60%', height: '2px', background: 'linear-gradient(90deg, transparent, var(--accent-blue), var(--accent-cyan), transparent)', zIndex: 5, pointerEvents: 'none' }} className="beam-animation-container">
-            {/* Pulsing glow particle that slides across */}
-            <div style={{
-              width: '12px',
-              height: '12px',
-              backgroundColor: 'var(--accent-cyan)',
-              borderRadius: '50%',
-              boxShadow: '0 0 15px var(--accent-cyan), 0 0 30px var(--accent-cyan)',
-              position: 'absolute',
-              top: '-5px',
-              left: '0%',
-              animation: 'pulse-beam 4s cubic-bezier(0.4, 0, 0.2, 1) infinite'
-            }} />
-          </div>
-
-          {/* Right Device: Sentinel */}
-          <div style={{ flex: '1', minWidth: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 10 }}>
-            <img 
-              src={SAQR_ASSETS.sentinelPoster} 
-              alt="SAQR Sentinel" 
-              style={{ width: '220px', height: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 15px 30px rgba(0, 255, 213, 0.2))' }} 
-            />
-            <div style={{ marginTop: '1.5rem' }}>
-              <span className="badge-concept" style={{ color: 'var(--accent-cyan)', borderColor: 'var(--accent-cyan)' }}>SNT-V1</span>
-              <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.1rem', color: 'var(--text-primary)', marginTop: '0.5rem' }}>SAQR Sentinel</h4>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '0.25rem' }}>Vertical monitoring tower</p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      {/* 6. Creative Deliverables / Process */}
-      <section 
-        className="deliverables-section" 
+        className="split-brain-section" 
         style={{ 
           padding: '8rem 2rem', 
           maxWidth: '1100px', 
@@ -317,71 +340,81 @@ export default function ProductExperiencePage({ onBackToShowcase }) {
           borderTop: '1px solid var(--border-color)'
         }}
       >
-        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Scope of Work</p>
-        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2rem', fontWeight: 700, marginBottom: '4rem', color: 'var(--text-primary)' }}>Built as a complete creative package</h2>
+        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-blue)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Speculative Processing</p>
+        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2.2rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Split-Brain System Logic</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 300, marginBottom: '4rem', maxWidth: '800px', margin: '0 auto 4rem' }}>
+          Connected speculative intelligence split between mobile containment units and tall radar hubs.
+        </p>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', textAlign: 'left' }}>
+        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between', alignItems: 'stretch', flexWrap: 'wrap' }}>
+          {/* Left panel: Defender */}
+          <div style={{ flex: '1', minWidth: '280px', padding: '2.5rem 2rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'rgba(10, 10, 15, 0.4)', textAlign: 'left' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-blue)', display: 'block', marginBottom: '0.5rem' }}>MODULE // DFN-V1</span>
+            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Defender: Close-range module</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6', fontWeight: 300 }}>
+              Tactical mobile containment and environmental mapping. Designed to react dynamically at ground level to simulated thermal and seismic threat points.
+            </p>
+          </div>
+
+          {/* Central Connecting Processing Node */}
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', minWidth: '120px' }}>
+            <div style={{ width: '60px', height: '60px', borderRadius: '50%', border: '2px dashed var(--accent-cyan)', display: 'flex', justifyContent: 'center', alignItems: 'center', animation: 'spin-node 12s linear infinite' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--accent-blue)', boxShadow: '0 0 15px var(--accent-blue)' }} />
+            </div>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', color: 'var(--text-muted)', marginTop: '1rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Shared Layer // Connected Intel</span>
+          </div>
+
+          {/* Right panel: Sentinel */}
+          <div style={{ flex: '1', minWidth: '280px', padding: '2.5rem 2rem', border: '1px solid var(--border-color)', borderRadius: '8px', background: 'rgba(10, 10, 15, 0.4)', textAlign: 'right' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.5rem' }}>STATION // SNT-V1</span>
+            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Sentinel: Vertical monitoring tower</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6', fontWeight: 300 }}>
+              Static broad-range radar surveillance. Designed for high architectural placement to scan wide-area air space and broadcast coordinates to mobile nodes.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Concept Build Timeline */}
+      <section 
+        className="timeline-section" 
+        style={{ 
+          padding: '8rem 2rem', 
+          maxWidth: '1000px', 
+          margin: '0 auto', 
+          textAlign: 'center',
+          borderTop: '1px solid var(--border-color)'
+        }}
+      >
+        <p className="section-tagline" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '1rem' }}>Development History</p>
+        <h2 style={{ fontFamily: 'var(--font-hud)', fontSize: '2.2rem', fontWeight: 700, marginBottom: '1rem', color: 'var(--text-primary)' }}>Concept Build Timeline</h2>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 300, marginBottom: '4rem', maxWidth: '800px', margin: '0 auto 4rem' }}>
+          From concept identity to a complete interactive product experience.
+        </p>
+
+        {/* Timeline Line */}
+        <div style={{ position: 'relative', width: '100%', marginTop: '3rem' }}>
+          {/* Horizontal Bar */}
+          <div style={{ position: 'absolute', top: '24px', left: '10%', width: '80%', height: '1px', backgroundColor: 'var(--border-color)', zIndex: 1 }} />
           
-          {/* Panel 1: Interactive Website */}
-          <div 
-            style={{ 
-              padding: '2.5rem 2rem', 
-              borderRadius: '8px', 
-              border: '1px solid var(--border-color)', 
-              background: 'rgba(10, 10, 15, 0.6)', 
-              backdropFilter: 'blur(10px)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1rem' }}>DELIVERABLE // 01</span>
-            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Interactive Website</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6', fontWeight: 300 }}>
-              Scroll-driven product storytelling and responsive web execution.
-            </p>
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '4px', height: '100%', backgroundColor: 'var(--accent-blue)' }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
+            {[
+              { title: "Identity", sub: "Brand System & Aesthetics", desc: "Establishing sand beige and dark graphite palettes, typography structures, and speculative logic." },
+              { title: "Presentation", sub: "Slide Deck Layout", desc: "Mapping modular device components, strategic business cases, and facility defense grids." },
+              { title: "Video", sub: "Motion assembly trailer", desc: "Rendering camera sweeps, 3D parts assembly sequences, and high-DPI concept videos." },
+              { title: "Website", sub: "Scroll-reveal canvas web", desc: "Developing GSAP pinned triggers, preloading canvas pipelines, and hosting final sites." }
+            ].map((step, idx) => (
+              <div key={idx} style={{ flex: '1', minWidth: '180px', position: 'relative', zIndex: 5, textAlign: 'center' }}>
+                {/* Number Circle */}
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', backgroundColor: '#07070a', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'center', alignItems: 'center', margin: '0 auto 1.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--accent-blue)', boxShadow: '0 0 10px rgba(0,0,0,0.8)' }}>
+                  0{idx + 1}
+                </div>
+                <h4 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.05rem', color: 'var(--text-primary)', margin: '0 0 0.25rem 0' }}>{step.title}</h4>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--accent-cyan)', display: 'block', marginBottom: '0.75rem' }}>{step.sub}</span>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', lineHeight: '1.4', padding: '0 10px' }}>{step.desc}</p>
+              </div>
+            ))}
           </div>
-
-          {/* Panel 2: Product Presentation */}
-          <div 
-            style={{ 
-              padding: '2.5rem 2rem', 
-              borderRadius: '8px', 
-              border: '1px solid var(--border-color)', 
-              background: 'rgba(10, 10, 15, 0.6)', 
-              backdropFilter: 'blur(10px)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1rem' }}>DELIVERABLE // 02</span>
-            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Product Presentation</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6', fontWeight: 300 }}>
-              A structured deck explaining the concept, visual system, and fictional product logic.
-            </p>
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '4px', height: '100%', backgroundColor: 'var(--accent-cyan)' }} />
-          </div>
-
-          {/* Panel 3: Cinematic Product Video */}
-          <div 
-            style={{ 
-              padding: '2.5rem 2rem', 
-              borderRadius: '8px', 
-              border: '1px solid var(--border-color)', 
-              background: 'rgba(10, 10, 15, 0.6)', 
-              backdropFilter: 'blur(10px)',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-          >
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block', marginBottom: '1rem' }}>DELIVERABLE // 03</span>
-            <h3 style={{ fontFamily: 'var(--font-hud)', fontSize: '1.25rem', color: 'var(--text-primary)', marginBottom: '1rem' }}>Cinematic Product Video</h3>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: '1.6', fontWeight: 300 }}>
-              Motion-led assembly reveal designed to present the fictional product universe.
-            </p>
-            <div style={{ position: 'absolute', bottom: 0, left: 0, width: '4px', height: '100%', backgroundColor: 'var(--accent-blue)' }} />
-          </div>
-
         </div>
       </section>
 

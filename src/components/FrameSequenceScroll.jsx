@@ -1,5 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import TechnicalCallout from './TechnicalCallout';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function FrameSequenceScroll({
   productName,
@@ -10,15 +14,19 @@ export default function FrameSequenceScroll({
   callouts = []
 }) {
   const containerRef = useRef(null);
+  const stickyRef = useRef(null);
   const canvasRef = useRef(null);
   
   const [progress, setProgress] = useState(0);
   const [hasStartedLoading, setHasStartedLoading] = useState(false);
-  const [loadedImages, setLoadedImages] = useState({});
   const [loadCount, setLoadCount] = useState(0);
   const [currentFrameIndex, setCurrentFrameIndex] = useState(1);
   const [isCanvasReady, setIsCanvasReady] = useState(false);
   const [loadError, setLoadError] = useState(null);
+
+  // Keep track of loaded images and current index in Refs to avoid re-triggering ScrollTrigger
+  const loadedImagesRef = useRef({});
+  const currentFrameIndexRef = useRef(1);
 
   // 1. Trigger lazy-loading when container approaches viewport
   useEffect(() => {
@@ -39,7 +47,57 @@ export default function FrameSequenceScroll({
     return () => observer.disconnect();
   }, []);
 
-  // 2. Progressive background preloader with error detection
+  // 2. Canvas rendering function with custom scale zoom logic
+  const drawFrame = (frameIndex) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const imagesMap = loadedImagesRef.current;
+    let img = imagesMap[frameIndex];
+    if (!img) {
+      // Find closest loaded frame if target frame is not loaded yet
+      for (let offset = 1; offset < frameCount; offset++) {
+        if (imagesMap[frameIndex - offset]) {
+          img = imagesMap[frameIndex - offset];
+          break;
+        }
+        if (imagesMap[frameIndex + offset]) {
+          img = imagesMap[frameIndex + offset];
+          break;
+        }
+      }
+    }
+
+    if (img) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Calculate cover scale (no black bars / letterboxing in canvas)
+      const scaleX = canvas.width / img.width;
+      const scaleY = canvas.height / img.height;
+      const coverScale = Math.max(scaleX, scaleY);
+      
+      // Zoom factor for immersive presentation
+      let productScale = 1.0;
+      if (productName === 'Defender') {
+        productScale = 1.45; // zoom in on Defender to feel wide and dominant
+      } else {
+        productScale = 1.35; // zoom in on Sentinel to feel vertical and powerful
+      }
+      
+      const drawWidth = img.width * coverScale * productScale;
+      const drawHeight = img.height * coverScale * productScale;
+
+      // Re-center drawing coordinates
+      const xOffset = (canvas.width - drawWidth) / 2;
+      const yOffset = (canvas.height - drawHeight) / 2;
+      
+      ctx.drawImage(img, xOffset, yOffset, drawWidth, drawHeight);
+    }
+  };
+
+  // 3. Progressive background preloader with error detection
   useEffect(() => {
     if (!hasStartedLoading) return;
 
@@ -52,13 +110,19 @@ export default function FrameSequenceScroll({
         img.src = getFramePath(index);
         img.onload = () => {
           if (isMounted) {
-            setLoadedImages(prev => ({ ...prev, [index]: img }));
+            loadedImagesRef.current[index] = img;
             loaded++;
             setLoadCount(loaded);
+            
+            // Draw immediately if we've scrolled to this frame
+            if (index === currentFrameIndexRef.current) {
+              drawFrame(index);
+            }
           }
           resolve(true);
         };
         img.onerror = () => {
+          console.error(`[FRAME_LOAD_FAILED] Failed to load frame ${index}: ${img.src}`);
           resolve(false);
         };
       });
@@ -74,13 +138,16 @@ export default function FrameSequenceScroll({
       const success = await new Promise((resolve) => {
         firstFrameImg.onload = () => {
           if (isMounted) {
-            setLoadedImages(prev => ({ ...prev, 1: firstFrameImg }));
+            loadedImagesRef.current[1] = firstFrameImg;
+            loaded = 1;
             setLoadCount(1);
+            setIsCanvasReady(true);
+            drawFrame(1);
           }
           resolve(true);
         };
         firstFrameImg.onerror = () => {
-          console.error("Frame not found:", firstFrameUrl);
+          console.error(`[CRITICAL_FRAME_LOAD_FAILED] Failed to load first frame: ${firstFrameUrl}`);
           if (isMounted) {
             setLoadError(firstFrameUrl);
           }
@@ -114,59 +181,6 @@ export default function FrameSequenceScroll({
     };
   }, [hasStartedLoading, frameCount, getFramePath]);
 
-  // 3. Canvas rendering function with custom scale zoom logic
-  const drawFrame = (frameIndex, imagesMap) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let img = imagesMap[frameIndex];
-    if (!img) {
-      // Find closest loaded frame if target frame is not loaded yet
-      for (let offset = 1; offset < frameCount; offset++) {
-        if (imagesMap[frameIndex - offset]) {
-          img = imagesMap[frameIndex - offset];
-          break;
-        }
-        if (imagesMap[frameIndex + offset]) {
-          img = imagesMap[frameIndex + offset];
-          break;
-        }
-      }
-    }
-
-    if (img) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      const canvasRatio = canvas.width / canvas.height;
-      const imgRatio = img.width / img.height;
-      
-      // Calculate cover scale (no black bars / letterboxing in canvas)
-      const scaleX = canvas.width / img.width;
-      const scaleY = canvas.height / img.height;
-      const coverScale = Math.max(scaleX, scaleY);
-      
-      // Zoom factor for immersive presentation
-      let productScale = 1.0;
-      if (productName === 'Defender') {
-        productScale = 1.45; // zoom in on Defender to feel wide and dominant
-      } else {
-        productScale = 1.35; // zoom in on Sentinel to feel vertical and powerful
-      }
-      
-      const drawWidth = img.width * coverScale * productScale;
-      const drawHeight = img.height * coverScale * productScale;
-
-      // Re-center drawing coordinates
-      const xOffset = (canvas.width - drawWidth) / 2;
-      const yOffset = (canvas.height - drawHeight) / 2;
-      
-      ctx.drawImage(img, xOffset, yOffset, drawWidth, drawHeight);
-      if (!isCanvasReady) setIsCanvasReady(true);
-    }
-  };
-
   // 4. Handle resize and high-DPI scaling
   useEffect(() => {
     const handleResize = () => {
@@ -179,62 +193,52 @@ export default function FrameSequenceScroll({
       canvas.width = rect.width * dpr;
       canvas.height = rect.height * dpr;
       
-      drawFrame(currentFrameIndex, loadedImages);
+      drawFrame(currentFrameIndexRef.current);
     };
 
     window.addEventListener('resize', handleResize);
     handleResize();
 
     return () => window.removeEventListener('resize', handleResize);
-  }, [loadedImages, currentFrameIndex]);
+  }, [isCanvasReady]);
 
-  // Redraw when new images load
+  // 5. GSAP ScrollTrigger for pinned frame sequence
   useEffect(() => {
-    drawFrame(currentFrameIndex, loadedImages);
-  }, [loadedImages, currentFrameIndex]);
+    if (!isCanvasReady) return;
 
-  // 5. Scroll progress listener (throttled with requestAnimationFrame)
-  useEffect(() => {
-    let ticking = false;
+    let trigger = ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top top",
+      end: "+=2800",
+      scrub: true,
+      pin: stickyRef.current,
+      anticipatePin: 1,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        const currentProgress = self.progress;
+        setProgress(currentProgress);
 
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const rect = containerRef.current.getBoundingClientRect();
-          const viewHeight = window.innerHeight;
-          const scrollableDistance = rect.height - viewHeight;
-          const scrolledAmount = -rect.top;
-          
-          let currentProgress = scrolledAmount / scrollableDistance;
-          currentProgress = Math.max(0, Math.min(1, currentProgress));
-          
-          setProgress(currentProgress);
-
-          const targetIndex = Math.max(
-            1, 
-            Math.min(
-              frameCount, 
-              Math.floor(currentProgress * (frameCount - 1)) + 1
-            )
-          );
-          
-          setCurrentFrameIndex(targetIndex);
-          ticking = false;
-        });
-
-        ticking = true;
+        const targetIndex = Math.max(
+          1,
+          Math.min(
+            frameCount,
+            Math.round(currentProgress * (frameCount - 1)) + 1
+          )
+        );
+        
+        currentFrameIndexRef.current = targetIndex;
+        setCurrentFrameIndex(targetIndex);
+        drawFrame(targetIndex);
       }
-    };
+    });
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    // Make sure first frame is drawn
+    drawFrame(currentFrameIndexRef.current);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      if (trigger) trigger.kill();
     };
-  }, [frameCount]);
+  }, [isCanvasReady, frameCount]);
 
   const activeStageIndex = stages.findIndex(
     stage => progress >= stage.progressStart && progress <= stage.progressEnd
@@ -244,13 +248,12 @@ export default function FrameSequenceScroll({
   const showFallback = !isCanvasReady;
 
   return (
-    <section className="sequence-shell" style={{ height: '300vh', position: 'relative', width: '100%' }}>
+    <section ref={containerRef} className="sequence-shell" style={{ position: 'relative', width: '100%' }}>
       <div 
+        ref={stickyRef}
         className="sequence-sticky"
         style={{
-          position: 'sticky',
-          top: 0,
-          left: 0,
+          position: 'relative', // Let GSAP handle the pinning position (fixed/absolute)
           width: '100%',
           height: '100vh',
           overflow: 'hidden',
@@ -282,7 +285,7 @@ export default function FrameSequenceScroll({
             style={{
               width: '100%',
               height: '100%',
-              objectFit: 'contain',
+              objectFit: 'cover',
               position: 'absolute',
               top: 0,
               left: 0
