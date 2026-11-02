@@ -116,10 +116,19 @@ def sip():
     return norm(n * env, 0.35)
 
 
+def puff():
+    # one breath into a balloon: airy, rubbery, attack on the beat
+    t = t_arr(0.32)
+    n = filt(rng.standard_normal(len(t)), "band", [300, 2200])
+    env = np.minimum(1, t / 0.012) * np.exp(-t * 9)
+    rub = np.sin(2 * np.pi * (180 + 60 * t) * t) * np.exp(-t * 14) * 0.25
+    return norm(n * env + rub, 0.5)
+
+
 def write_all(dest: Path):
     dest.mkdir(parents=True, exist_ok=True)
     for name, fn in [("pop", pop), ("whoosh", whoosh), ("bonk", bonk), ("stamp", stamp), ("ding", ding),
-                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip)]:
+                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip), ("puff", puff)]:
         x = fn()
         fade = int(0.01 * SR)
         x[-fade:] *= np.linspace(1, 0, fade)

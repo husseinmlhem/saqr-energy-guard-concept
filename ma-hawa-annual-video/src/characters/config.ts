@@ -6,12 +6,25 @@ export type CharId = "amr" | "ali" | "hussein" | "michael" | "saeed";
 export type Expression = "neutral" | "happy" | "shocked" | "tired";
 export type BodyType = "leader" | "muscle" | "genius" | "boss" | "money";
 
+export type Outfit = {
+  id: CharId;
+  top: string;
+  bottom: string;
+  shoes: string;
+  skin: string;
+  accent: string;
+  sleeves: "long" | "short";
+  cuff?: string;
+  sandals?: boolean;
+};
+
 type CharCfg = {
   name: string;
   tag: string | null;
   body: BodyType;
   faces: Partial<Record<Expression, string>>;
   placeholder: { initials: string; hair?: string };
+  outfit?: Partial<Omit<Outfit, "id">>;
 };
 
 type CharactersFile = {
@@ -53,6 +66,17 @@ export const facePath = (id: CharId, expression: Expression = "neutral"): string
 };
 
 export const charCfg = (id: CharId) => CHARS.characters[id];
+
+export const outfitOf = (id: CharId): Outfit => ({
+  id,
+  top: "#FFFFFF",
+  bottom: "#2E3440",
+  shoes: "#222222",
+  skin: "#B98E78",
+  accent: "#76ADDE",
+  sleeves: "long",
+  ...(CHARS.characters[id]?.outfit ?? {}),
+});
 
 /** every face file referenced — preloaded so no frame ever shows a blank head */
 export const allFacePaths = (): string[] =>

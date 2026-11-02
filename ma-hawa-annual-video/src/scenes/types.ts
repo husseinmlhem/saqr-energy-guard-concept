@@ -1,6 +1,6 @@
 import type { SceneSlot } from "../sync/timeline";
 
-export type SfxName = "pop" | "whoosh" | "bonk" | "stamp" | "ding" | "slam" | "sparkle" | "tick" | "boing" | "sip";
+export type SfxName = "pop" | "whoosh" | "bonk" | "stamp" | "ding" | "slam" | "sparkle" | "tick" | "boing" | "sip" | "puff";
 
 /** frames are relative to the scene start */
 export type Sfx = { f: number; name: SfxName; volume?: number };

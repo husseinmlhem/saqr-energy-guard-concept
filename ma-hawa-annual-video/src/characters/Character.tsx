@@ -1,10 +1,12 @@
-// A bobblehead: big real-photo head (or line-art placeholder) on a small line-art body.
+// A character: real-photo head (or line-art placeholder) on a clothed, outlined body.
+// Bodies are drawn as outlined "tubes" (dark under-stroke + coloured over-stroke) so joints are seamless,
+// with outfit colours taken from each person's photo (config/characters.json → outfit).
 import React from "react";
 import { Img, staticFile } from "remotion";
 import { ACCENT, ACCENT_SOFT, INK, PAPER, STROKE } from "../theme";
-import { CHARS, CharId, Expression, HEAD_R, charCfg, facePath } from "./config";
+import { CHARS, CharId, Expression, HEAD_R, Outfit, charCfg, facePath, outfitOf } from "./config";
 import { Goggles, Prop, PropName } from "./props";
-import { DIMS, Pose, Pt, Skeleton, add, muscleLimb, pts, solve } from "./rig";
+import { DIMS, Pose, Pt, Skeleton, add, pts, solve } from "./rig";
 
 export type CharacterProps = {
   id: CharId;
@@ -25,10 +27,12 @@ export type CharacterProps = {
   left?: PropName;
   right?: PropName;
   frame?: number;
-  /** wind amount 0..1 (ties, ghutra, kandura flutter) */
+  /** wind amount 0..1 (tie, ghutra, kandura flutter) */
   wind?: number;
   /** seen from behind (no face) — for turning away */
   back?: boolean;
+  /** soft contact shadow on the ground (default on unless spinning) */
+  shadow?: boolean;
   /** extra svg drawn in body space, in front of everything */
   children?: React.ReactNode;
 };
@@ -49,26 +53,31 @@ const lineStyle = (sw: number) => ({
   fill: "none",
 });
 
-/** where the head is on screen — used to put stars, sweat, bulbs above heads */
-export const headScreenPos = (
+/** any skeleton point on screen (stars over heads, balloons at mouths…) */
+export const jointScreenPos = (
   id: CharId,
   x: number,
   y: number,
   scale: number,
   pose: Pose,
+  joint: keyof Pick<Skeleton, "headCenter" | "mouth" | "handL" | "handR" | "neck" | "hip">,
   flip = false,
   rotate = 0,
-): { x: number; y: number; r: number } => {
+): Pt => {
   const sk = solve(pose, DIMS[charCfg(id).body], HEAD_R);
   const f = flip ? -1 : 1;
-  // rotate around the hip pivot like <Character rotate>
-  const px = sk.headCenter.x * scale * f;
-  const py = (sk.headCenter.y - sk.hip.y) * scale;
+  const j = sk[joint];
+  const px = j.x * scale * f;
+  const py = (j.y - sk.hip.y) * scale;
   const a = (rotate * Math.PI) / 180;
-  const rx = px * Math.cos(a) - py * Math.sin(a);
-  const ry = px * Math.sin(a) + py * Math.cos(a);
-  return { x: x + rx, y: y + sk.hip.y * scale + ry, r: HEAD_R * scale };
+  return { x: x + px * Math.cos(a) - py * Math.sin(a), y: y + sk.hip.y * scale + px * Math.sin(a) + py * Math.cos(a) };
 };
+
+/** where the head is on screen (centre + radius) */
+export const headScreenPos = (id: CharId, x: number, y: number, scale: number, pose: Pose, flip = false, rotate = 0) => ({
+  ...jointScreenPos(id, x, y, scale, pose, "headCenter", flip, rotate),
+  r: HEAD_R * scale,
+});
 
 export const Character: React.FC<CharacterProps> = (p) => {
   const cfg = charCfg(p.id);
@@ -85,14 +94,16 @@ export const Character: React.FC<CharacterProps> = (p) => {
   const pivotY = sk.hip.y;
   const expression = p.expression ?? "neutral";
   const face = p.back ? null : facePath(p.id, expression);
-  const tilt = (p.headTilt ?? 0) + p.pose.head + p.pose.lean * 0.5;
+  const tilt = (p.headTilt ?? 0) + p.pose.head + p.pose.lean * 0.6;
   const hc = sk.headCenter;
-  const pivot = { x: hc.x, y: hc.y + r * 0.7 };
+  const pivot = { x: hc.x, y: hc.y + r * 0.8 };
   const defaults = DEFAULT_PROPS[body] ?? {};
   const left = p.left ?? defaults.left ?? "none";
   const right = p.right ?? defaults.right ?? "none";
   const frame = p.frame ?? 0;
   const wind = p.wind ?? 0;
+  const o = outfitOf(p.id);
+  const armsFront = !!p.pose.armsFront;
 
   const transform = [
     `translate(${p.x}px, ${p.y}px)`,
@@ -101,51 +112,47 @@ export const Character: React.FC<CharacterProps> = (p) => {
     `translate(0px, ${-pivotY * s}px)`,
     `scale(${s * flip * sx}, ${s * sy})`,
   ].join(" ");
-
   const svgStyle: React.CSSProperties = { position: "absolute", left: 0, top: 0, overflow: "visible" };
+  const arms = <Arms sk={sk} d={d} o={o} sw={sw} body={body} />;
+  const props = (
+    <>
+      {left !== "none" && <HandProp name={left} at={sk.handL} angle={sk.angles.forearmL} sw={sw} frame={frame} />}
+      {right !== "none" && <HandProp name={right} at={sk.handR} angle={sk.angles.forearmR} sw={sw} frame={frame} />}
+    </>
+  );
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 0, height: 0, transform, transformOrigin: "0 0", opacity: p.opacity ?? 1 }}>
-      {/* back layer: body, outfit, arms */}
       <svg width={1} height={1} style={svgStyle}>
         <defs>
           <filter id="glowBlur" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation={10} />
           </filter>
+          <pattern id={`gingham-${p.id}`} width={10} height={10} patternUnits="userSpaceOnUse">
+            <rect width={10} height={10} fill={o.top} />
+            <rect width={5} height={10} fill="rgba(255,255,255,0.35)" />
+            <rect width={10} height={5} fill="rgba(255,255,255,0.35)" />
+            <rect width={5} height={5} fill="rgba(40,80,150,0.18)" />
+          </pattern>
         </defs>
-        {body === "money" && <GhutraBack hc={hc} r={r} sw={sw} wind={wind} frame={frame} neck={sk.neck} />}
-        <Body body={body} sk={sk} sw={sw} wind={wind} frame={frame} />
-        {/* head backing (hides limbs behind the head) */}
-        <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} />
-        {left !== "none" && <HandProp name={left} at={sk.handL} angle={sk.angles.forearmL} sw={sw} frame={frame} flip={flip} />}
-        {right !== "none" && <HandProp name={right} at={sk.handR} angle={sk.angles.forearmR} sw={sw} frame={frame} flip={flip} />}
+        {(p.shadow ?? rot === 0) && <ellipse cx={(sk.footL.x + sk.footR.x) / 2} cy={4} rx={Math.abs(sk.footR.x - sk.footL.x) / 2 + 52} ry={10} fill="rgba(20,30,50,0.10)" />}
+        <Legs sk={sk} d={d} o={o} sw={sw} body={body} />
+        <Neck sk={sk} o={o} sw={sw} w={body === "muscle" ? 40 : 28} />
+        <Torso sk={sk} d={d} o={o} sw={sw} body={body} id={p.id} wind={wind} frame={frame} />
+        {body === "money" && !p.back && <GhutraDrape hc={hc} r={r} sw={sw} wind={wind} frame={frame} sk={sk} />}
+        {!armsFront && arms}
+        {!face && <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} />}
+        {!armsFront && props}
       </svg>
-      {/* photo head */}
-      {face && (
-        <Img
-          src={staticFile(face)}
-          style={{
-            position: "absolute",
-            left: hc.x - r,
-            top: hc.y - r,
-            width: 2 * r,
-            height: 2 * r,
-            transform: `rotate(${tilt}deg) scaleX(${flip})`,
-            transformOrigin: "50% 85%",
-          }}
-        />
-      )}
-      {/* front layer: head ring / placeholder face, goggles, ghutra front */}
+      {face && <PhotoHead src={face} hc={hc} r={r} tilt={tilt} flip={flip} sw={sw} />}
       <svg width={1} height={1} style={svgStyle}>
         <g transform={`rotate(${tilt} ${pivot.x} ${pivot.y})`}>
           {p.back ? (
             <BackOfHead hc={hc} r={r} sw={sw} body={body} />
-          ) : face ? (
-            <circle cx={hc.x} cy={hc.y} r={r} {...lineStyle(sw)} />
-          ) : (
+          ) : face ? null : (
             <PlaceholderHead id={p.id} hc={hc} r={r} sw={sw} expression={expression} flip={flip} />
           )}
-          {body === "money" && !p.back && <GhutraFront hc={hc} r={r} sw={sw} />}
+          {body === "money" && !p.back && !face && <GhutraFront hc={hc} r={r} sw={sw} />}
           {body === "genius" && (p.goggles ?? "forehead") !== "none" && (
             <g transform={`translate(${hc.x} ${hc.y})`}>
               <Goggles
@@ -158,192 +165,277 @@ export const Character: React.FC<CharacterProps> = (p) => {
             </g>
           )}
         </g>
+        {armsFront && arms}
+        {armsFront && props}
         {p.children}
       </svg>
     </div>
   );
 };
 
-const HandProp: React.FC<{ name: PropName; at: Pt; angle: number; sw: number; frame: number; flip: number }> = ({
-  name, at, angle, sw, frame,
-}) => (
+/**
+ * The photo head as a cut-out silhouette (background removed by process_faces.py), outlined like the
+ * line art, with the photo's own neck/shirt faded out so it sits on the drawn neck.
+ */
+const PhotoHead: React.FC<{ src: string; hc: Pt; r: number; tilt: number; flip: number; sw: number }> = ({ src, hc, r, tilt, flip, sw }) => {
+  const o = Math.max(1.5, sw * 0.55);
+  // oval vignette around hair + face + beard: drops the photo's own neck/shirt cleanly
+  const fade = "radial-gradient(ellipse 50% 45% at 50% 45%, #000 90%, transparent 100%)";
+  return (
+    <Img
+      src={staticFile(src)}
+      style={{
+        position: "absolute",
+        left: hc.x - r,
+        top: hc.y - r,
+        width: 2 * r,
+        height: 2 * r,
+        transform: `rotate(${tilt}deg) scaleX(${flip})`,
+        transformOrigin: "50% 90%",
+        WebkitMaskImage: fade,
+        maskImage: fade,
+        filter: `drop-shadow(${o}px 0 0 ${INK}) drop-shadow(-${o}px 0 0 ${INK}) drop-shadow(0 ${o}px 0 ${INK}) drop-shadow(0 -${o}px 0 ${INK})`,
+      }}
+    />
+  );
+};
+
+const HandProp: React.FC<{ name: PropName; at: Pt; angle: number; sw: number; frame: number }> = ({ name, at, angle, sw, frame }) => (
   <g transform={`translate(${at.x} ${at.y})`}>
     <Prop name={name} sw={sw} angle={angle} frame={frame} />
   </g>
 );
 
-// ------------------------------------------------------------------- bodies
-const Body: React.FC<{ body: string; sk: Skeleton; sw: number; wind: number; frame: number }> = ({ body, sk, sw, wind, frame }) => {
+// ------------------------------------------------------------------- body parts
+/** outlined tube through points with per-segment widths (seamless joints) */
+const Tube: React.FC<{ p: Pt[]; w: number[]; color: string; sw: number; cap?: "round" | "butt" }> = ({ p, w, color, sw, cap = "round" }) => (
+  <g>
+    {p.slice(1).map((b, i) => (
+      <line key={`u${i}`} x1={p[i].x} y1={p[i].y} x2={b.x} y2={b.y} stroke={INK} strokeWidth={w[i] + 2 * sw} strokeLinecap={cap} />
+    ))}
+    {p.slice(1).map((b, i) => (
+      <line key={`o${i}`} x1={p[i].x} y1={p[i].y} x2={b.x} y2={b.y} stroke={color} strokeWidth={w[i]} strokeLinecap={cap} />
+    ))}
+  </g>
+);
+
+const lerpPt = (a: Pt, b: Pt, t: number): Pt => ({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t });
+
+const Hand: React.FC<{ at: Pt; elbow: Pt; o: Outfit; sw: number; size: number }> = ({ at, elbow, o, sw, size }) => {
+  const dx = at.x - elbow.x;
+  const dy = at.y - elbow.y;
+  const len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len;
+  const uy = dy / len;
+  const c = { x: at.x + ux * size * 0.35, y: at.y + uy * size * 0.35 };
+  const ang = (Math.atan2(uy, ux) * 180) / Math.PI - 90;
+  return (
+    <g transform={`translate(${c.x} ${c.y}) rotate(${ang})`}>
+      <ellipse cx={size * 0.45} cy={-size * 0.1} rx={size * 0.28} ry={size * 0.42} transform={`rotate(-25 ${size * 0.45} ${-size * 0.1})`} fill={o.skin} stroke={INK} strokeWidth={sw * 0.8} />
+      <ellipse rx={size * 0.55} ry={size * 0.7} fill={o.skin} stroke={INK} strokeWidth={sw * 0.8} />
+    </g>
+  );
+};
+
+const Arms: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: number; body: string }> = ({ sk, d, o, sw, body }) => {
+  const [wu, wf] = d.w;
+  const sleeveCol = body === "leader" ? `url(#gingham-${o.id})` : o.top;
+  const arm = (sh: Pt, el: Pt, hand: Pt) => {
+    if (o.sleeves === "short") {
+      // skin arm, then a short sleeve over the upper arm
+      const sleeveEnd = lerpPt(sh, el, 0.62);
+      return (
+        <g>
+          <Tube p={[sh, el, hand]} w={[wu - 3, wf]} color={o.skin} sw={sw} />
+          <Tube p={[sh, sleeveEnd]} w={[wu + 6]} color={o.top} sw={sw} cap="butt" />
+          <circle cx={sh.x} cy={sh.y} r={(wu + 6) / 2} fill={o.top} />
+          <Hand at={hand} elbow={el} o={o} sw={sw} size={wf * 0.95} />
+        </g>
+      );
+    }
+    const cuff = lerpPt(el, hand, 0.9);
+    return (
+      <g>
+        <Tube p={[sh, el, cuff]} w={[wu, wf]} color={sleeveCol} sw={sw} />
+        {o.cuff && <Tube p={[lerpPt(el, hand, 0.78), cuff]} w={[wf + 2]} color={o.cuff} sw={sw * 0.6} cap="butt" />}
+        <Hand at={hand} elbow={el} o={o} sw={sw} size={wf * 0.95} />
+      </g>
+    );
+  };
+  return (
+    <g>
+      {arm(sk.shoulderL, sk.elbowL, sk.handL)}
+      {arm(sk.shoulderR, sk.elbowR, sk.handR)}
+    </g>
+  );
+};
+
+const Shoe: React.FC<{ at: Pt; side: -1 | 1; o: Outfit; sw: number; big?: boolean }> = ({ at, side, o, sw, big }) => {
+  const L = big ? 44 : 38;
+  const H = big ? 20 : 17;
+  const x0 = at.x - side * 8;
+  const y = at.y + 6;
+  const toe = x0 + side * L;
+  const d = `M ${x0 - side * 6} ${y} L ${x0 - side * 6} ${y - H + 4} Q ${x0 - side * 4} ${y - H} ${x0 + side * 8} ${y - H} Q ${toe - side * 6} ${y - H + 3} ${toe} ${y - 4} Q ${toe + side * 2} ${y} ${toe - side * 4} ${y} Z`;
+  return (
+    <g>
+      <path d={d} fill={o.shoes} stroke={INK} strokeWidth={sw} strokeLinejoin="round" />
+      {o.sandals && <path d={`M ${x0} ${y - H + 2} L ${x0 + side * 22} ${y - 4}`} stroke={INK} strokeWidth={sw * 0.6} />}
+    </g>
+  );
+};
+
+const Legs: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: number; body: string }> = ({ sk, d, o, sw, body }) => {
+  const [, , wt, ws] = d.w;
+  const pelvisW = d.hipHalf * 2 + wt;
+  const top = add(sk.hip, sk.up, 12);
+  const crotch = add(sk.hip, sk.up, -22);
+  const a = add(top, sk.side, -pelvisW / 2);
+  const b = add(top, sk.side, pelvisW / 2);
+  const c = add(crotch, sk.side, pelvisW / 2 - 2);
+  const e = add(crotch, sk.side, -pelvisW / 2 + 2);
+  const robe = body === "money";
+  return (
+    <g>
+      <Tube p={[sk.hipL, sk.kneeL, sk.footL]} w={[wt, ws]} color={o.bottom} sw={sw} />
+      <Tube p={[sk.hipR, sk.kneeR, sk.footR]} w={[wt, ws]} color={o.bottom} sw={sw} />
+      {!robe && <polygon points={pts(a, b, c, e)} fill={o.bottom} stroke={INK} strokeWidth={sw} strokeLinejoin="round" />}
+      {!robe && (
+        <>
+          <line x1={sk.hipL.x} y1={sk.hipL.y} x2={sk.kneeL.x} y2={sk.kneeL.y} stroke={o.bottom} strokeWidth={wt} strokeLinecap="round" />
+          <line x1={sk.hipR.x} y1={sk.hipR.y} x2={sk.kneeR.x} y2={sk.kneeR.y} stroke={o.bottom} strokeWidth={wt} strokeLinecap="round" />
+          <line x1={crotch.x} y1={crotch.y} x2={add(crotch, sk.up, -14).x} y2={add(crotch, sk.up, -14).y} stroke={INK} strokeWidth={sw * 0.6} strokeLinecap="round" />
+        </>
+      )}
+      <Shoe at={sk.footL} side={-1} o={o} sw={sw} big={body === "muscle"} />
+      <Shoe at={sk.footR} side={1} o={o} sw={sw} big={body === "muscle"} />
+    </g>
+  );
+};
+
+const Neck: React.FC<{ sk: Skeleton; o: Outfit; sw: number; w: number }> = ({ sk, o, sw, w }) => {
+  const a = add(sk.neck, sk.up, -10);
+  const b = add(sk.neckTop, sk.up, 18);
+  return <Tube p={[a, b]} w={[w]} color={o.skin} sw={sw} cap="butt" />;
+};
+
+const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: number; body: string; id: CharId; wind: number; frame: number }> = ({
+  sk, d, o, sw, body, id, wind, frame,
+}) => {
   const L = lineStyle(sw);
-  const legs = (
-    <>
-      <polyline points={pts(sk.hipL, sk.kneeL, sk.footL)} {...L} />
-      <polyline points={pts(sk.hipR, sk.kneeR, sk.footR)} {...L} />
-      <line x1={sk.footL.x} y1={sk.footL.y} x2={sk.footL.x - 14} y2={sk.footL.y + 1} {...L} />
-      <line x1={sk.footR.x} y1={sk.footR.y} x2={sk.footR.x + 14} y2={sk.footR.y + 1} {...L} />
-    </>
-  );
-  const arms = (
-    <>
-      <polyline points={pts(sk.shoulderL, sk.elbowL, sk.handL)} {...L} />
-      <polyline points={pts(sk.shoulderR, sk.elbowR, sk.handR)} {...L} />
-    </>
-  );
-  const spine = <line x1={sk.hip.x} y1={sk.hip.y} x2={sk.neck.x} y2={sk.neck.y} {...L} />;
-  const at = (k: number, side = 0): Pt => add(add(sk.neck, sk.up, -k), sk.side, side);
-  const flutter = Math.sin(frame / 3) * 10 * wind;
+  const T = d.torso;
+  // torso-local point: u = across (+ right), v = up from the hips
+  const q = (u: number, v: number): Pt => add(add(sk.hip, sk.side, u), sk.up, v);
+  const S = d.shoulderHalf;
+  const hipW = d.hipHalf + d.w[2] / 2;
+  const muscle = body === "muscle";
+  const chest = muscle ? S + 10 : S + 4;
+  const waist = muscle ? hipW - 2 : hipW + 1;
+  const hemV = body === "boss" ? -16 : body === "genius" || muscle ? -8 : 4;
+  const neckW = muscle ? 22 : 15;
+  const shirt = (fill: string) => {
+    const path = `M ${pts(q(-waist, hemV))} L ${pts(q(-waist - 1, 30))} Q ${pts(q(-chest - 2, T * 0.55))} ${pts(q(-chest, T - 34))} Q ${pts(q(-S - 14, T - 10))} ${pts(q(-S + 4, T - 2))} L ${pts(q(-neckW, T + 2))} Q ${pts(q(0, T - 12))} ${pts(q(neckW, T + 2))} L ${pts(q(S - 4, T - 2))} Q ${pts(q(S + 14, T - 10))} ${pts(q(chest, T - 34))} Q ${pts(q(chest + 2, T * 0.55))} ${pts(q(waist + 1, 30))} L ${pts(q(waist, hemV))} Z`;
+    return <path d={path} {...L} fill={fill} />;
+  };
+  const flutter = Math.sin(frame / 3) * 9 * wind;
 
   switch (body) {
     case "leader": {
-      // Amr: shirt collar + blue tie
-      const knot = at(10);
-      const tip = add(at(58), sk.side, 4 + flutter * 0.6);
+      // Amr: gingham shirt, collar, navy tie, belt
       return (
         <g>
-          {legs}
-          {spine}
-          <polyline points={pts(at(0, -14), at(10), at(0, 14))} {...L} />
-          <path d={`M ${pts(at(6, -6))} L ${pts(at(6, 6))} L ${pts(at(16, 4))} L ${pts(at(16, -4))} Z`} {...L} fill={ACCENT} strokeWidth={sw * 0.7} />
-          <path d={`M ${pts(at(16, -4))} L ${pts(add(at(48), sk.side, -9 + flutter * 0.4))} L ${pts(tip)} L ${pts(add(at(48), sk.side, 9 + flutter * 0.4))} L ${pts(at(16, 4))} Z`} {...L} fill={ACCENT} strokeWidth={sw * 0.7} />
-          <circle cx={knot.x} cy={knot.y} r={0.1} />
-          {arms}
+          {shirt(`url(#gingham-${id})`)}
+          <path d={`M ${pts(q(-waist - 1, 6))} L ${pts(q(waist + 1, 6))}`} stroke={INK} strokeWidth={sw * 2.4} />
+          <rect x={q(0, 6).x - 9} y={q(0, 6).y - 7} width={18} height={14} rx={3} fill="#C9A86A" stroke={INK} strokeWidth={sw * 0.6} />
+          {/* tie */}
+          <path d={`M ${pts(q(-7, T - 6))} L ${pts(q(7, T - 6))} L ${pts(q(5, T - 20))} L ${pts(q(-5, T - 20))} Z`} {...L} fill={o.accent} strokeWidth={sw * 0.8} />
+          <path d={`M ${pts(q(-5, T - 20))} L ${pts(q(-11 + flutter * 0.3, T * 0.32))} L ${pts(q(0 + flutter * 0.6, T * 0.22))} L ${pts(q(11 + flutter * 0.3, T * 0.32))} L ${pts(q(5, T - 20))} Z`} {...L} fill={o.accent} strokeWidth={sw * 0.8} />
+          {/* collar */}
+          <path d={`M ${pts(q(-neckW - 2, T + 1))} L ${pts(q(-6, T - 16))} L ${pts(q(-2, T - 2))}`} {...L} fill={o.top} strokeWidth={sw * 0.8} />
+          <path d={`M ${pts(q(neckW + 2, T + 1))} L ${pts(q(6, T - 16))} L ${pts(q(2, T - 2))}`} {...L} fill={o.top} strokeWidth={sw * 0.8} />
         </g>
       );
     }
-    case "genius": {
-      // Hussein: pocket with pens
-      const pk = at(30, -26);
+    case "genius":
+      // Hussein: navy t-shirt with crew neck
       return (
         <g>
-          {legs}
-          {spine}
-          <polyline points={pts(at(0, -12), at(9), at(0, 12))} {...L} />
-          <rect x={pk.x - 13} y={pk.y} width={26} height={22} rx={3} {...L} fill={PAPER} strokeWidth={sw * 0.7} />
-          <line x1={pk.x - 5} y1={pk.y + 4} x2={pk.x - 5} y2={pk.y - 12} stroke={ACCENT} strokeWidth={sw} strokeLinecap="round" />
-          <line x1={pk.x + 5} y1={pk.y + 4} x2={pk.x + 5} y2={pk.y - 9} {...L} />
-          {arms}
+          {shirt(o.top)}
+          <path d={`M ${pts(q(-neckW - 1, T + 1))} Q ${pts(q(0, T - 16))} ${pts(q(neckW + 1, T + 1))}`} fill="none" stroke="#3A4766" strokeWidth={sw * 1.2} />
+          <path d={`M ${pts(q(-waist + 4, hemV + 6))} L ${pts(q(waist - 4, hemV + 6))}`} stroke="#3A4766" strokeWidth={sw * 0.6} />
         </g>
       );
-    }
-    case "muscle": {
-      // Ali: V-shaped torso, pecs, abs, huge arms
-      const sh = 64;
-      const waist = 26;
-      const top = at(-2);
-      const shL = add(at(12), sk.side, -sh);
-      const shR = add(at(12), sk.side, sh);
-      const wL = add(sk.hip, sk.side, -waist);
-      const wR = add(sk.hip, sk.side, waist);
-      const trapL = add(top, sk.side, -18);
-      const trapR = add(top, sk.side, 18);
-      const ctl = (a: Pt, b: Pt, k: number): Pt => add({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, sk.side, k);
-      const torso = `M ${pts(trapL)} Q ${pts(add(trapL, sk.side, -30))} ${pts(shL)} Q ${pts(ctl(shL, wL, -14))} ${pts(wL)} L ${pts(wR)} Q ${pts(ctl(shR, wR, 14))} ${pts(shR)} Q ${pts(add(trapR, sk.side, 30))} ${pts(trapR)}`;
-      const pecY = 36;
-      const pec = (s: number) => `M ${pts(at(pecY - 18, s * 4))} Q ${pts(at(pecY + 10, s * 26))} ${pts(at(pecY - 2, s * 50))}`;
-      const abs = [62, 80, 98].map((k) => `M ${pts(at(k, -16))} L ${pts(at(k, -4))} M ${pts(at(k, 4))} L ${pts(at(k, 16))}`).join(" ");
-      const limbs = (
-        <>
-          <path d={muscleLimb(sk.shoulderL, sk.elbowL, 20, 30, 16, 0.4)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.elbowL, sk.handL, 15, 20, 11, 0.35)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.shoulderR, sk.elbowR, 20, 30, 16, 0.4)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.elbowR, sk.handR, 15, 20, 11, 0.35)} {...L} fill={PAPER} />
-          <circle cx={sk.handL.x} cy={sk.handL.y} r={12} {...L} fill={PAPER} />
-          <circle cx={sk.handR.x} cy={sk.handR.y} r={12} {...L} fill={PAPER} />
-        </>
-      );
+    case "muscle":
+      // Ali: knit tee stretched over a big chest
       return (
         <g>
-          <path d={muscleLimb(sk.hipL, sk.kneeL, 15, 17, 12)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.kneeL, sk.footL, 12, 12, 9, 0.3)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.hipR, sk.kneeR, 15, 17, 12)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.kneeR, sk.footR, 12, 12, 9, 0.3)} {...L} fill={PAPER} />
-          <line x1={sk.footL.x} y1={sk.footL.y + 6} x2={sk.footL.x - 22} y2={sk.footL.y + 6} {...L} />
-          <line x1={sk.footR.x} y1={sk.footR.y + 6} x2={sk.footR.x + 22} y2={sk.footR.y + 6} {...L} />
-          <path d={`${torso} Z`} fill={PAPER} stroke="none" />
-          <path d={torso} {...L} />
-          <path d={pec(-1)} {...L} />
-          <path d={pec(1)} {...L} />
-          <path d={abs} {...L} strokeWidth={sw * 0.7} />
-          <line x1={wL.x} y1={wL.y} x2={wR.x} y2={wR.y} {...L} />
-          {limbs}
+          {shirt(o.top)}
+          <path d={`M ${pts(q(-neckW - 1, T + 1))} Q ${pts(q(0, T - 18))} ${pts(q(neckW + 1, T + 1))}`} fill="none" stroke="#B9AC98" strokeWidth={sw * 1.4} />
+          <path d={`M ${pts(q(-S + 4, T - 44))} Q ${pts(q(-S * 0.45, T - 70))} ${pts(q(-3, T - 50))}`} fill="none" stroke="#B9AC98" strokeWidth={sw * 0.8} strokeLinecap="round" />
+          <path d={`M ${pts(q(S - 4, T - 44))} Q ${pts(q(S * 0.45, T - 70))} ${pts(q(3, T - 50))}`} fill="none" stroke="#B9AC98" strokeWidth={sw * 0.8} strokeLinecap="round" />
+          <path d={`M ${pts(q(0, T - 52))} L ${pts(q(0, 40))}`} stroke="#C8BCA9" strokeWidth={sw * 0.5} />
         </g>
       );
-    }
     case "boss": {
-      // Michael: suit jacket, lapels, blue tie
-      const sh = 26;
-      const shL = add(at(8), sk.side, -sh);
-      const shR = add(at(8), sk.side, sh);
-      const hemL = add(sk.hip, sk.side, -24);
-      const hemR = add(sk.hip, sk.side, 24);
-      const jacket = `M ${pts(at(0, -10))} L ${pts(shL)} L ${pts(add(hemL, sk.up, -10))} L ${pts(hemR.x < hemL.x ? hemR : add(hemR, sk.up, -10))} L ${pts(shR)} L ${pts(at(0, 10))} Z`;
-      const lapel = `M ${pts(at(0, -10))} L ${pts(at(48, 0))} L ${pts(at(0, 10))}`;
-      const tie = `M ${pts(at(6, -5))} L ${pts(at(6, 5))} L ${pts(add(at(44, 6), sk.side, flutter * 0.4))} L ${pts(add(at(52, 0), sk.side, flutter * 0.6))} L ${pts(add(at(44, -6), sk.side, flutter * 0.4))} Z`;
-      const b1 = at(66);
-      const b2 = at(86);
+      // Michael: dark blazer, open white collar
       return (
         <g>
-          {legs}
-          <path d={jacket} {...L} fill={PAPER} />
-          <path d={tie} {...L} fill={ACCENT} strokeWidth={sw * 0.7} />
-          <path d={lapel} {...L} />
-          <circle cx={b1.x} cy={b1.y} r={3.5} fill={INK} />
-          <circle cx={b2.x} cy={b2.y} r={3.5} fill={INK} />
-          <polyline points={pts(shL, sk.elbowL, sk.handL)} {...L} />
-          <polyline points={pts(shR, sk.elbowR, sk.handR)} {...L} />
+          {shirt(o.top)}
+          <path d={`M ${pts(q(-neckW - 1, T + 1))} L ${pts(q(0, T * 0.45))} L ${pts(q(neckW + 1, T + 1))} Z`} fill={o.cuff ?? PAPER} stroke={INK} strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          <path d={`M ${pts(q(-neckW - 1, T + 1))} L ${pts(q(-7, T - 18))} L ${pts(q(-2, T - 4))}`} fill={PAPER} stroke={INK} strokeWidth={sw * 0.6} />
+          <path d={`M ${pts(q(neckW + 1, T + 1))} L ${pts(q(7, T - 18))} L ${pts(q(2, T - 4))}`} fill={PAPER} stroke={INK} strokeWidth={sw * 0.6} />
+          <path d={`M ${pts(q(-neckW - 4, T))} L ${pts(q(-24, T * 0.62))} L ${pts(q(-2, T * 0.42))}`} fill="none" stroke="#5A606B" strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          <path d={`M ${pts(q(neckW + 4, T))} L ${pts(q(24, T * 0.62))} L ${pts(q(2, T * 0.42))}`} fill="none" stroke="#5A606B" strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          <circle cx={q(0, T * 0.32).x} cy={q(0, T * 0.32).y} r={3.5} fill="#5A606B" />
+          <circle cx={q(0, T * 0.16).x} cy={q(0, T * 0.16).y} r={3.5} fill="#5A606B" />
         </g>
       );
     }
     case "money": {
-      // Saeed: kandura (long white robe)
-      const hemY = -10;
-      const shL = add(at(6), sk.side, -22);
-      const shR = add(at(6), sk.side, 22);
+      // Saeed: kandura to the ankles, flaring over the feet
       const sway = Math.sin(frame / 4) * 6 * wind;
-      const hemL = { x: sk.hip.x - 40 + sway, y: hemY };
-      const hemR = { x: sk.hip.x + 40 + sway, y: hemY };
-      const robe = `M ${pts(shL)} Q ${pts(add(sk.hip, sk.side, -34))} ${pts(hemL)} Q ${pts({ x: sk.hip.x + sway, y: hemY + 6 })} ${pts(hemR)} Q ${pts(add(sk.hip, sk.side, 34))} ${pts(shR)} Z`;
-      const tassel0 = at(4);
-      const tassel1 = at(40);
+      const hemY = Math.min(sk.footL.y, sk.footR.y) - 4;
+      const hl = { x: Math.min(sk.footL.x - 18, sk.hip.x - 46) + sway, y: hemY };
+      const hr = { x: Math.max(sk.footR.x + 18, sk.hip.x + 46) + sway, y: hemY };
+      const robe = `M ${pts(q(-neckW, T + 2))} L ${pts(q(-S + 4, T - 2))} Q ${pts(q(-S - 14, T - 10))} ${pts(q(-chest, T - 34))} Q ${pts(q(-chest - 6, T * 0.3))} ${pts(hl)} Q ${pts({ x: (hl.x + hr.x) / 2, y: hemY + 5 })} ${pts(hr)} Q ${pts(q(chest + 6, T * 0.3))} ${pts(q(chest, T - 34))} Q ${pts(q(S + 14, T - 10))} ${pts(q(S - 4, T - 2))} L ${pts(q(neckW, T + 2))} Q ${pts(q(0, T - 10))} ${pts(q(-neckW, T + 2))} Z`;
+      const tA = q(0, T - 6);
+      const tB = q(0, T - 70);
       return (
         <g>
-          <line x1={sk.footL.x + 6} y1={hemY} x2={sk.footL.x} y2={sk.footL.y} {...L} />
-          <line x1={sk.footR.x - 6} y1={hemY} x2={sk.footR.x} y2={sk.footR.y} {...L} />
-          <line x1={sk.footL.x} y1={sk.footL.y} x2={sk.footL.x - 16} y2={sk.footL.y} {...L} />
-          <line x1={sk.footR.x} y1={sk.footR.y} x2={sk.footR.x + 16} y2={sk.footR.y} {...L} />
-          <path d={robe} {...L} fill={PAPER} />
-          <line x1={tassel0.x} y1={tassel0.y} x2={tassel1.x} y2={tassel1.y} {...L} strokeWidth={sw * 0.6} />
-          <circle cx={tassel1.x} cy={tassel1.y + 4} r={5} fill={ACCENT} stroke={INK} strokeWidth={sw * 0.5} />
-          {/* wide sleeves */}
-          <path d={muscleLimb(shL, sk.elbowL, 12, 13, 12, 0.5)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.elbowL, sk.handL, 12, 12, 11, 0.5)} {...L} fill={PAPER} />
-          <path d={muscleLimb(shR, sk.elbowR, 12, 13, 12, 0.5)} {...L} fill={PAPER} />
-          <path d={muscleLimb(sk.elbowR, sk.handR, 12, 12, 11, 0.5)} {...L} fill={PAPER} />
+          <path d={robe} {...L} fill={o.top} />
+          <path d={`M ${pts(q(-10, 0))} Q ${pts(q(-16, -60))} ${pts({ x: hl.x + 30, y: hemY - 2 })}`} fill="none" stroke="#D9D9D9" strokeWidth={sw * 0.6} />
+          <path d={`M ${pts(q(12, 0))} Q ${pts(q(18, -60))} ${pts({ x: hr.x - 28, y: hemY - 2 })}`} fill="none" stroke="#D9D9D9" strokeWidth={sw * 0.6} />
+          <line x1={tA.x} y1={tA.y} x2={tB.x} y2={tB.y} stroke="#BDBDBD" strokeWidth={sw * 0.7} />
+          <path d={`M ${tB.x} ${tB.y} q ${-3 + flutter * 0.2} 20 ${flutter * 0.4} 40`} fill="none" stroke="#9E9E9E" strokeWidth={sw * 1.1} strokeLinecap="round" />
         </g>
       );
     }
     default:
-      return (
-        <g>
-          {legs}
-          {spine}
-          {arms}
-        </g>
-      );
+      return shirt(o.top);
   }
 };
 
 // ------------------------------------------------------------------- ghutra (Saeed)
-const GhutraBack: React.FC<{ hc: Pt; r: number; sw: number; wind: number; frame: number; neck: Pt }> = ({ hc, r, sw, wind, frame, neck }) => {
-  const R = r * 1.14;
-  const flap = Math.sin(frame / 3.5) * 14 * wind;
-  const d = `M ${hc.x - R} ${hc.y + r * 0.1}
-    A ${R} ${R} 0 0 1 ${hc.x + R} ${hc.y + r * 0.1}
-    L ${hc.x + R * 0.98 + flap} ${neck.y + 30}
-    Q ${hc.x + r * 0.5} ${neck.y + 40} ${hc.x + r * 0.35} ${neck.y + 6}
-    L ${hc.x - r * 0.35} ${neck.y + 6}
-    Q ${hc.x - r * 0.5} ${neck.y + 40} ${hc.x - R * 0.98 + flap} ${neck.y + 30} Z`;
-  return <path d={d} fill={PAPER} stroke={INK} strokeWidth={sw} strokeLinejoin="round" />;
+/** ghutra cloth falling from the head onto both shoulders (matches the real ghutra in the photo) */
+const GhutraDrape: React.FC<{ hc: Pt; r: number; sw: number; wind: number; frame: number; sk: Skeleton }> = ({ hc, r, sw, wind, frame, sk }) => {
+  const flap = Math.sin(frame / 3.5) * 12 * wind;
+  const flap2 = Math.sin(frame / 3.1 + 1) * 10 * wind;
+  const left = `M ${hc.x - r * 0.86} ${hc.y - r * 0.1}
+    Q ${hc.x - r * 1.12} ${hc.y + r * 0.7} ${sk.shoulderL.x - 14 + flap} ${sk.shoulderL.y + 46}
+    L ${sk.shoulderL.x + 26 + flap * 0.5} ${sk.shoulderL.y + 40}
+    Q ${hc.x - r * 0.4} ${hc.y + r * 1.2} ${hc.x - r * 0.42} ${hc.y + r * 0.7} Z`;
+  const right = `M ${hc.x + r * 0.86} ${hc.y - r * 0.1}
+    Q ${hc.x + r * 1.12} ${hc.y + r * 0.7} ${sk.shoulderR.x + 14 + flap2} ${sk.shoulderR.y + 46}
+    L ${sk.shoulderR.x - 26 + flap2 * 0.5} ${sk.shoulderR.y + 40}
+    Q ${hc.x + r * 0.4} ${hc.y + r * 1.2} ${hc.x + r * 0.42} ${hc.y + r * 0.7} Z`;
+  return (
+    <g>
+      <path d={left} fill={PAPER} stroke={INK} strokeWidth={sw} strokeLinejoin="round" />
+      <path d={right} fill={PAPER} stroke={INK} strokeWidth={sw} strokeLinejoin="round" />
+      <path d={`M ${hc.x - r * 0.95} ${hc.y + r * 0.4} Q ${hc.x - r * 0.9} ${hc.y + r * 1.0} ${sk.shoulderL.x + 2} ${sk.shoulderL.y + 34}`} fill="none" stroke="#D5D5D5" strokeWidth={sw * 0.6} />
+      <path d={`M ${hc.x + r * 0.95} ${hc.y + r * 0.4} Q ${hc.x + r * 0.9} ${hc.y + r * 1.0} ${sk.shoulderR.x - 2} ${sk.shoulderR.y + 34}`} fill="none" stroke="#D5D5D5" strokeWidth={sw * 0.6} />
+    </g>
+  );
 };
 
 const GhutraFront: React.FC<{ hc: Pt; r: number; sw: number }> = ({ hc, r, sw }) => (
@@ -372,16 +464,21 @@ const GhutraFront: React.FC<{ hc: Pt; r: number; sw: number }> = ({ hc, r, sw })
 const BackOfHead: React.FC<{ hc: Pt; r: number; sw: number; body: string }> = ({ hc, r, sw, body }) =>
   body === "money" ? (
     <g>
-      <circle cx={hc.x} cy={hc.y} r={r * 1.08} fill={PAPER} stroke={INK} strokeWidth={sw} />
-      <path d={`M ${hc.x - r * 0.2} ${hc.y - r * 0.5} Q ${hc.x - r * 0.3} ${hc.y + r * 0.4} ${hc.x - r * 0.45} ${hc.y + r * 1.1}`} fill="none" stroke={INK} strokeWidth={sw * 0.6} strokeLinecap="round" />
-      <path d={`M ${hc.x + r * 0.25} ${hc.y - r * 0.5} Q ${hc.x + r * 0.35} ${hc.y + r * 0.4} ${hc.x + r * 0.5} ${hc.y + r * 1.1}`} fill="none" stroke={INK} strokeWidth={sw * 0.6} strokeLinecap="round" />
-      <ellipse cx={hc.x} cy={hc.y - r * 0.74} rx={r * 0.78} ry={r * 0.17} fill="none" stroke={INK} strokeWidth={sw * 1.6} />
-      <ellipse cx={hc.x} cy={hc.y - r * 0.6} rx={r * 0.84} ry={r * 0.17} fill="none" stroke={INK} strokeWidth={sw * 1.6} />
+      <path
+        d={`M ${hc.x - r * 0.78} ${hc.y - r * 0.3} Q ${hc.x - r * 0.8} ${hc.y - r * 0.95} ${hc.x} ${hc.y - r * 0.98} Q ${hc.x + r * 0.8} ${hc.y - r * 0.95} ${hc.x + r * 0.78} ${hc.y - r * 0.3} L ${hc.x + r * 1.0} ${hc.y + r * 1.25} Q ${hc.x} ${hc.y + r * 1.4} ${hc.x - r * 1.0} ${hc.y + r * 1.25} Z`}
+        fill={PAPER}
+        stroke={INK}
+        strokeWidth={sw}
+        strokeLinejoin="round"
+      />
+      <path d={`M ${hc.x - r * 0.25} ${hc.y - r * 0.4} Q ${hc.x - r * 0.35} ${hc.y + r * 0.5} ${hc.x - r * 0.5} ${hc.y + r * 1.2}`} fill="none" stroke="#D5D5D5" strokeWidth={sw * 0.6} />
+      <path d={`M ${hc.x + r * 0.25} ${hc.y - r * 0.4} Q ${hc.x + r * 0.35} ${hc.y + r * 0.5} ${hc.x + r * 0.5} ${hc.y + r * 1.2}`} fill="none" stroke="#D5D5D5" strokeWidth={sw * 0.6} />
+      <ellipse cx={hc.x} cy={hc.y - r * 0.66} rx={r * 0.7} ry={r * 0.15} fill="none" stroke={INK} strokeWidth={sw * 1.5} />
+      <ellipse cx={hc.x} cy={hc.y - r * 0.52} rx={r * 0.76} ry={r * 0.15} fill="none" stroke={INK} strokeWidth={sw * 1.5} />
     </g>
   ) : (
     <g>
-      <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} stroke={INK} strokeWidth={sw} />
-      <path d={`M ${hc.x - r} ${hc.y} A ${r} ${r} 0 0 1 ${hc.x + r} ${hc.y} Q ${hc.x} ${hc.y + r * 0.3} ${hc.x - r} ${hc.y} Z`} fill={INK} />
+      <ellipse cx={hc.x} cy={hc.y} rx={r * 0.72} ry={r * 0.85} fill="#2A2420" stroke={INK} strokeWidth={sw} />
     </g>
   );
 
@@ -442,29 +539,22 @@ const PlaceholderHead: React.FC<{ id: CharId; hc: Pt; r: number; sw: number; exp
 
 /** Just a head (photo or placeholder) at a screen position — for top-down shots and close-ups. */
 export const FaceDisc: React.FC<{ id: CharId; x: number; y: number; r: number; expression?: Expression; rotate?: number; ring?: string; goggles?: "eyes" | "forehead" | "none"; gogglesGlow?: number }> = ({
-  id, x, y, r, expression = "neutral", rotate = 0, ring = INK, goggles = "none", gogglesGlow = 0,
+  id, x, y, r, expression = "neutral", rotate = 0, goggles = "none", gogglesGlow = 0,
 }) => {
   const face = facePath(id, expression);
   const s = r / HEAD_R;
   const sw = STROKE / s;
   return (
     <div style={{ position: "absolute", left: x, top: y, width: 0, height: 0, transform: `rotate(${rotate}deg) scale(${s})`, transformOrigin: "0 0" }}>
-      <svg width={1} height={1} style={{ position: "absolute", overflow: "visible" }}>
-        <circle r={HEAD_R} fill={PAPER} />
-      </svg>
-      {face && <Img src={staticFile(face)} style={{ position: "absolute", left: -HEAD_R, top: -HEAD_R, width: 2 * HEAD_R, height: 2 * HEAD_R }} />}
+      {face && <PhotoHead src={face} hc={{ x: 0, y: 0 }} r={HEAD_R} tilt={0} flip={1} sw={sw} />}
       <svg width={1} height={1} style={{ position: "absolute", overflow: "visible" }}>
         <defs>
           <filter id="glowBlur" x="-100%" y="-100%" width="300%" height="300%">
             <feGaussianBlur stdDeviation={10} />
           </filter>
         </defs>
-        {face ? (
-          <circle r={HEAD_R} fill="none" stroke={ring} strokeWidth={sw} />
-        ) : (
-          <PlaceholderHead id={id} hc={{ x: 0, y: 0 }} r={HEAD_R} sw={sw} expression={expression} flip={1} />
-        )}
-        {charCfg(id).body === "money" && <GhutraFront hc={{ x: 0, y: 0 }} r={HEAD_R} sw={sw} />}
+        {!face && <PlaceholderHead id={id} hc={{ x: 0, y: 0 }} r={HEAD_R} sw={sw} expression={expression} flip={1} />}
+        {charCfg(id).body === "money" && !face && <GhutraFront hc={{ x: 0, y: 0 }} r={HEAD_R} sw={sw} />}
         {charCfg(id).body === "genius" && goggles !== "none" && (
           <Goggles r={HEAD_R} sw={sw} eyes={[CHARS.faceGeometry.leftEye, CHARS.faceGeometry.rightEye]} mode={goggles} glow={gogglesGlow} />
         )}

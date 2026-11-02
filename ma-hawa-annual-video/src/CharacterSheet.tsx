@@ -1,59 +1,34 @@
-// Studio helper: every character in every expression. Use it to check a face swap.
+// Studio helper: every character in a few poses. Use it to check a face swap or outfit colours.
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Character } from "./characters/Character";
-import { CharId, Expression } from "./characters/config";
-import { POSES } from "./characters/rig";
+import { CharId } from "./characters/config";
+import { POSES, Pose, walkPose } from "./characters/rig";
 import { idleMotion } from "./sync/beats";
 import { FONT, INK, PAPER } from "./theme";
 
-const IDS: CharId[] = ["amr", "ali", "hussein", "michael", "saeed"];
-const EXPR: Expression[] = ["neutral", "happy", "shocked", "tired"];
-const POSE_FOR: Record<CharId, keyof typeof POSES> = {
-  amr: "clipboard",
-  ali: "flex",
-  hussein: "stand",
-  michael: "batReady",
-  saeed: "sip",
+const IDS: CharId[] = ["ali", "amr", "hussein", "michael", "saeed"];
+const POSE_FOR: Record<CharId, Pose> = {
+  amr: POSES.clipboard,
+  ali: POSES.flex,
+  hussein: POSES.relaxed,
+  michael: POSES.batReady,
+  saeed: POSES.sip,
 };
 
-export const CharacterSheet: React.FC<{ expressionRow?: boolean }> = ({ expressionRow = true }) => {
+export const CharacterSheet: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: PAPER, fontFamily: FONT }}>
       {IDS.map((id, i) => {
         const m = idleMotion(frame, i * 0.37);
+        const x = 200 + i * 380;
         return (
           <React.Fragment key={id}>
-            <Character
-              id={id}
-              x={210 + i * 375}
-              y={expressionRow ? 600 : 900}
-              scale={0.95}
-              pose={POSES[POSE_FOR[id]]}
-              expression="happy"
-              squashX={m.scaleX}
-              squashY={m.scaleY}
-              headTilt={m.headTilt}
-              goggles={id === "hussein" ? "eyes" : undefined}
-              frame={frame}
-            />
-            <div style={{ position: "absolute", left: 210 + i * 375 - 150, width: 300, top: expressionRow ? 615 : 950, textAlign: "center", fontWeight: 800, fontSize: 30, color: INK }}>
-              {id}
-            </div>
-            {expressionRow &&
-              EXPR.map((e, k) => (
-                <Character
-                  key={e}
-                  id={id}
-                  x={210 + i * 375 - 120 + k * 80}
-                  y={1060}
-                  scale={0.33}
-                  pose={POSES.stand}
-                  expression={e}
-                  frame={frame}
-                />
-              ))}
+            <Character id={id} x={x} y={560} scale={0.95} pose={{ ...POSE_FOR[id], hipY: m.hipY, hipX: m.hipX }} expression="happy" headTilt={m.headTilt} goggles={id === "hussein" ? "eyes" : undefined} frame={frame} />
+            <div style={{ position: "absolute", left: x - 150, width: 300, top: 572, textAlign: "center", fontWeight: 800, fontSize: 26, color: INK }}>{id}</div>
+            <Character id={id} x={x - 90} y={1050} scale={0.62} pose={POSES.blow} expression="neutral" left="none" right="none" frame={frame} />
+            <Character id={id} x={x + 90} y={1050} scale={0.62} pose={walkPose(POSES.relaxed, frame / 30 + i * 0.2)} expression="neutral" left="none" right="none" frame={frame} />
           </React.Fragment>
         );
       })}

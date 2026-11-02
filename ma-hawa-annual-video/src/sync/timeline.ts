@@ -64,8 +64,8 @@ const sec = (s: number) => Math.round(s * FPS);
 export const eventStampCount = () =>
   VIDEO.events.reduce((n, e) => n + (e.years?.length ?? 1), 0);
 
-/** beats the Events scene needs: stamps, then badge (1 bar), counter (1 bar), short hold */
-const eventsBeatsNeeded = () => Math.ceil(eventStampCount() / 4) * 4 + 4 + 4 + 2;
+/** beats the Events scene needs: one stamp per beat, badge on the next beat, counter lands on the next downbeat, short hold */
+const eventsBeatsNeeded = () => Math.ceil((eventStampCount() + 3) / 4) * 4 + 2;
 
 const nearest = (arr: number[], target: number, lo = -Infinity, hi = Infinity) => {
   let best: number | null = null;

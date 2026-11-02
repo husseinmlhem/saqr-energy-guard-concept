@@ -33,12 +33,12 @@ const buildStamps = (): Stamp[] => {
 export const eventsCues = (slot: SceneSlot) => {
   const stamps = buildStamps();
   const hits = stamps.map((_, i) => beatOf(slot, i));
-  const lastIdx = stamps.length - 1;
-  const after = slot.downbeats.find((d) => d > hits[lastIdx] + 2) ?? beatOf(slot, lastIdx + 2);
-  const badge = after;
-  const badgeIdx = slot.beats.indexOf(badge);
-  const countStart = beatOf(slot, badgeIdx + 4);
-  const countEnd = beatOf(slot, badgeIdx + 8);
+  // gold badge on the beat after the last stamp, counter starts a beat later
+  // and lands "45+" on the next downbeat
+  const S = stamps.length;
+  const badge = beatOf(slot, S);
+  const countStart = beatOf(slot, S + 1);
+  const countEnd = slot.downbeats.find((d) => d >= beatOf(slot, S + 3) - 0.5) ?? beatOf(slot, S + 3);
   const countBeats = slot.beats.filter((b) => b > countStart && b < countEnd);
   const cues: Cues = {
     marks: [
@@ -212,7 +212,7 @@ export const S6Events: React.FC<SceneProps> = ({ slot }) => {
   const cam2 = shake(frame, [c.badge, c.countEnd], 18);
   const wallDim = lin(frame, [c.badge - 3, c.badge + 6], [0, 1], easeOut);
   const wallScale = 1 - wallDim * 0.12;
-  const toLeft = lin(frame, [c.countStart, c.countStart + 10], [0, 1], easeInOut);
+  const toLeft = lin(frame, [c.countStart - 2, c.countStart + 8], [0, 1], easeInOut);
   const badgeX = 960 - toLeft * 420;
   const countT = lin(frame, [c.countStart, c.countEnd], [0, 1], (t) => 1 - Math.pow(1 - t, 2.2));
   const value = Math.round(VIDEO.eventCount * countT);

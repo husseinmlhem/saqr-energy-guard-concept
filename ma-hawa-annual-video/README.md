@@ -1,16 +1,19 @@
 # Ma Hawa — Annual Meeting Video (60 s, beat-synced)
 
-A 1920×1080, 30 fps "Bobblehead Line Art" animation built in **Remotion (React)**.
+A 1920×1080, 30 fps animation built in **Remotion (React)**. It uses real-photo heads on clothed, outlined bodies, with outfit colours taken from each person's photo. White background, Ma Hawa blue accents.
 Every scene is a React component, and every cut, hit and bounce comes from the music analysis in `config/beats.json`.
 
 ```
 Playtime → CEO enters → The huddle → The CFO → Hard work → Events → Finale (hero shot + logo)
 ```
 
-> **About the music in this version:** no audio file came through with the original request, so the
-> preview uses a **synthesised stand-in track** (`assets/audio/placeholder.wav`, 124 BPM, with a quiet intro, a hard
-> break, a build-up and a drop). Drop in the real song with one command (see *Re-sync to a new song*) and the
-> whole video re-times itself.
+**Current version** is synced to *7mama — Sheshtawy* (95 BPM). The best 60 s window is **40.5 s → 100.5 s** of the song:
+- It opens on the song's soft break bar, where the three start blowing up balloons.
+- The breakdown and build-up (song 80.9–91 s) carry the tired walk-back and "Great work, guys!".
+- The biggest drop (song 91.0 s) is the hero shot at 50.5 s.
+- It ends in the full groove with a 2.5 s fade.
+
+The song's only hard breaks (40.5 s, 80.9 s, 106 s) can't sit near 10 s in any 60 s window that also contains that drop. So the CEO bursts in on the bar-5 downbeat (10.1 s), right after the groove's bass stop. To put the CEO on a real break instead, use `npm run sync -- song.mp3 --start 30.39`, but the video then ends before the big drop.
 
 ---
 
@@ -98,6 +101,17 @@ Render `MaHawaDebug`, or open it in the Studio. It shows:
 
 If any cue is off-beat, the panel flags it.
 
+## Characters and motion
+
+- **Bodies** (`src/characters/Character.tsx`) are outlined "tubes": a dark under-stroke plus a coloured over-stroke, so joints are seamless. They have hands, shoes, a neck, and a torso cut to each outfit: Amr's gingham shirt and tie, Ali's knit tee, Hussein's navy tee, Michael's blazer, Saeed's kandura with his ghutra falling onto the shoulders.
+- **Heads** are the photo cut-outs (no circle frame), outlined and faded into the drawn neck. `headScale` in `config/characters.json` sets head size: 1.0 is realistic, 1.45 is used now.
+- **Outfit colours** live in `config/characters.json → outfit` (`top`, `bottom`, `shoes`, `skin`, `accent`, `sleeves: long|short`).
+- **Rig** (`src/characters/rig.ts`): two-bone IK keeps feet planted. Bounces bend the knees instead of sliding the body, and hands can be placed at the mouth or chest (`lHand` / `rHand` / `hold`).
+  - Walk cycle: the stance foot stays put, the swing foot lifts, and the hips bob.
+  - Pose changes ease naturally, and the arms lag a few frames behind the body (follow-through).
+- **Idle groove** (`idleMotion`): the knees dip exactly on every beat, weight shifts once per bar, and the head sways every two beats. Each person is slightly offset so the group never moves like one robot.
+- **Amr is always in the centre:** Ali | Amr | Hussein in every group shot. He's at the head of the huddle, in the middle panel of the split screen, and front and centre (larger) in the hero shot.
+
 ## Edit the content
 
 | What | Where |
@@ -109,7 +123,8 @@ If any cue is off-beat, the panel flags it.
 | Colours | `config/video.json` → `brand` (accent `#76ADDE`) |
 | Music / SFX volume, SFX on/off | `config/video.json` → `audio` |
 | A scene's animation | `src/scenes/S1Playtime.tsx` … `S7Finale.tsx` (one component per scene) |
-| Poses | `src/characters/rig.ts` → `POSES` |
+| Poses | `src/characters/rig.ts` → `POSES` (angles, or IK targets `lHand`/`rHand`/`lFoot`/`rFoot`) |
+| Outfit colours, head size | `config/characters.json` → `outfit`, `headScale` |
 | Bodies / outfits / props | `src/characters/Character.tsx`, `src/characters/props.tsx` |
 
 ## Project layout

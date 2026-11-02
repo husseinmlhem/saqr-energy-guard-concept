@@ -104,19 +104,23 @@ export const nearestDownbeatFrame = (frame: number): number => {
   return best;
 };
 
-/** standard idle motion for a character, phase-shifted so a group doesn't move like one robot */
+/**
+ * Natural idle groove for a character, locked to the beat grid:
+ * knees bend (hips dip, feet stay planted) exactly on every beat, weight shifts once per bar,
+ * the head sways once every two beats. `offset` de-syncs people slightly so a group doesn't move like one robot.
+ */
 export const idleMotion = (frame: number, offset = 0, amount = 1) => {
   const clock = beatClock(frame);
-  const pulse = beatPulse(frame, 6);
+  const ph = beatPhase(frame);
+  const dip = 0.5 + 0.5 * Math.cos(2 * Math.PI * ph); // 1 on the beat, 0 half-way
   return {
-    /** vertical bob (px at scale 1) — dips on the beat */
-    y: pulse * 7 * amount,
-    /** squash on the beat */
-    scaleY: 1 - 0.045 * pulse * amount,
-    scaleX: 1 + 0.03 * pulse * amount,
-    /** head bobble: one sway every two beats */
-    headTilt: Math.sin(((clock + offset) / 2) * Math.PI * 2) * 5 * amount,
-    /** arm sway */
+    hipY: dip * 6 * amount,
+    hipX: Math.sin(((clock + offset) / 4) * Math.PI * 2) * 4 * amount,
+    headTilt: (Math.sin(((clock + offset) / 2) * Math.PI * 2) * 3 + dip * 1.5) * amount,
     sway: Math.sin(((clock + offset) / 2) * Math.PI * 2) * amount,
+    // legacy fields (no cartoon squash any more)
+    y: 0,
+    scaleX: 1,
+    scaleY: 1,
   };
 };

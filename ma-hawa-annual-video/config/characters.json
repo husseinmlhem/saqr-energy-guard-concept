@@ -3,19 +3,36 @@
     "Swap a face: drop photos in assets/faces/raw/<id>_<expression>.jpg, run `npm run faces`, then point 'faces' below at the new PNGs.",
     "Expressions: neutral, happy, shocked, tired. Missing ones fall back via 'expressionFallbacks'.",
     "A character with no faces (or whose files are missing) is drawn as a line-art placeholder with its initials.",
-    "Paths are relative to /assets. 'tag' is shown once, for 1.5 s, on the character's first appearance (null = never)."
+    "Paths are relative to /assets. 'tag' is shown once, for 1.5 s, on the character's first appearance (null = never).",
+    "outfit: clothing colours (taken from each person's photo). sleeves: long|short. Hands/neck use 'skin'."
   ],
-  "headScale": 1.6,
+  "headScale": 1.45,
   "expressionFallbacks": {
-    "neutral": ["happy"],
-    "happy": ["neutral"],
-    "shocked": ["tired", "neutral"],
-    "tired": ["shocked", "neutral"]
+    "neutral": [
+      "happy"
+    ],
+    "happy": [
+      "neutral"
+    ],
+    "shocked": [
+      "tired",
+      "neutral"
+    ],
+    "tired": [
+      "shocked",
+      "neutral"
+    ]
   },
   "faceGeometry": {
     "_help": "Where the eyes sit inside every processed face PNG (0-1). process_faces.py aligns all photos to this.",
-    "leftEye": [0.407, 0.47],
-    "rightEye": [0.593, 0.47]
+    "leftEye": [
+      0.407,
+      0.47
+    ],
+    "rightEye": [
+      0.593,
+      0.47
+    ]
   },
   "characters": {
     "amr": {
@@ -27,7 +44,17 @@
         "happy": "faces/amr_happy.png",
         "shocked": "faces/amr_shocked.png"
       },
-      "placeholder": { "initials": "A" }
+      "placeholder": {
+        "initials": "A"
+      },
+      "outfit": {
+        "top": "#A9C7EE",
+        "bottom": "#2C3448",
+        "shoes": "#2A211C",
+        "skin": "#C49A84",
+        "accent": "#24406E",
+        "sleeves": "long"
+      }
     },
     "ali": {
       "name": "Ali",
@@ -38,7 +65,16 @@
         "happy": "faces/ali_happy.png",
         "shocked": "faces/ali_shocked.png"
       },
-      "placeholder": { "initials": "AL" }
+      "placeholder": {
+        "initials": "AL"
+      },
+      "outfit": {
+        "top": "#D9CDBB",
+        "bottom": "#36404F",
+        "shoes": "#2B2B2B",
+        "skin": "#9C7865",
+        "sleeves": "short"
+      }
     },
     "hussein": {
       "name": "Hussein",
@@ -49,21 +85,56 @@
         "happy": "faces/hussein_happy.png",
         "tired": "faces/hussein_tired.png"
       },
-      "placeholder": { "initials": "H" }
+      "placeholder": {
+        "initials": "H"
+      },
+      "outfit": {
+        "top": "#1F2840",
+        "bottom": "#4B5160",
+        "shoes": "#2B2B2B",
+        "skin": "#A88472",
+        "sleeves": "short"
+      }
     },
     "michael": {
       "name": "Michael",
       "tag": "Michael — CEO",
       "body": "boss",
-      "faces": {},
-      "placeholder": { "initials": "M", "hair": "side-part" }
+      "faces": {
+        "happy": "faces/michael_happy.png"
+      },
+      "placeholder": {
+        "initials": "M",
+        "hair": "side-part"
+      },
+      "outfit": {
+        "top": "#23262D",
+        "bottom": "#23262D",
+        "shoes": "#111111",
+        "skin": "#B08470",
+        "sleeves": "long",
+        "cuff": "#FFFFFF"
+      }
     },
     "saeed": {
       "name": "Saeed",
       "tag": "Saeed — CFO",
       "body": "money",
-      "faces": {},
-      "placeholder": { "initials": "S", "hair": "none" }
+      "faces": {
+        "neutral": "faces/saeed_neutral.png"
+      },
+      "placeholder": {
+        "initials": "S",
+        "hair": "none"
+      },
+      "outfit": {
+        "top": "#FBFBFB",
+        "bottom": "#F0F0F0",
+        "shoes": "#8A5A3C",
+        "skin": "#A97B62",
+        "sleeves": "long",
+        "sandals": true
+      }
     }
   }
 }

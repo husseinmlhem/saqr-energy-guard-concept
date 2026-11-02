@@ -116,8 +116,8 @@ export const Goggles: React.FC<{
         </g>
       )}
       {/* strap to the edge of the head */}
-      <path d={`M ${-r * 0.97} ${l.y + 2} L ${l.x - lr} ${l.y}`} {...line(sw * 1.3)} fill="none" />
-      <path d={`M ${r * 0.97} ${rr.y + 2} L ${rr.x + lr} ${rr.y}`} {...line(sw * 1.3)} fill="none" />
+      <path d={`M ${-r * 0.8} ${l.y + 2} L ${l.x - lr} ${l.y}`} {...line(sw * 1.3)} fill="none" />
+      <path d={`M ${r * 0.8} ${rr.y + 2} L ${rr.x + lr} ${rr.y}`} {...line(sw * 1.3)} fill="none" />
       <path d={`M ${l.x + lr * 0.8} ${l.y - 2} Q 0 ${l.y - lr * 0.6} ${rr.x - lr * 0.8} ${rr.y - 2}`} {...line(sw)} fill="none" />
       {[l, rr].map((p, i) => (
         <g key={i}>

@@ -3,24 +3,26 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { Character, headScreenPos } from "../characters/Character";
-import { POSES, lerpPose, walkPose } from "../characters/rig";
+import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, lin, popIn, rand } from "../fx/anim";
-import { Doodles, Floor, LightRays, SpeechBubble, SpeedLines, Sweat, Svg } from "../fx/Fx";
+import { Doodles, LightRays, SpeechBubble, SpeedLines, Sweat, Svg } from "../fx/Fx";
+import { Ground } from "./common";
 import { BEAT_FRAMES, beatClock, energyAt, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { Cues, SceneProps } from "./types";
 
-const GROUND = 965;
 
 export const finaleCues = (slot: SceneSlot) => {
   const hero = slot.anchors.hero;
   const logo = slot.anchors.logo;
   const pre = slot.beats.filter((b) => b < hero);
-  const michael = pre[1] ?? Math.round(hero * 0.25);
   const words = VIDEO.lines.finale.split(" ");
   const chunks = words.length >= 3 ? [words.slice(0, words.length - 2).join(" "), ...words.slice(-2)] : words;
-  const speech = chunks.map((_, i) => pre[2 + i] ?? Math.round(michael + (i + 1) * BEAT_FRAMES));
+  // walk in, Michael appears, says his line one chunk per beat, faces light up on the last beat before the drop
+  const speechStart = Math.max(2, pre.length - 1 - chunks.length);
+  const michael = pre[speechStart - 1] ?? Math.round(hero * 0.4);
+  const speech = chunks.map((_, i) => pre[speechStart + i] ?? Math.round(michael + (i + 1) * BEAT_FRAMES));
   const lookUp = pre[pre.length - 1] ?? hero - Math.round(BEAT_FRAMES);
   const cues: Cues = {
     marks: [
@@ -89,43 +91,53 @@ export const S7Finale: React.FC<SceneProps> = ({ slot }) => {
   const inHero = frame >= c.hero;
   const inLogo = frame >= c.logo;
 
-  // ------------------------------------------------ part A: tired walk + Michael
-  const walkT = lin(frame, [0, Math.max(1, c.hero * 0.65)], [0, 1], easeOut);
+  // ------------------------------------------------ part A: tired walk back + Michael
+  // they walk in from the left, one step per beat, shoulders down; Amr in the middle
   const clock = beatClock(frame);
   const happy = frame >= c.lookUp;
+  const walkEnd = c.speech[0] ?? Math.round(c.hero * 0.6);
   const build = lin(frame, [c.lookUp - BEAT_FRAMES * 3, c.hero], [0, 1], (t) => t * t);
+  const SA = 1.4;
+  const GA = 1040;
+  const walkers = [
+    { id: "ali" as const, tx: 330 },
+    { id: "amr" as const, tx: 640 },
+    { id: "hussein" as const, tx: 950 },
+  ];
 
   const partA = (
-    <AbsoluteFill style={{ transform: `scale(${1 + build * 0.08})`, transformOrigin: "50% 70%" }}>
+    <AbsoluteFill style={{ transform: `scale(${1 + build * 0.07})`, transformOrigin: "50% 75%" }}>
       <Svg>
         <Doodles frame={frame} seed={21} />
-        <Floor y={GROUND + 6} />
       </Svg>
-      {(["amr", "ali", "hussein"] as const).map((id, i) => {
-        const tx = 300 + i * 300;
-        const x = -260 - (2 - i) * 180 + (tx + 260 + (2 - i) * 180) * walkT;
-        const walking = walkT < 0.98;
-        const base = happy ? POSES.cheer : POSES.tiredWalk;
-        const pose = walking ? walkPose(base, clock / 2 + i * 0.25, 0.7) : happy ? lerpPose(POSES.tiredWalk, POSES.cheer, clamp01((frame - c.lookUp) / 5)) : POSES.tiredWalk;
+      <Ground y={GA} />
+      {walkers.map(({ id, tx }, i) => {
+        const startX = tx - 900;
+        const t = clamp01(frame / Math.max(1, walkEnd));
+        const x = startX + (tx - startX) * t; // constant speed while walking (no ease = no foot sliding)
+        const walking = frame < walkEnd;
         const m = idleMotion(frame, i * 0.3, 0.5);
-        const h = headScreenPos(id, x, GROUND, 1.2, pose);
+        const stride = ((tx - startX) / Math.max(1, walkEnd)) * BEAT_FRAMES / SA; // one step per beat
+        let pose: Pose = walking ? walkPose(POSES.tired, clock / 2 + i * 0.5, stride, 1, 10) : withIdle(POSES.tired, m);
+        if (happy) pose = lerpPose(withIdle(POSES.tired, m), withIdle(POSES.cheer, m), clamp01((frame - c.lookUp) / 8));
+        const h = headScreenPos(id, x, GA, SA, pose);
         return (
           <React.Fragment key={id}>
             <Character
               id={id}
               x={x}
-              y={GROUND - m.y}
-              scale={1.2}
+              y={GA}
+              scale={SA}
               pose={pose}
               expression={happy ? "happy" : id === "ali" ? "shocked" : "tired"}
-              headTilt={happy ? m.headTilt : 12 + Math.sin(frame / 8 + i) * 3}
+              headTilt={happy ? m.headTilt : 8 + Math.sin(frame / 9 + i) * 2}
               goggles={id === "hussein" ? "forehead" : undefined}
               left="none"
               frame={frame}
             />
             {!happy && (
               <Svg>
-                <Sweat frame={frame + i * 7} x={h.x + h.r * 0.8} y={h.y - h.r * 0.6} />
+                <Sweat frame={frame + i * 7} x={h.x + h.r * 0.7} y={h.y - h.r * 0.5} />
               </Svg>
             )}
           </React.Fragment>
@@ -134,10 +146,10 @@ export const S7Finale: React.FC<SceneProps> = ({ slot }) => {
       {frame >= c.michael && (
         <Character
           id="michael"
-          x={1520 + (1 - popIn(frame, c.michael, 220, 14)) * 500}
-          y={GROUND}
-          scale={1.2}
-          pose={POSES.thumbsUp}
+          x={1560 + (1 - popIn(frame, c.michael, 160, 18)) * 500}
+          y={GA}
+          scale={SA}
+          pose={withIdle(POSES.thumbsUp, idleMotion(frame, 0.1, 0.5))}
           expression="happy"
           flip
           right="none"
@@ -145,53 +157,48 @@ export const S7Finale: React.FC<SceneProps> = ({ slot }) => {
           frame={frame}
         />
       )}
-      <SpeechBubble frame={frame} x={1250} y={250} chunks={c.chunks} chunkFrames={c.speech} tail="right" hideAt={c.hero - 2} />
+      <SpeechBubble frame={frame} x={1290} y={230} chunks={c.chunks} chunkFrames={c.speech} tail="right" hideAt={c.hero - 2} />
     </AbsoluteFill>
   );
 
-  // ------------------------------------------------ part B: hero shot (slow motion)
+  // ------------------------------------------------ part B: hero shot (slow motion, low angle)
   const slow = (frame - c.hero) * 0.3 + c.hero; // slow-motion clock
   const heroT = frame - c.hero;
-  const push = lin(frame, [c.hero, c.logo], [1, 1.1], easeInOut);
+  const push = lin(frame, [c.hero, c.logo], [1, 1.08], easeInOut);
   const flash = inHero ? Math.exp(-heroT / 5) : 0;
   const energy = energyAt(slot.from + frame);
+  // Amr in the centre, slightly forward and bigger
   const heroes = [
-    { id: "amr" as const, x: 500, pose: POSES.heroPoint, expr: "happy" as const },
-    { id: "ali" as const, x: 960, pose: POSES.heroFlex, expr: "happy" as const },
-    { id: "hussein" as const, x: 1420, pose: POSES.hero, expr: "happy" as const },
+    { id: "ali" as const, x: 440, s: 1.9, pose: POSES.heroFlex },
+    { id: "hussein" as const, x: 1480, s: 1.9, pose: POSES.hero },
+    { id: "amr" as const, x: 960, s: 2.12, pose: POSES.heroPoint },
   ];
   const partB = (
     <AbsoluteFill style={{ background: PAPER, overflow: "hidden" }}>
       <Svg>
         <rect x={0} y={0} width={1920} height={1080} fill="#EAF3FB" />
-        <LightRays frame={slow} x={960} y={760} n={18} intensity={0.55 + 0.45 * energy} speed={0.6} />
-        <circle cx={960} cy={760} r={260} fill={PAPER} opacity={0.7} />
-        <SpeedLines frame={frame} n={22} dir={-1} speed={55} y0={60} y1={980} opacity={0.75} seed={7} />
-        {/* floating dust in slow motion */}
+        <LightRays frame={slow} x={960} y={720} n={18} intensity={0.55 + 0.45 * energy} speed={0.6} />
+        <circle cx={960} cy={720} r={280} fill={PAPER} opacity={0.6} />
+        <SpeedLines frame={frame} n={22} dir={-1} speed={55} y0={60} y1={980} opacity={0.6} seed={7} />
         {Array.from({ length: 26 }, (_, i) => {
           const x = (rand(i) * 2100 - (slow * (3 + rand(i * 2) * 4)) % 2100 + 2100) % 2100 - 90;
           const y = 120 + rand(i * 7) * 820 + Math.sin(slow / 9 + i) * 14;
           return <circle key={i} cx={x} cy={y} r={3 + rand(i * 3) * 6} fill={i % 3 ? ACCENT : PAPER} stroke={INK} strokeWidth={2} />;
         })}
       </Svg>
-      <AbsoluteFill style={{ transform: `perspective(1300px) rotateX(17deg) scale(${push})`, transformOrigin: "50% 100%" }}>
-        <Svg>
-          <line x1={-200} x2={2120} y1={1050} y2={1050} stroke={INK} strokeWidth={STROKE} />
-        </Svg>
-        {heroes.map(({ id, x, pose, expr }, i) => {
-          const m = idleMotion(slow, i * 0.4, 0.5);
-          const breathe = Math.sin(slow / 10 + i) * 0.015;
+      <AbsoluteFill style={{ transform: `perspective(1300px) rotateX(14deg) scale(${push})`, transformOrigin: "50% 100%" }}>
+        <Ground y={1062} color="#DCE8F5" />
+        {heroes.map(({ id, x, s, pose }, i) => {
+          const m = idleMotion(slow, i * 0.4, 0.35);
           return (
             <Character
               key={id}
               id={id}
               x={x}
-              y={1050}
-              scale={1.95}
-              pose={{ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 3 }}
-              expression={expr}
-              squashX={1 - breathe}
-              squashY={1 + breathe}
+              y={1062}
+              scale={s}
+              pose={withIdle({ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 2 }, m)}
+              expression="happy"
               headTilt={m.headTilt * 0.4}
               goggles={id === "hussein" ? "eyes" : undefined}
               gogglesGlow={id === "hussein" ? 0.7 + 0.3 * Math.sin(slow / 4) : 0}

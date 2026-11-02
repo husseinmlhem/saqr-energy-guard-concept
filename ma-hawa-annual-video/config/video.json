@@ -5,33 +5,101 @@
     "anchors: the CEO door lands on a quiet part / hard break near 'ceoTarget'; the hero shot lands on the biggest drop."
   ],
   "scenes": [
-    { "id": "playtime", "title": "Playtime", "target": 8, "minSeconds": 4 },
-    { "id": "ceo", "title": "CEO enters", "target": 7, "minSeconds": 5 },
-    { "id": "huddle", "title": "The huddle", "target": 6, "minSeconds": 3.5 },
-    { "id": "cfo", "title": "The CFO", "target": 6, "minSeconds": 4 },
-    { "id": "hardwork", "title": "Hard work", "target": 8, "minSeconds": 5 },
-    { "id": "events", "title": "Events", "target": 14, "minSeconds": 9 },
-    { "id": "finale", "title": "Finale", "target": 11, "minSeconds": 7 }
+    {
+      "id": "playtime",
+      "title": "Playtime",
+      "target": 10,
+      "minSeconds": 8
+    },
+    {
+      "id": "ceo",
+      "title": "CEO enters",
+      "target": 7.5,
+      "minSeconds": 5
+    },
+    {
+      "id": "huddle",
+      "title": "The huddle",
+      "target": 5,
+      "minSeconds": 3.5
+    },
+    {
+      "id": "cfo",
+      "title": "The CFO",
+      "target": 5,
+      "minSeconds": 4
+    },
+    {
+      "id": "hardwork",
+      "title": "Hard work",
+      "target": 5,
+      "minSeconds": 4
+    },
+    {
+      "id": "events",
+      "title": "Events",
+      "target": 12.5,
+      "minSeconds": 9
+    },
+    {
+      "id": "finale",
+      "title": "Finale",
+      "target": 15,
+      "minSeconds": 7
+    }
   ],
   "anchors": {
-    "ceoTarget": 8,
-    "ceoWindow": [3.5, 16],
-    "heroWindowFraction": [0.55, 0.95],
+    "ceoTarget": 10,
+    "ceoWindow": [
+      6,
+      16
+    ],
+    "heroWindowFraction": [
+      0.55,
+      0.95
+    ],
     "finaleLeadIn": 5,
-    "logoSeconds": 4
+    "logoSeconds": 4.2
   },
   "events": [
-    { "name": "Gulfood", "years": ["2024", "2025", "2026"] },
-    { "name": "GITEX Global" },
-    { "name": "WETEX" },
-    { "name": "Abu Dhabi International Hunting & Equestrian Exhibition" },
-    { "name": "Liwa International Festival" },
-    { "name": "Abu Dhabi International Book Fair" },
-    { "name": "Dubai World Cup 2025" },
-    { "name": "Kayan Wellness Festival" },
-    { "name": "ExpoCulinaire" },
-    { "name": "Arab Water Forum 2024" },
-    { "name": "The Music Run Dubai 2025" }
+    {
+      "name": "Gulfood",
+      "years": [
+        "2024",
+        "2025",
+        "2026"
+      ]
+    },
+    {
+      "name": "GITEX Global"
+    },
+    {
+      "name": "WETEX"
+    },
+    {
+      "name": "Abu Dhabi International Hunting & Equestrian Exhibition"
+    },
+    {
+      "name": "Liwa International Festival"
+    },
+    {
+      "name": "Abu Dhabi International Book Fair"
+    },
+    {
+      "name": "Dubai World Cup 2025"
+    },
+    {
+      "name": "Kayan Wellness Festival"
+    },
+    {
+      "name": "ExpoCulinaire"
+    },
+    {
+      "name": "Arab Water Forum 2024"
+    },
+    {
+      "name": "The Music Run Dubai 2025"
+    }
   ],
   "award": "ADNOC Onshore HSE — Best Exhibit Winner",
   "eventCount": 45,

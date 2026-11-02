@@ -172,9 +172,8 @@ def circle_alpha(feather=2.0) -> np.ndarray:
 def main(prefix: str | None):
     import tempfile
 
-    files = sorted(p for p in RAW.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".heic"})
-    if prefix:
-        files = [f for f in files if f.stem.startswith(prefix)]
+    all_files = sorted(p for p in RAW.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".heic"})
+    files = [f for f in all_files if f.stem.startswith(prefix)] if prefix else all_files
     if not files:
         sys.exit(f"no photos found in {RAW}")
 
@@ -182,19 +181,22 @@ def main(prefix: str | None):
     tmp_dir = Path(tempfile.mkdtemp(prefix="faces-"))
 
     staged = []
-    for f in files:
+    group_stats = []
+    for f in all_files:
         rgb = load_rgb(f)
         pts = landmarks(detector, rgb)
         M = align(rgb, pts)
         aligned = warp(rgb, M, border=(255, 255, 255))
         apts = tf_pts(pts, M)
-        staged.append((f, aligned, apts))
-        print(f"  landmarks ok  {f.name}")
+        # tone target is always the whole cast, even when only one person is re-processed
+        group_stats.append(skin_stats(aligned, apts))
+        if f in files:
+            staged.append((f, aligned, apts))
+            print(f"  landmarks ok  {f.name}")
 
-    # group tone target = average of all skin patches
+    t_mean = np.mean([s[0] for s in group_stats], axis=0)
+    t_std = np.mean([s[1] for s in group_stats], axis=0)
     stats = [skin_stats(a, p) for _, a, p in staged]
-    t_mean = np.mean([s[0] for s in stats], axis=0)
-    t_std = np.mean([s[1] for s in stats], axis=0)
 
     meta_path = OUT / "faces.meta.json"
     meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
