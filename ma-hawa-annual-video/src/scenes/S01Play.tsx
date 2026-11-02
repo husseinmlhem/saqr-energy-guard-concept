@@ -50,6 +50,11 @@ export const playCues = (slot: SceneSlot) => {
       ...beats.map((f, k) => ({ f, name: (k % 2 ? "puff" : "sip") as "puff" | "sip", volume: 0.3 })),
       ...punch.map((f) => ({ f, name: "tick" as const, volume: 0.35 })),
     ],
+    voice: [
+      { f: beats[1], id: "ali_rep", sub: true },
+      { f: beats[3], id: "amr_beach", sub: true },
+      { f: beats[5], id: "hussein_shisha", sub: true },
+    ],
   };
   return { beats, enter, punch, cues };
 };

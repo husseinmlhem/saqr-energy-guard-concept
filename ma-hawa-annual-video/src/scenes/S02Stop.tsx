@@ -46,7 +46,7 @@ export const stopCues = (slot: SceneSlot) => {
       { f: resume, name: "sparkle", volume: 0.6 },
     ],
   };
-  cues.voice = [{ f: words[0], id: "michael_stop" }];
+  cues.voice = [{ f: words[0], id: "michael_stop" }, { f: peek, id: "hussein_gone", sub: true }];
   return { enter, words, hide, innocent, squint, leave, peek, resume, cues };
 };
 

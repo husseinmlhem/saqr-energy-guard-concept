@@ -34,3 +34,9 @@ export const voiceFrames = (id: string): number => {
 
 export const lineText = (id: string) => VOICES.lines[id]?.text ?? "";
 export const lineSpeaker = (id: string) => VOICES.lines[id]?.speaker ?? "";
+
+/** display name of the speaker of a line ("Hussein") */
+export const speakerName = (id: string) => {
+  const sp = VOICES.lines[id]?.speaker ?? "";
+  return sp ? sp[0].toUpperCase() + sp.slice(1) : "";
+};

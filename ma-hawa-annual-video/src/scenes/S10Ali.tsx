@@ -15,6 +15,7 @@ import { Chapter, Subtitle, camAt, faceCam } from "./kit";
 import { camTransform } from "../world/Office";
 import { Cues, SceneProps } from "./types";
 import { LogoSvg } from "../brand/Logo";
+import { hipShakePose } from "./playtime";
 
 const G = 1000;
 const AX = 520;
@@ -30,7 +31,7 @@ export const aliCues = (slot: SceneSlot) => {
   const cues: Cues = {
     marks: [{ f: lift, name: "LIFT (LED wall crate)" }, ...walls.map((f, i) => ({ f, name: `booth wall ${i + 1} slams in` })), { f: header, name: "MA HAWA header" }, { f: wipe, name: "wipes forehead" }, { f: lights, name: "LIGHTS ON" }, { f: proud, name: "proud flex" }],
     sfx: [{ f: lift, name: "slam", volume: 0.6 }, ...walls.map((f) => ({ f, name: "stamp" as const, volume: 0.8 })), { f: header, name: "whoosh", volume: 0.5 }, { f: lights, name: "sparkle", volume: 0.9 }, { f: lights, name: "ding", volume: 0.5 }],
-    voice: [{ f: lift, id: "ali_lift" }],
+    voice: [{ f: lift, id: "ali_lift" }, { f: lights, id: "ali_lights", sub: true }],
   };
   return { lift, walls, header, wipe, lights, proud, cues };
 };
@@ -106,6 +107,8 @@ export const S10Ali: React.FC<SceneProps> = ({ slot }) => {
   if (frame >= c.header) pose = withIdle({ ...POSES.pointUp, rArm: [160, 6] }, m);
   if (frame >= c.wipe) pose = withIdle({ ...POSES.relaxed, rArm: [150, 70] }, m);
   if (frame >= c.lights - 3) pose = lerpPose(pose, withIdle(POSES.heroFlex, m), easeInOut(clamp01((frame - c.lights + 3) / 8)));
+  // lights on → his dance: hands on his head, hips shaking on every beat
+  if (frame >= c.proud - 4) pose = lerpPose(pose, hipShakePose("ali", frame), easeInOut(clamp01((frame - c.proud + 4) / 5)));
   const hands = { l: jointScreenPos("ali", AX, G, 1.5, pose, "handL"), r: jointScreenPos("ali", AX, G, 1.5, pose, "handR") };
   const crateOn = frame < c.walls[0];
   const crateDown = { x: 760, y: G - 20 };

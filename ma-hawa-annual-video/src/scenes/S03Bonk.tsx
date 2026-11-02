@@ -42,7 +42,7 @@ export const bonkCues = (slot: SceneSlot) => {
       { f: beatOf(slot, 3), name: "slam", volume: 0.5 },
     ],
   };
-  cues.voice = [{ f: words[0], id: "michael_ideas" }];
+  cues.voice = [{ f: hit, id: "ali_ouch", sub: true }, { f: words[0], id: "michael_ideas" }];
   return { hit, windup, land, words, cues };
 };
 

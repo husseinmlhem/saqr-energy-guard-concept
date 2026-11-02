@@ -3,7 +3,7 @@
 // counter races 1 → 45; on the next downbeat "45+ EVENTS" slams in, the Guinness World Record lands, and rows of
 // event names race past behind them until the finale.
 import React, { useMemo } from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { LogoSvg } from "../brand/Logo";
 import { clamp01, easeIn, easeOut, lin, popIn, rand, shake } from "../fx/anim";
 import { LightRays, StarShape, Svg } from "../fx/Fx";
@@ -60,6 +60,11 @@ export const eventsCues = (slot: SceneSlot) => {
       { f: badge, name: "sparkle" as const, volume: 0.9 },
     ],
   };
+  const bAfter = (n: number) => slot.beats.filter((b) => b >= slam)[n] ?? slam + Math.round(n * BEAT_FRAMES);
+  cues.voice = [
+    { f: slam, id: "amr_events", sub: true },
+    { f: bAfter(3), id: "hussein_guinness", sub: true },
+  ];
   return { hits, slam, badge, cues };
 };
 
@@ -148,41 +153,47 @@ const Ticker: React.FC<{ frame: number; from: number }> = ({ frame, from }) => {
   );
 };
 
-/** the Guinness World Records title Ma Hawa holds — a framed record certificate that slams in, the figure counting up */
+/** "we hold a Guinness World Record" — no reading needed: a big seal (or the official logo, if set) + RECORD HOLDER */
 const RecordCard: React.FC<{ frame: number; at: number; x: number; y: number }> = ({ frame, at, x, y }) => {
   if (frame < at - 4) return null;
   const R = VIDEO.record;
   const k = frame < at ? lin(frame, [at - 4, at], [2.6, 1], easeIn) : 1 + (1 - popIn(frame, at, 400, 10)) * 0.25;
-  const count = R.value * (1 - Math.pow(1 - clamp01((frame - at) / 22), 3));
-  const shine = ((frame - at) * 26) % 1400;
+  const ribbon = popIn(frame, at + 5, 420, 12);
+  const spin = (frame - at) * 0.6;
   return (
-    <div style={{ position: "absolute", left: x - 330, top: y - 300, width: 660, height: 600, transform: `scale(${k}) rotate(-3deg)`, opacity: clamp01((frame - at + 4) / 4) }}>
-      {/* gold frame + certificate */}
-      <div style={{ position: "absolute", inset: 0, borderRadius: 26, background: `linear-gradient(135deg, #F6D77A, ${GOLD} 45%, #B98A1E)`, border: `${STROKE}px solid ${INK}`, boxShadow: `14px 14px 0 ${INK}` }} />
-      <div style={{ position: "absolute", inset: 22, borderRadius: 14, background: "#FFFDF6", border: `4px solid ${INK}`, overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: 0, left: shine - 300, width: 120, height: "100%", background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent)", transform: "skewX(-20deg)" }} />
-        <div style={{ position: "absolute", left: 0, right: 0, top: 0, height: 92, background: "#1A2A6C", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, paddingRight: 80, boxSizing: "border-box" }}>
-          <svg width={46} height={46} viewBox="-50 -50 100 100">
-            <StarShape r={44} fill={GOLD} sw={6} />
-          </svg>
-          <div style={{ fontFamily: FONT, fontWeight: 900, fontSize: 27, letterSpacing: 2, color: PAPER, whiteSpace: "nowrap" }}>{R.org}</div>
-        </div>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 106, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 22, letterSpacing: 8, color: "#1A2A6C" }}>OFFICIAL WORLD RECORD</div>
-        <div style={{ position: "absolute", left: 34, right: 34, top: 146, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 31, lineHeight: 1.12, color: INK, textTransform: "uppercase" }}>{R.title}</div>
-        <div style={{ position: "absolute", left: 0, right: 0, top: 292, textAlign: "center", fontFamily: FONT, fontWeight: 900, fontSize: 132, lineHeight: 1, color: ACCENT, WebkitTextStroke: `4px ${INK}`, textShadow: `8px 8px 0 ${INK}` }}>
-          {count.toFixed(2)}
-          <span style={{ fontSize: 72, marginLeft: 10 }}>{R.unit}</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 64, textAlign: "center", fontFamily: FONT, fontWeight: 800, fontSize: 24, color: INK }}>{R.where}</div>
-        <div style={{ position: "absolute", left: 0, right: 0, bottom: 30, textAlign: "center", fontFamily: FONT, fontWeight: 700, fontSize: 22, letterSpacing: 4, color: "#6A7386" }}>{R.date.toUpperCase()}</div>
-      </div>
-      {/* "WORLD RECORD" seal */}
-      <div style={{ position: "absolute", right: -58, top: -62, width: 140, height: 140, borderRadius: 70, background: "#C8202F", border: `${STROKE}px solid ${INK}`, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", transform: `rotate(${14 + Math.sin(frame / 8) * 3}deg) scale(${popIn(frame, at + 6, 500, 10)})`, fontFamily: FONT, fontWeight: 900, fontSize: 24, lineHeight: 1.05, color: PAPER, boxShadow: `6px 6px 0 ${INK}` }}>
-        WORLD
-        <br />
-        RECORD
-        <br />
-        HOLDER
+    <div style={{ position: "absolute", left: x - 300, top: y - 300, width: 600, height: 600, transform: `scale(${k}) rotate(-4deg)`, opacity: clamp01((frame - at + 4) / 4) }}>
+      <svg width={600} height={600} viewBox="-300 -300 600 600" style={{ position: "absolute", overflow: "visible" }}>
+        <path
+          d={Array.from({ length: 56 }, (_, i) => {
+            const a = (i / 56) * Math.PI * 2 + (spin * Math.PI) / 180;
+            const r = i % 2 ? 252 : 272;
+            return `${i ? "L" : "M"} ${Math.cos(a) * r} ${Math.sin(a) * r}`;
+          }).join(" ") + " Z"}
+          fill={GOLD}
+          stroke={INK}
+          strokeWidth={STROKE}
+          strokeLinejoin="round"
+        />
+        <circle r={232} fill={R.logo ? PAPER : "#1A2A6C"} stroke={INK} strokeWidth={STROKE} />
+        <circle r={214} fill="none" stroke={GOLD} strokeWidth={5} strokeDasharray="12 10" />
+        {!R.logo && (
+          <g>
+            <g transform="translate(0 -88)">
+              <StarShape r={70} fill={GOLD} sw={STROKE} />
+            </g>
+            <text y={44} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={70} letterSpacing={2} fill={PAPER}>
+              GUINNESS
+            </text>
+            <text y={100} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={38} letterSpacing={5} fill={GOLD}>
+              WORLD RECORDS
+            </text>
+          </g>
+        )}
+      </svg>
+      {R.logo && <Img src={staticFile(R.logo)} style={{ position: "absolute", left: 120, top: 110, width: 360, height: 320, objectFit: "contain" }} />}
+      {/* RECORD HOLDER ribbon */}
+      <div style={{ position: "absolute", left: 30, right: 30, top: 430, height: 96, transform: `scale(${ribbon}) rotate(2deg)`, background: "#C8202F", border: `${STROKE}px solid ${INK}`, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT, fontWeight: 900, fontSize: 52, letterSpacing: 6, color: PAPER, boxShadow: `8px 8px 0 ${INK}` }}>
+        RECORD HOLDER
       </div>
     </div>
   );
@@ -240,7 +251,7 @@ export const S12Events: React.FC<SceneProps> = ({ slot }) => {
             <LightRays frame={frame} x={badgeX} y={520} intensity={0.5 * clamp01((frame - c.badge + 4) / 6)} speed={0.5} />
           </Svg>
         )}
-        <RecordCard frame={frame} at={c.badge} x={badgeX} y={560} />
+        <RecordCard frame={frame} at={c.badge} x={badgeX} y={520} />
         {landed && (
           <div
             style={{

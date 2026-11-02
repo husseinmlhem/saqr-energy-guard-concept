@@ -35,7 +35,7 @@ export const husseinCues = (slot: SceneSlot) => {
       { f: done, name: "And… done! → dive into the screen" },
     ],
     sfx: [...lamps.map((f) => ({ f, name: "tick" as const, volume: 0.5 })), ...exports.map((f) => ({ f, name: "tick" as const, volume: 0.4 })), { f: done, name: "ding" as const, volume: 0.9 }],
-    voice: [{ f: done, id: "hussein_done" }],
+    voice: [{ f: leave[0], id: "ali_night", sub: true }, { f: beatOf(slot, Math.min(n - 3, bar + 1)), id: "hussein_late", sub: true }, { f: done, id: "hussein_done" }],
   };
   return { leave, lamps, solo, night, exports, done, cups, bar, split: [] as number[], cues };
 };

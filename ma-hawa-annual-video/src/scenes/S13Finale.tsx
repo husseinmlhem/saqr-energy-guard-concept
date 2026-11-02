@@ -18,6 +18,7 @@ import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 import { LogoBlock } from "../brand/Logo";
 import { Battered } from "../characters/Battered";
+import { hipShakePose } from "./playtime";
 
 export const finaleCues = (slot: SceneSlot) => {
   const hero = slot.anchors.hero;
@@ -30,7 +31,7 @@ export const finaleCues = (slot: SceneSlot) => {
   const cues: Cues = {
     marks: [{ f: 0, name: "walk back, worn out" }, ...say.map((f, i) => ({ f, name: `"${words[i]}"` })), { f: hero, name: "HERO SHOT — biggest drop" }, { f: logo, name: "logo" }],
     sfx: [{ f: hero, name: "slam" as const, volume: 0.6 }, { f: hero, name: "sparkle" as const, volume: 0.8 }, { f: logo, name: "ding" as const, volume: 0.7 }],
-    voice: [{ f: say[0], id: "michael_great" }],
+    voice: [{ f: 0, id: "saeed_next", sub: true }, { f: say[0], id: "michael_great" }],
   };
   return { hero, logo, say, words, cues };
 };
@@ -87,7 +88,7 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
         const limp = Math.max(0, Math.sin(Math.PI * 2 * (clock / 2 + i * 0.5))) * 9;
         let pose: Pose = frame < walkEnd ? { ...walkPose(POSES.tired, clock / 2 + i * 0.5, stride * 0.8, 1, 5), hipY: POSES.tired.hipY + limp, lean: 6 + limp * 0.5 } : withIdle(POSES.tired, m);
         if (id === "hussein") pose = { ...pose, rArm: [30, 110], lArm: [-20, 80] };
-        if (proud) pose = lerpPose(pose, withIdle(id === "ali" ? POSES.flex : POSES.cheer, m), easeInOut(clamp01((frame - c.say[c.say.length - 1]) / 6)));
+        if (proud) pose = lerpPose(pose, id === "ali" ? hipShakePose("ali", frame) : withIdle(POSES.cheer, m), easeInOut(clamp01((frame - c.say[c.say.length - 1]) / 6)));
         const h = headScreenPos(id, x, 1000, 1.35, pose);
         return (
           <React.Fragment key={id}>
@@ -137,8 +138,10 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
         {back.map(({ id, x, s, y }, i) => (
           <Character key={id} id={id} x={x} y={y} scale={s} pose={withIdle(id === "michael" ? POSES.cheer : POSES.sip, idleMotion(slow, i, 0.3))} expression={id === "michael" ? "happy" : "neutral"} wind={1} frame={slow} right={id === "michael" ? "none" : undefined} />
         ))}
-        {front.map(({ id, x, s, pose }, i) => {
+        {front.map(({ id, x, s, pose: p0 }, i) => {
           const m = idleMotion(slow, i * 0.4, 0.35);
+          // Ali keeps dancing on the beat (hands on his head, hips going) while the rest is in slow motion
+          const pose = id === "ali" ? hipShakePose("ali", frame) : p0;
           return (
             <React.Fragment key={id}>
               <Character id={id} x={x} y={1062} scale={s} pose={withIdle({ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 2 }, m)} expression="happy" headTilt={m.headTilt * 0.4} left={id === "amr" ? "clipboard" : "none"} wind={1} frame={slow} />

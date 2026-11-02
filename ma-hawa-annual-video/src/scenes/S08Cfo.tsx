@@ -18,6 +18,7 @@ import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { CAST } from "./S01Play";
 import { Chapter, Notes, Shout, Stage, Subtitle, W, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
+import { hipShakePose } from "./playtime";
 
 const X = { ali: 300, amr: 590, hussein: 860 } as const;
 const G = 1000;
@@ -139,7 +140,7 @@ export const S08Cfo: React.FC<SceneProps> = ({ slot }) => {
     if (id === "amr" && frame >= c.ask - 4 && frame < c.weed) pose = withIdle(POSES.holdSign, m);
     if (frame >= c.weed && frame < c.shrug) tilt = (i === 0 ? 8 : i === 2 ? -8 : 0) + m.headTilt; // look at each other
     if (frame >= c.shrug && frame < c.accept) pose = lerpPose(pose, withIdle(POSES.shrug, m), easeOut(clamp01((frame - c.shrug) / 5)));
-    if (frame >= c.accept && frame < c.go) pose = lerpPose(withIdle(POSES.shrug, m), withIdle(id === "ali" ? POSES.flex : id === "amr" ? POSES.pointUp : POSES.thumbsUp, m), easeOut(clamp01((frame - c.accept) / 6)));
+    if (frame >= c.accept && frame < c.go) pose = lerpPose(withIdle(POSES.shrug, m), id === "ali" ? hipShakePose("ali", frame) : withIdle(id === "amr" ? POSES.pointUp : POSES.thumbsUp, m), easeOut(clamp01((frame - c.accept) / 6)));
     if (gone) {
       const t = (frame - c.go) / BEAT_FRAMES;
       x = X[id] - easeIn(clamp01(t / 1.6)) * 1400;

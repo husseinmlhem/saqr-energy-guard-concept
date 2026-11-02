@@ -24,6 +24,11 @@ export const brainstormCues = (s: SceneSlot) => {
   const cues: Cues = {
     marks: [...notes.map((f, i) => ({ f, name: `idea: ${VIDEO.ideas[i]}` })), { f: handoff, name: "stack handed to Michael" }],
     sfx: [...notes.map((f) => ({ f, name: "tick" as const, volume: 0.6 })), { f: handoff, name: "whoosh" as const, volume: 0.5 }],
+    voice: [
+      { f: beatOf(s, 1), id: "amr_go", sub: true },
+      { f: beatOf(s, 4), id: "ali_hmm", sub: true },
+      { f: beatOf(s, 6), id: "hussein_photo", sub: true },
+    ],
   };
   return { notes, handoff, n, cues };
 };

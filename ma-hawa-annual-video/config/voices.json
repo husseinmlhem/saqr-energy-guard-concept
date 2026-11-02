@@ -41,13 +41,7 @@
     "michael_more": {
       "speaker": "michael",
       "text": "I want MORE creative ideas!",
-      "prompt": "[exasperated] I want MORE... creative ideas!",
-      "kokoro": {
-        "voice": "am_santa",
-        "speed": 1.0,
-        "pitch": 6
-      },
-      "kokoroText": "I want MORE... creative ideas!"
+      "prompt": "[exasperated] I want MORE... creative ideas!"
     },
     "hussein_eureka": {
       "speaker": "hussein",
@@ -112,7 +106,13 @@
     "ali_lift": {
       "speaker": "ali",
       "text": "Leave the heavy lifting to me!",
-      "prompt": "[confident, playful] Leave the heavy lifting to me!"
+      "prompt": "[confident, playful] Leave the heavy lifting to me!",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Leave the heavy lifting to me!"
     },
     "hussein_done": {
       "speaker": "hussein",
@@ -129,7 +129,205 @@
       "speaker": "michael",
       "text": "Great work, guys!",
       "prompt": "[warmly, proud] Great work, guys!"
+    },
+    "ali_rep": {
+      "speaker": "ali",
+      "text": "One more rep!",
+      "prompt": "One more rep!",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "One more rep!"
+    },
+    "amr_beach": {
+      "speaker": "amr",
+      "text": "Ahh… this is the life.",
+      "prompt": "Ahh… this is the life.",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "Ahh... this is the life."
+    },
+    "hussein_shisha": {
+      "speaker": "hussein",
+      "text": "Best. Break. Ever.",
+      "prompt": "Best. Break. Ever.",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "Best. Break. Ever."
+    },
+    "hussein_gone": {
+      "speaker": "hussein",
+      "text": "Psst… is he gone?",
+      "prompt": "Psst… is he gone?",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "Psst... is he gone?"
+    },
+    "ali_ouch": {
+      "speaker": "ali",
+      "text": "Ouch!",
+      "prompt": "Ouch!",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Ouch!"
+    },
+    "amr_go": {
+      "speaker": "amr",
+      "text": "Okay team… ideas. Go!",
+      "prompt": "Okay team… ideas. Go!",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Okay team... ideas. Go!"
+    },
+    "ali_hmm": {
+      "speaker": "ali",
+      "text": "Hmm… hmm…",
+      "prompt": "Hmm… hmm…",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 0.9,
+        "pitch": 0
+      },
+      "kokoroText": "Hmm... hmm..."
+    },
+    "hussein_photo": {
+      "speaker": "hussein",
+      "text": "What about… a photo wall?",
+      "prompt": "What about… a photo wall?",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "What about... a photo wall?"
+    },
+    "amr_3d": {
+      "speaker": "amr",
+      "text": "Bigger. Bolder. Let's see it in 3D!",
+      "prompt": "Bigger. Bolder. Let's see it in 3D!",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Bigger. Bolder. Let's see it in 3D!"
+    },
+    "hussein_pitch": {
+      "speaker": "hussein",
+      "text": "So… here's the big idea.",
+      "prompt": "So… here's the big idea.",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "So... here's the big idea."
+    },
+    "amr_think": {
+      "speaker": "amr",
+      "text": "Hmm… let me think.",
+      "prompt": "Hmm… let me think.",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Hmm... let me think."
+    },
+    "hussein_watch": {
+      "speaker": "hussein",
+      "text": "Ow! Watch it, Ali!",
+      "prompt": "Ow! Watch it, Ali!",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 1.1,
+        "pitch": 0
+      },
+      "kokoroText": "Ow! Watch it, Ali!"
+    },
+    "ali_lights": {
+      "speaker": "ali",
+      "text": "Boom! Lights on!",
+      "prompt": "Boom! Lights on!",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Boom! Lights on!"
+    },
+    "ali_night": {
+      "speaker": "ali",
+      "text": "Night, Hussein!",
+      "prompt": "Night, Hussein!",
+      "kokoro": {
+        "voice": "am_eric",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Night, Hussein!"
+    },
+    "hussein_late": {
+      "speaker": "hussein",
+      "text": "Just… one more export.",
+      "prompt": "Just… one more export.",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "Just... one more export."
+    },
+    "amr_events": {
+      "speaker": "amr",
+      "text": "Forty-five plus events!",
+      "prompt": "Forty-five plus events!",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Forty-five plus events!"
+    },
+    "hussein_guinness": {
+      "speaker": "hussein",
+      "text": "And a Guinness World Record!",
+      "prompt": "And a Guinness World Record!",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "And a Guinness World Record!"
+    },
+    "saeed_next": {
+      "speaker": "saeed",
+      "text": "Okay… next year, we talk budget.",
+      "prompt": "Okay… next year, we talk budget.",
+      "kokoro": {
+        "voice": "bm_george",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "Okay... next year, we talk budget."
     }
   },
-  "_engines": "Lines with a 'kokoro' block are voiced locally with Kokoro TTS (scripts/tts_kokoro.py) when no take of their own exists; the others are ElevenLabs takes in assets/voice/raw/."
+  "_engines": "Michael: ElevenLabs takes. Amr, Ali, Hussein (and Saeed's 'next year' line): Kokoro TTS via scripts/tts_kokoro.py, one fixed voice per character. Saeed's 'Hmm…' is a slice of an ElevenLabs take."
 }

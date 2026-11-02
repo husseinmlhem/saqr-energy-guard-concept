@@ -122,7 +122,7 @@ export const pitchCues = (slot: SceneSlot) => {
     marks: [...slides.map((f, i) => ({ f, name: `slide: ${VIDEO.pitchSlides[i].title}` })), { f: ok[0], name: "EXCELLENT!" }, { f: ok[1], name: "MAKE IT HAPPEN!" }],
     sfx: [...slides.map((f) => ({ f, name: "tick" as const, volume: 0.6 })), { f: ok[0], name: "ding" as const, volume: 0.8 }, { f: ok[1], name: "sparkle" as const, volume: 0.8 }],
   };
-  cues.voice = [{ f: ok[0], id: "michael_ok" }];
+  cues.voice = [{ f: slides[1], id: "hussein_pitch", sub: true }, { f: ok[0], id: "michael_ok" }];
   return { slides, ok, cues };
 };
 

@@ -338,3 +338,13 @@ export const ScratchMarks: React.FC<{ x: number; y: number; r: number; frame: nu
     })}
   </g>
 );
+
+// ------------------------------------------------------------------ Ali's dance: hands on his head, hips shaking on the beat
+export const hipShakePose = (id: CharId, frame: number): Pose => {
+  const clock = beatClock(frame);
+  const sway = Math.cos(Math.PI * clock); // ±1, flips side on every beat
+  const bounce = Math.abs(Math.sin(Math.PI * clock));
+  const body: Pose = { ...POSES.stand, hipX: sway * 20, hipY: 8 + bounce * 6, lean: -sway * 5, lFoot: { x: -42, y: 0 }, rFoot: { x: 42, y: 0 }, head: sway * 4 };
+  const hc = solve(body, DIMS[charCfg(id).body], HEAD_R).headCenter;
+  return { ...body, lHand: { x: hc.x - HEAD_R * 0.52, y: hc.y - HEAD_R * 0.72 }, rHand: { x: hc.x + HEAD_R * 0.52, y: hc.y - HEAD_R * 0.72 }, armsFront: true };
+};

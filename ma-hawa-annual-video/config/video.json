@@ -157,7 +157,9 @@
     "value": 60.75,
     "unit": "m³",
     "where": "Formula 1 Abu Dhabi Grand Prix · Yas Marina",
-    "date": "5 December 2025"
+    "date": "5 December 2025",
+    "logo": null,
+    "_logoHelp": "Put the official Guinness World Records logo (PNG/SVG) in /assets/logo and set e.g. \"logo/guinness.png\" — it replaces the drawn emblem."
   },
   "eventCount": 45,
   "lines": {

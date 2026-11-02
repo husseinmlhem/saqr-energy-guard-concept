@@ -3,12 +3,11 @@ import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Character } from "../characters/Character";
 import { POSES, withIdle } from "../characters/rig";
-import { clamp01, easeInOut, easeOut, lin, popIn } from "../fx/anim";
+import { clamp01, easeInOut, lin, popIn } from "../fx/anim";
 import { idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
-import { FONT, INK, PAPER } from "../theme";
+import { ACCENT, FONT, INK, PAPER } from "../theme";
 import { Stage, camAt } from "./kit";
-import { LogoSvg } from "../brand/Logo";
 import { Cues, SceneProps } from "./types";
 
 export const CAST_X = { ali: 470, amr: 960, hussein: 1450 } as const;
@@ -60,20 +59,11 @@ export const S00Title: React.FC<SceneProps> = ({ slot }) => {
       {/* frosted veil so the title reads, lifting as the camera arrives */}
       <AbsoluteFill style={{ background: `rgba(255,255,255,${0.78 * veil})` }} />
       <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", transform: `translateY(${-outT * 700}px) scale(${1 - outT * 0.2})`, opacity: 1 - outT }}>
-        {/* the real logo: the mark pops on beat 1, the wordmark wipes in on beat 2 */}
-        <svg width={1200} height={360} viewBox="0 0 1000 300" style={{ overflow: "visible" }}>
-          <defs>
-            <clipPath id="titleWordWipe">
-              <rect x={300} y={-40} width={720 * easeOut(clamp01(k2))} height={380} />
-            </clipPath>
-          </defs>
-          <g transform={`translate(140 150) scale(${0.2 + 0.8 * k1}) rotate(${(1 - clamp01(k1)) * -90}) translate(-140 -150)`} opacity={clamp01(k1 * 3)}>
-            <LogoSvg x={0} y={0} width={280} variant="mark" />
-          </g>
-          <g clipPath="url(#titleWordWipe)" transform={`translate(${(1 - clamp01(k2)) * 40} 0)`}>
-            <LogoSvg x={325} y={35} width={675} variant="word" />
-          </g>
-        </svg>
+        {/* MARKETING (beat 1) TEAM (beat 2) */}
+        <div style={{ display: "flex", gap: 44, fontFamily: FONT, fontWeight: 900, fontSize: 190, letterSpacing: 6, lineHeight: 1 }}>
+          <span style={{ display: "inline-block", transform: `scale(${1 + (1 - k1) * 1.2})`, opacity: clamp01(k1 * 3), color: INK, textShadow: `12px 12px 0 ${ACCENT}` }}>MARKETING</span>
+          <span style={{ display: "inline-block", transform: `scale(${1 + (1 - k2) * 1.2})`, opacity: clamp01(k2 * 3), color: ACCENT, textShadow: `12px 12px 0 ${INK}` }}>TEAM</span>
+        </div>
         <div style={{ marginTop: 28, fontFamily: FONT, fontWeight: 800, fontSize: 46, letterSpacing: 22 + (1 - k3) * 30, color: INK, opacity: clamp01(k3 * 2) }}>{VIDEO.title.sub}</div>
       </AbsoluteFill>
     </AbsoluteFill>

@@ -42,7 +42,7 @@ export const creativeCues = (slot: SceneSlot) => {
       { f: eureka, name: "sparkle" as const, volume: 0.9 },
       { f: eureka, name: "slam" as const, volume: 0.4 },
     ],
-    voice: [{ f: eureka, id: "hussein_eureka" }],
+    voice: [{ f: steps[2], id: "amr_3d", sub: true }, { f: eureka, id: "hussein_eureka" }],
   };
   return { steps, eureka, cues };
 };

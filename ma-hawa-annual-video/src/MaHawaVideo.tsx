@@ -7,7 +7,8 @@ import { SCENES } from "./scenes";
 import { BEATS, DURATION_IN_FRAMES, FPS } from "./sync/beats";
 import { PLAN, SceneId, VIDEO } from "./sync/timeline";
 import { PAPER } from "./theme";
-import { voiceFile, voiceFrames } from "./voice";
+import { lineText, speakerName, voiceFile, voiceFrames } from "./voice";
+import { Subtitle } from "./scenes/kit";
 import { useBrandLogo } from "./brand/Logo";
 
 export type MaHawaProps = { debug: boolean; sfx?: boolean };
@@ -88,6 +89,18 @@ const SceneCut: React.FC<{ children: React.ReactNode; cutIn: Cut; cutOut: Cut; d
   );
 };
 
+/** subtitles for the lines a scene doesn't caption itself */
+const SubtitleLayer: React.FC<{ cues: { at: number; id: string; len: number }[] }> = ({ cues }) => {
+  const f = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ pointerEvents: "none" }}>
+      {cues.map((v) => (
+        <Subtitle key={`${v.id}-${v.at}`} frame={f} at={v.at} frames={v.len} speaker={speakerName(v.id)} text={lineText(v.id)} />
+      ))}
+    </AbsoluteFill>
+  );
+};
+
 const easeOutCubic = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
 
 /** fine film grain over everything: six noise tiles, cycled and offset every frame */
@@ -134,7 +147,7 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
       PLAN.scenes.flatMap((slot) =>
         (SCENES[slot.id].cues(slot).cues.voice ?? []).flatMap((v) => {
           const file = voiceFile(v.id);
-          return file ? [{ at: slot.from + v.f, id: v.id, file, len: voiceFrames(v.id) }] : [];
+          return file ? [{ at: slot.from + v.f, id: v.id, file, len: voiceFrames(v.id), sub: !!v.sub }] : [];
         }),
       ),
     [],
@@ -169,6 +182,7 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
         );
       })}
 
+      <SubtitleLayer cues={voiceCues.filter((v) => v.sub)} />
       <Grain />
 
       {/* dialogue: each line on its beat cue */}
