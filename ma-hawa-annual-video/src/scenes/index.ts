@@ -1,4 +1,4 @@
-// One component per scene + its cue sheet (beat-snapped hits, SFX, debug labels).
+// One component per scene + its cue sheet (beat-snapped hits, SFX, voice, debug labels).
 import React from "react";
 import type { SceneId, SceneSlot } from "../sync/timeline";
 import { S00Title, titleCues } from "./S00Title";
@@ -10,9 +10,11 @@ import { S05MoreCreative, moreCreativeCues } from "./S05MoreCreative";
 import { S06Creative, creativeCues } from "./S06Creative";
 import { S07Pitch, pitchCues } from "./S07Pitch";
 import { S08Cfo, cfoCues } from "./S08Cfo";
-import { S09Execute, executeCues } from "./S09Execute";
-import { S10Events, eventsCues } from "./S10Events";
-import { S11Finale, finaleCues } from "./S11Finale";
+import { S09Amr, amrCues } from "./S09Amr";
+import { S10Ali, aliCues } from "./S10Ali";
+import { S11Hussein, husseinCues } from "./S11Hussein";
+import { S12Events, eventsCues } from "./S12Events";
+import { S13Finale, finaleCues } from "./S13Finale";
 import { Cues, SceneProps } from "./types";
 
 export const SCENES: Record<SceneId, { Component: React.FC<SceneProps>; cues: (slot: SceneSlot) => { cues: Cues } }> = {
@@ -25,7 +27,9 @@ export const SCENES: Record<SceneId, { Component: React.FC<SceneProps>; cues: (s
   creative: { Component: S06Creative, cues: creativeCues },
   pitch: { Component: S07Pitch, cues: pitchCues },
   cfo: { Component: S08Cfo, cues: cfoCues },
-  execute: { Component: S09Execute, cues: executeCues },
-  events: { Component: S10Events, cues: eventsCues },
-  finale: { Component: S11Finale, cues: finaleCues },
+  amr: { Component: S09Amr, cues: amrCues },
+  ali: { Component: S10Ali, cues: aliCues },
+  hussein: { Component: S11Hussein, cues: husseinCues },
+  events: { Component: S12Events, cues: eventsCues },
+  finale: { Component: S13Finale, cues: finaleCues },
 };

@@ -38,7 +38,7 @@ export const eventsCues = (slot: SceneSlot) => {
   const S = stamps.length;
   const badge = beatOf(slot, S);
   const countStart = beatOf(slot, S + 1);
-  const countEnd = beatOf(slot, Math.min(S + 2, slot.beats.length - 1));
+  const countEnd = slot.downbeats.find((d) => d >= beatOf(slot, S + 2) - 0.5) ?? beatOf(slot, Math.min(S + 2, slot.beats.length - 1));
   const countBeats = slot.beats.filter((b) => b > countStart && b < countEnd);
   const cues: Cues = {
     marks: [
@@ -205,7 +205,7 @@ const Badge: React.FC<{ frame: number; at: number; x: number; y: number }> = ({ 
   );
 };
 
-export const S10Events: React.FC<SceneProps> = ({ slot }) => {
+export const S12Events: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
   const c = useMemo(() => eventsCues(slot), [slot]);
   const cam = shake(frame, c.hits, 7, 0.5);

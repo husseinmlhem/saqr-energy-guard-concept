@@ -226,3 +226,33 @@ export const Notes: React.FC<{ frame: number; at: number; x: number; y: number }
 };
 
 export const beatsToFrames = (n: number) => Math.round(n * BEAT_FRAMES);
+
+// ------------------------------------------------------------------ subtitles + chapter labels
+/** cinematic subtitle for a spoken line: speaker chip + text, bottom centre */
+export const Subtitle: React.FC<{ frame: number; at: number; frames: number; speaker: string; text: string }> = ({ frame, at, frames, speaker, text }) => {
+  if (frame < at - 2 || frame > at + frames + 14) return null;
+  const k = popIn(frame, at - 2, 300, 18);
+  const out = clamp01((frame - at - frames - 6) / 8);
+  return (
+    <div style={{ position: "absolute", left: 0, right: 0, bottom: 64, display: "flex", justifyContent: "center", opacity: clamp01(k * 2) * (1 - out), transform: `translateY(${(1 - k) * 20}px)` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 18, background: "rgba(12,18,32,0.82)", borderRadius: 18, padding: "14px 30px 14px 16px", fontFamily: FONT }}>
+        <span style={{ background: ACCENT, color: PAPER, fontWeight: 800, fontSize: 24, letterSpacing: 3, padding: "6px 14px", borderRadius: 10, textTransform: "uppercase" }}>{speaker}</span>
+        <span style={{ color: PAPER, fontWeight: 700, fontSize: 40 }}>{text}</span>
+      </div>
+    </div>
+  );
+};
+
+/** small chapter label, top-left (who / where) */
+export const Chapter: React.FC<{ frame: number; title: string; sub?: string; dark?: boolean }> = ({ frame, title, sub, dark }) => {
+  const k = popIn(frame, 1, 220, 18);
+  return (
+    <div style={{ position: "absolute", left: 56, top: 48, fontFamily: FONT, opacity: clamp01(k * 2), transform: `translateX(${(1 - k) * -60}px)` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <span style={{ width: 14, height: 54, background: ACCENT, borderRadius: 4 }} />
+        <span style={{ fontWeight: 900, fontSize: 52, letterSpacing: 6, color: dark ? PAPER : INK }}>{title}</span>
+      </div>
+      {sub && <div style={{ marginLeft: 28, marginTop: 4, fontWeight: 700, fontSize: 24, letterSpacing: 8, color: dark ? "#B9C6DA" : "#5A6578" }}>{sub}</div>}
+    </div>
+  );
+};

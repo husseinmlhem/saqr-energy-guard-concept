@@ -184,7 +184,7 @@ const CfoWall: React.FC<{ night: number; floorY: number }> = ({ night, floorY })
       ))}
     </g>
     {/* framed chart */}
-    <g transform="translate(180 150)">
+    <g transform="translate(560 170)">
       <rect width={420} height={300} fill={PAPER} stroke={INK} strokeWidth={STROKE} />
       <polyline points="40,250 120,200 190,215 260,140 330,110 390,60" fill="none" stroke="#3E7D5A" strokeWidth={10} strokeLinecap="round" strokeLinejoin="round" />
       <text x={30} y={50} fontFamily={FONT} fontWeight={800} fontSize={28} fill={INK}>

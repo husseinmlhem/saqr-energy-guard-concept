@@ -10,7 +10,7 @@ import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, lin, popIn, rand } from "../fx/anim";
 import { LightRays, SpeedLines, Sweat, Svg } from "../fx/Fx";
 import { BEAT_FRAMES, beatClock, energyAt, idleMotion } from "../sync/beats";
-import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
+import { SceneSlot, VIDEO } from "../sync/timeline";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { Ground } from "./common";
 import { CAST } from "./S01Pump";
@@ -22,10 +22,13 @@ export const finaleCues = (slot: SceneSlot) => {
   const logo = slot.anchors.logo;
   const pre = slot.beats.filter((b) => b < hero);
   const words = VIDEO.lines.finale.split(" ");
-  const say = words.map((_, i) => pre[Math.min(pre.length - 1, i + 1)] ?? Math.round((i + 1) * BEAT_FRAMES));
+  // the line lands in the bar right before the hero shot (the song's break) — one word per beat
+  const sayStart = Math.max(1, pre.length - 4);
+  const say = words.map((_, i) => pre[Math.min(pre.length - 1, sayStart + i)] ?? Math.round((i + 1) * BEAT_FRAMES));
   const cues: Cues = {
     marks: [{ f: 0, name: "walk back, worn out" }, ...say.map((f, i) => ({ f, name: `"${words[i]}"` })), { f: hero, name: "HERO SHOT — biggest drop" }, { f: logo, name: "logo" }],
-    sfx: [...say.map((f) => ({ f, name: "tick" as const, volume: 0.4 })), { f: hero, name: "slam" as const, volume: 0.6 }, { f: hero, name: "sparkle" as const, volume: 0.8 }, { f: logo, name: "ding" as const, volume: 0.7 }],
+    sfx: [{ f: hero, name: "slam" as const, volume: 0.6 }, { f: hero, name: "sparkle" as const, volume: 0.8 }, { f: logo, name: "ding" as const, volume: 0.7 }],
+    voice: [{ f: say[0], id: "michael_great" }],
   };
   return { hero, logo, say, words, cues };
 };
@@ -74,7 +77,7 @@ const Logo: React.FC<{ frame: number; at: number }> = ({ frame, at }) => {
 
 const WX = { ali: 300, amr: 560, hussein: 820 } as const;
 
-export const S11Finale: React.FC<SceneProps> = ({ slot }) => {
+export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
   const c = useMemo(() => finaleCues(slot), [slot]);
   const inHero = frame >= c.hero;
@@ -84,7 +87,7 @@ export const S11Finale: React.FC<SceneProps> = ({ slot }) => {
 
   // ------------------------------------------------ part A: walk back + "GREAT WORK, GUYS!"
   const camA = breathe(camAt(frame, [[0, { x: 900, y: 560, zoom: 1.0 }], [c.hero, { x: 960, y: 520, zoom: 1.12 }]], ), frame);
-  const walkEnd = c.say[1] ?? Math.round(c.hero * 0.5);
+  const walkEnd = c.say[0] ?? Math.round(c.hero * 0.5);
   const partA = (
     <Stage cam={camA}>
       {CAST.map((id, i) => {

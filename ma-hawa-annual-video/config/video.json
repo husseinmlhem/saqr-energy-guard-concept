@@ -1,8 +1,9 @@
 {
   "_help": [
     "Scene order is fixed. 'target' = rough length in seconds; src/sync/timeline.ts snaps every cut to a downbeat in config/beats.json.",
-    "anchor 'break': the scene starts on a hard break / quiet part (Michael's 'STOP PLAYING!'). The finale holds the hero shot on the biggest drop.",
-    "musicWindow: how long the video is and where the break / drop should sit — used by `npm run sync` to pick the window of a new song."
+    "anchor 'break': the scene starts on a hard break (Michael's STOP PLAYING!). anchor 'drop': the scene starts on the biggest drop (the events wall).",
+    "The hero shot lands where the beat returns after the last break near the end ('GREAT WORK, GUYS!' is spoken in that break).",
+    "musicWindow: video length and the song window. 'start' pins the window; remove it to let `npm run sync` pick one for a new song."
   ],
   "scenes": [
     {
@@ -56,27 +57,40 @@
     },
     {
       "id": "cfo",
-      "title": "The CFO",
+      "title": "Finance",
+      "target": 7.6,
+      "minSeconds": 6
+    },
+    {
+      "id": "amr",
+      "title": "Amr — the plan",
       "target": 5,
       "minSeconds": 4
     },
     {
-      "id": "execute",
-      "title": "Making it happen",
-      "target": 7.5,
+      "id": "ali",
+      "title": "Ali — the build",
+      "target": 5,
+      "minSeconds": 4
+    },
+    {
+      "id": "hussein",
+      "title": "Hussein — the night shift",
+      "target": 7.6,
       "minSeconds": 5
     },
     {
       "id": "events",
       "title": "Events",
-      "target": 10,
-      "minSeconds": 8
+      "target": 12.6,
+      "minSeconds": 9,
+      "anchor": "drop"
     },
     {
       "id": "finale",
       "title": "Finale",
-      "target": 12.6,
-      "minSeconds": 7
+      "target": 15.2,
+      "minSeconds": 9
     }
   ],
   "anchors": {
@@ -85,11 +99,15 @@
       6,
       25
     ],
-    "heroWindowFraction": [
-      0.6,
-      0.95
+    "dropWindowFraction": [
+      0.5,
+      0.85
     ],
-    "finaleLeadIn": 2.5,
+    "heroWindowFraction": [
+      0.78,
+      0.97
+    ],
+    "finaleLeadIn": 5,
     "logoSeconds": 5
   },
   "events": [
@@ -154,12 +172,16 @@
   "audio": {
     "musicVolume": 1.0,
     "sfx": true,
-    "sfxVolume": 0.55
+    "sfxVolume": 0.55,
+    "voiceVolume": 1.0,
+    "duckTo": 0.45
   },
   "musicWindow": {
-    "duration": 73.27,
-    "breakAt": 0.17,
-    "dropAt": 0.86
+    "track": "sheshtawy.mp3",
+    "start": 27.867,
+    "duration": 90.95,
+    "breakAt": 0.139,
+    "dropAt": 0.694
   },
   "ideas": [
     "Pop-up booth",

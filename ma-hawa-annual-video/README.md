@@ -1,25 +1,34 @@
-# Ma Hawa — Annual Meeting Video (~73 s, beat-synced)
+# Ma Hawa — Annual Meeting Video (~91 s, beat-synced, with voices)
 
-A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo), set in a Ma Hawa office with depth, camera moves, and day/night lighting. Every cut, hit, caption and bounce comes from the music analysis in `config/beats.json`.
+A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo) and is set in a Ma Hawa office with depth, camera moves, and day/night lighting. It has spoken dialogue (ElevenLabs), with the music ducking under every line. Every cut, hit, caption and line comes from the music analysis in `config/beats.json`.
 
-### Storyline (one React component per scene, `src/scenes/S00…S11`)
+### Storyline (one React component per scene, `src/scenes/S00…S13`)
 
 | # | Scene | Music moment |
 |---|---|---|
 | 0 | **Title**: the camera glides across the office, MA HAWA slams in on the beats | 1 bar |
-| 1 | **Pump party**: Ali, Amr (centre) and Hussein inflate balloons with floor pumps. The handle goes down on every beat and up on the off-beat. Then they dance with the balloons | 4 bars |
-| 2 | **"STOP PLAYING!"**: Michael leans in from the edge of the screen. Balloons go behind backs, innocent whistling. He leaves and the party resumes | **the song's hard break** (bass drops out) |
-| 3 | **BONK**: a bat swings in from the screen edge, the three tumble down. "I WANT IDEAS!" | 1 bar |
-| 4 | **Lots of ideas**: a sticky note flies onto the board on every beat. Amr hands the stack to Michael | 2 bars |
-| 5 | **"I WANT MORE CREATIVE IDEAS!"**: the stack goes in the air and he walks off | 1 bar |
-| 6 | **Creative huddle** (top-down): sketches orbit and bulbs light (Hussein's is the big one). EUREKA | 2 bars |
-| 7 | **The pitch** (over Michael's shoulder): Hussein drives the deck, one slide per beat. "EXCELLENT! MAKE IT HAPPEN!" | starts on the song's accent bar |
-| 8 | **The CFO**: Saeed is laughing at his phone. "WE NEED A BUDGET…" and he stops laughing instantly (record scratch, snap zoom) | 2 bars |
-| 9 | **Making it happen**: a three-way split, then over Hussein's shoulder on realistic screens (3D booth, edit timeline, key visual). Day turns to night. Exports fill on the beat, EXPORT COMPLETE, and the camera dives into his screen | 3 bars |
-| 10 | **Events**: the wall comes out of that screen, one stamp per beat, gold badge, 45+ | 4 bars |
-| 11 | **Finale**: they walk back worn out. "GREAT WORK, GUYS!" on the beats, then the **hero shot on the biggest drop** (whole team, low angle, rays, slow-mo), then the logo | 5 bars |
+| 1 | **Pump party**: Ali, Amr (centre) and Hussein inflate balloons with floor pumps. The handle goes down on every beat. Then they dance | 4 bars |
+| 2 | **"STOP PLAYING!"** (voiced): Michael leans in from the edge of the screen. Balloons go behind backs. He leaves and the party resumes | **first hard break** (bass drops out) |
+| 3 | **BONK**: the bat swings in from the edge. "I WANT IDEAS!" | 1 bar |
+| 4 | **Lots of ideas**: a sticky note flies onto the board on every beat, then goes to Michael | 2 bars |
+| 5 | **"I WANT MORE CREATIVE IDEAS!"** | 1 bar |
+| 6 | **Creative huddle** (top-down), EUREKA | 2 bars |
+| 7 | **The pitch**: Hussein drives the deck. "EXCELLENT! MAKE IT HAPPEN!" | the song's accent bar |
+| 8 | **Finance**: Saeed is relaxed with his coffee. "Saeed… we need a budget." He becomes focused and reviews the request; each line checks out on the beat. "Approved. Spend it wisely." | 3 bars |
+| 9 | **AMR · The plan**: client call, the project timeline locks in row by row on the beat. "Timeline's locked. Let's go, team!" | 2 bars |
+| 10 | **ALI · The build**: at the exhibition hall he lifts the LED-wall crate ("Leave the heavy lifting to me!"), the booth walls slam in on the beat, and the lights come on in the quiet bar | 2 bars (2nd = breakdown) |
+| 11 | **HUSSEIN · The night shift**: everyone heads home, he stays. Exports fill on every beat of the build-up. "And… done!", then a dive into his screen | quiet bar + build-up |
+| 12 | **Events**: the wall bursts out of his screen, one stamp per beat, gold badge, 45+ | **the biggest drop** |
+| 13 | **Finale**: they walk back, "GREAT WORK, GUYS!" in the song's second break, then the **hero shot as the beat returns**, then the logo | 6 bars |
 
-It is synced to *7mama — Sheshtawy* (95 BPM), song window **27.9 s → 101.1 s**. "STOP PLAYING!" lands on the song's bass break (40.5 s in the song), and the hero shot on the biggest drop (91.0 s in the song).
+It is synced to *7mama — Sheshtawy* (95 BPM), song window **27.9 s → 118.8 s** (`musicWindow` in `config/video.json`).
+
+### Voices
+- **Lines and speakers:** `config/voices.json`. Each speaker has a fixed ElevenLabs voice; the `prompt` is what was generated, including v4 tags like `[shouting]`.
+- **Audio files:** `assets/voice/raw/<line>.mp3`. Running `npm run voices` trims silence, levels loudness to -16 LUFS, and measures durations into `assets/voice/durations.json`.
+- **Missing lines:** a line with no audio file still shows its caption or subtitle, so the video always renders.
+- **Real recordings:** to use real recordings of the actual people, record the line, save it as `assets/voice/raw/<line>.wav`, run `npm run voices` and re-render.
+- **Ducking:** the music drops to `audio.duckTo` (45%) under each line. Voice level is set by `audio.voiceVolume`.
 
 ## Quick start
 
@@ -90,7 +99,7 @@ How the video locks to it (`src/sync/timeline.ts`):
 
 - **Scene cuts** land on downbeats. Dynamic programming over the downbeats picks the cuts closest to the target lengths in `config/video.json`.
 - **"STOP PLAYING!"** lands on a hard break (also a bass drop-out) or a quiet part, near `anchors.breakTarget`.
-- **Hero shot** lands on the biggest drop, late in the video. The finale starts about a bar before it, and the logo comes on a downbeat about 5 s before the end.
+- **Events** start on the biggest drop. The **hero shot** lands where the beat returns after the last break, and "GREAT WORK, GUYS!" is spoken in that break.
 - **Action hits** are on beats. Each scene builds a cue sheet from its own beats: pump strokes, the STOP/PLAYING words, the bat hit, sticky notes, bulbs, slides, the HA!s and the scratch, hammer/ticks/exports, stamps (one per beat), badge, counter, and the hero pose.
 - **Idle motion** follows the beat grid: characters dip and squash on every beat, and heads bobble once every two beats.
 - **SFX** (pop, whoosh, bonk, stamp, ding, slam, sparkle, tick, boing, sip) play at those same cue frames, under the music.

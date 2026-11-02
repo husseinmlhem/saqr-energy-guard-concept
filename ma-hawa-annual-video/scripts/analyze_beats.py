@@ -251,6 +251,17 @@ def window_targets():
     return float(mw.get("duration", 60.0)), float(mw.get("breakAt", 0.13)), float(mw.get("dropAt", 0.84))
 
 
+def window_start(audio_name: str):
+    """musicWindow.start pins the window — only for the track it was chosen for (musicWindow.track)."""
+    try:
+        mw = json.loads((ROOT / "config" / "video.json").read_text()).get("musicWindow", {})
+    except Exception:
+        return None
+    if mw.get("start") is not None and mw.get("track") and Path(audio_name).name == mw["track"]:
+        return float(mw["start"])
+    return None
+
+
 def pick_segment(duration, target, bars, drops, quiet, breaks, t, norm, force_start=None):
     _, BREAK_AT, DROP_AT = window_targets()
     starts = [b["t"] for b in bars]
@@ -312,6 +323,8 @@ def main():
     args = ap.parse_args()
     if args.duration is None:
         args.duration = window_targets()[0]
+    if args.start is None:
+        args.start = window_start(args.audio)
 
     src = Path(args.audio).resolve()
     audio_dir = ASSETS / "audio"

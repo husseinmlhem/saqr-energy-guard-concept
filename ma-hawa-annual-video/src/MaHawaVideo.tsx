@@ -7,6 +7,7 @@ import { SCENES } from "./scenes";
 import { BEATS, DURATION_IN_FRAMES, FPS } from "./sync/beats";
 import { PLAN, VIDEO } from "./sync/timeline";
 import { PAPER } from "./theme";
+import { voiceFile, voiceFrames } from "./voice";
 
 export type MaHawaProps = { debug: boolean; sfx?: boolean };
 
@@ -42,6 +43,28 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
   const fadeOut = Math.max(1, a.fadeOut * FPS);
   const sfxOn = sfx ?? VIDEO.audio.sfx;
 
+  const voiceCues = useMemo(
+    () =>
+      PLAN.scenes.flatMap((slot) =>
+        (SCENES[slot.id].cues(slot).cues.voice ?? []).flatMap((v) => {
+          const file = voiceFile(v.id);
+          return file ? [{ at: slot.from + v.f, id: v.id, file, len: voiceFrames(v.id) }] : [];
+        }),
+      ),
+    [],
+  );
+  // music ducks smoothly under each spoken line
+  const duck = (f: number) => {
+    let g = 1;
+    for (const v of voiceCues) {
+      const a = v.at - 4;
+      const b = v.at + v.len + 6;
+      const k = f < a - 6 || f > b + 10 ? 0 : f < a ? (f - (a - 6)) / 6 : f > b ? 1 - (f - b) / 10 : 1;
+      g = Math.min(g, 1 - (1 - (VIDEO.audio.duckTo ?? 0.45)) * Math.max(0, Math.min(1, k)));
+    }
+    return g;
+  };
+
   const cueSheets = useMemo(
     () => PLAN.scenes.map((slot) => ({ slot, cues: SCENES[slot.id].cues(slot).cues })),
     [],
@@ -60,11 +83,18 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
         );
       })}
 
-      {/* music: the analysed segment of the track, faded in/out */}
+      {/* dialogue: each line on its beat cue */}
+      {voiceCues.map((v, i) => (
+        <Sequence key={`voice-${i}`} from={v.at} durationInFrames={Math.min(v.len + 20, D - v.at)} name={`voice ${v.id}`} layout="none">
+          <Audio src={staticFile(v.file)} volume={VIDEO.audio.voiceVolume ?? 1} />
+        </Sequence>
+      ))}
+
+      {/* music: the analysed segment of the track, faded in/out, ducked under dialogue */}
       <Audio
         src={staticFile(a.file)}
         trimBefore={Math.round(a.segmentStart * FPS)}
-        volume={(f) => VIDEO.audio.musicVolume * Math.min(1, f / fadeIn) * Math.min(1, Math.max(0, (D - f) / fadeOut))}
+        volume={(f) => VIDEO.audio.musicVolume * Math.min(1, f / fadeIn) * Math.min(1, Math.max(0, (D - f) / fadeOut)) * duck(f)}
       />
 
       {/* SFX layer: every sound sits on a beat cue */}
