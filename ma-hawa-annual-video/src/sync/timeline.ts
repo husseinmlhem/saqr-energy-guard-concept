@@ -56,7 +56,7 @@ export const VIDEO = videoJson as unknown as {
     logoSeconds: number;
   };
   events: { name: string; years?: string[] }[];
-  award: string;
+  record: { org: string; title: string; value: number; unit: string; where: string; date: string };
   eventCount: number;
   lines: Record<string, string>;
   ideas: string[];

@@ -61,7 +61,7 @@ export const jointScreenPos = (
   y: number,
   scale: number,
   pose: Pose,
-  joint: keyof Pick<Skeleton, "headCenter" | "mouth" | "handL" | "handR" | "neck" | "hip">,
+  joint: keyof Pick<Skeleton, "headCenter" | "mouth" | "handL" | "handR" | "neck" | "hip" | "footL" | "footR" | "kneeL" | "kneeR" | "elbowL" | "elbowR" | "shoulderL" | "shoulderR">,
   flip = false,
   rotate = 0,
 ): Pt => {

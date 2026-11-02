@@ -14,6 +14,7 @@ import { FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { Chapter, Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 import { LogoSvg } from "../brand/Logo";
+import { ScratchMarks, scratchHeadPose } from "./playtime";
 
 const HOLO = "#7FE0FF";
 const G = 1000;
@@ -181,7 +182,9 @@ export const S06Creative: React.FC<SceneProps> = ({ slot }) => {
   const tap = Math.exp(-beatPhase(frame) * 6);
   const hussein: Pose = withIdle({ ...POSES.type, lean: 6 + tap * 3, head: 8 }, m(2));
   const amr: Pose = gold > 0 ? withIdle(POSES.cheer, m(1)) : withIdle({ ...POSES.point, rArm: [100 + (stepNow % 2) * 14, -8 - tap * 6] }, m(1));
-  const ali: Pose = gold > 0 ? withIdle(POSES.flex, m(0)) : lerpPose(withIdle(POSES.armsCrossed, m(0)), withIdle(POSES.thumbsUp, m(0)), easeInOut(clamp01((frame - c.steps[5]) / 6)));
+  // Ali thinks it over (scratching his bald head), then crosses his arms, then gives it the thumbs up
+  const aliThink = frame < c.steps[3];
+  const ali: Pose = gold > 0 ? withIdle(POSES.flex, m(0)) : aliThink ? scratchHeadPose("ali", frame, withIdle(POSES.stand, m(0))) : lerpPose(withIdle(POSES.armsCrossed, m(0)), withIdle(POSES.thumbsUp, m(0)), easeInOut(clamp01((frame - c.steps[5]) / 6)));
   const hHead = headScreenPos("hussein", 515, G, 1.32, hussein);
   const beam = lin(frame, [c.steps[0] - 4, c.steps[0] + 4], [0, 1]);
 
@@ -195,6 +198,11 @@ export const S06Creative: React.FC<SceneProps> = ({ slot }) => {
         </W>
         {/* Ali (far left) and Hussein with the laptop */}
         <Character id="ali" x={225} y={G} scale={1.32} pose={ali} expression={gold > 0 ? "happy" : "neutral"} left="none" right="none" frame={frame} />
+        {aliThink && (
+          <W>
+            <ScratchMarks {...headScreenPos("ali", 225, G, 1.32, ali)} frame={frame} />
+          </W>
+        )}
         <Character id="hussein" x={515} y={G} scale={1.32} pose={hussein} expression={gold > 0 ? "happy" : "neutral"} left="laptop" right="none" headTilt={6} frame={frame} />
         {/* Amr on the right, pointing back at the model */}
         <Character id="amr" x={1460} y={G} scale={1.4} pose={amr} flip={gold === 0} expression={gold > 0 ? "happy" : "neutral"} left="none" right="none" frame={frame} />

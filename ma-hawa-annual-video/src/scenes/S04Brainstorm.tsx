@@ -11,6 +11,7 @@ import { CAST } from "./S01Play";
 import { CAST_S, GROUND } from "./S00Title";
 import { STICKY_COLORS, Stage, Sticky, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
+import { ScratchMarks, scratchHeadPose } from "./playtime";
 
 const X = { ali: 520, amr: 960, hussein: 1400 } as const;
 const THINKERS: ("ali" | "amr" | "hussein")[] = ["amr", "hussein", "ali", "hussein", "amr", "ali", "hussein"];
@@ -51,9 +52,18 @@ export const S04Brainstorm: React.FC<SceneProps> = ({ slot: sl }) => {
           const mine = c.notes.map((f, k) => ({ f, k })).filter(({ k }) => THINKERS[k] === id);
           const active = mine.some(({ f }) => frame >= f - 8 && frame < f + 6);
           let pose: Pose = withIdle(active ? POSES.pointUp : POSES.think, m);
+          // Ali, thinking hard: scratching his bald head whenever he isn't the one with the idea
+          if (id === "ali" && !active) pose = scratchHeadPose("ali", frame, withIdle(POSES.stand, m));
           if (id === "amr" && frame >= c.handoff - 4) pose = lerpPose(pose, POSES.point, gather);
           return (
-            <Character key={id} id={id} x={X[id]} y={GROUND} scale={CAST_S} pose={pose} expression={active ? "happy" : "neutral"} headTilt={active ? 0 : m.headTilt + 6} left="none" frame={frame} />
+            <React.Fragment key={id}>
+              <Character id={id} x={X[id]} y={GROUND} scale={CAST_S} pose={pose} expression={active ? "happy" : "neutral"} headTilt={active ? 0 : m.headTilt + 6} left="none" frame={frame} />
+              {id === "ali" && !active && (
+                <W>
+                  <ScratchMarks {...headScreenPos("ali", X.ali, GROUND, CAST_S, pose)} frame={frame} />
+                </W>
+              )}
+            </React.Fragment>
           );
         })}
         <W>

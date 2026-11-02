@@ -1,13 +1,13 @@
 // Scene 5 — Michael flips through the stack… tosses it in the air: "I WANT MORE CREATIVE IDEAS!" — and walks off.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character, jointScreenPos } from "../characters/Character";
+import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
 import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, rand } from "../fx/anim";
 import { BEAT_FRAMES, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { CAST } from "./S01Play";
-import { STICKY_COLORS, Shout, Stage, Sticky, W, breathe, camAt } from "./kit";
+import { STICKY_COLORS, Shout, Stage, Sticky, W, breathe, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const X = { ali: 260, amr: 520, hussein: 780 } as const;
@@ -35,8 +35,10 @@ export const S05MoreCreative: React.FC<SceneProps> = ({ slot }) => {
   const c = useMemo(() => moreCreativeCues(slot), [slot]);
   const cam = breathe(
     camAt(frame, [
-      [0, { x: 960, y: 540, zoom: 1.0 }],
-      [c.toss, { x: 1000, y: 520, zoom: 1.06 }],
+      // open on Michael's face as he reads the stack… pull out for the toss
+      [0, faceCam(headScreenPos("michael", 1320, G, 1.6, { ...POSES.stand, head: 12 }, true), 1.8, 220, 170)],
+      [c.toss - 3, faceCam(headScreenPos("michael", 1320, G, 1.6, { ...POSES.stand, head: 12 }, true), 1.9, 220, 170)],
+      [c.toss + 3, { x: 1000, y: 520, zoom: 1.06 }],
       [slot.durationInFrames, { x: 960, y: 540, zoom: 1.0 }],
     ]),
     frame,

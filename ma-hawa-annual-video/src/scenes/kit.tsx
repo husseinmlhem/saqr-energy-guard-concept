@@ -23,6 +23,9 @@ export const camAt = (frame: number, keys: CamKey[], base: Cam = CAM0): Cam => {
   return full[full.length - 1][1];
 };
 
+/** close-up on a face: zoom in on a head (world coords); sx/sy = where the face sits on screen, relative to the centre */
+export const faceCam = (head: { x: number; y: number }, zoom = 2, sx = 0, sy = 160): Partial<Cam> => ({ x: head.x - sx / zoom, y: head.y - sy / zoom, zoom });
+
 /** handheld feel: tiny drift locked to the bar + a punch on every downbeat */
 export const breathe = (cam: Cam, frame: number, amount = 1): Cam => ({
   ...cam,

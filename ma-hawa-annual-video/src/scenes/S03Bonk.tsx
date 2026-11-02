@@ -12,7 +12,7 @@ import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { BALLOON, CAST } from "./S01Play";
 import { Dumbbell, OFFICE_SHISHA, Shisha, Smoke, Umbrella, officeActivity } from "./playtime";
 import { CAST_S, CAST_X, GROUND } from "./S00Title";
-import { Shout, Stage, W, breathe, camAt } from "./kit";
+import { Shout, Stage, W, breathe, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const LAND = [
@@ -55,7 +55,10 @@ export const S03Bonk: React.FC<SceneProps> = ({ slot }) => {
       [0, { x: 960, y: 560, zoom: 1.06 }],
       [c.hit, { x: 1100, y: 540, zoom: 1.12 }],
       [c.hit + 4, { x: 900, y: 600, zoom: 1.0 }],
-      [slot.durationInFrames, { x: 940, y: 580, zoom: 1.04 }],
+      [c.land + 3, { x: 920, y: 590, zoom: 1.02 }],
+      // close-up: Michael, bat on his shoulder — "I WANT IDEAS!"
+      [c.words[0] + 4, faceCam(headScreenPos("michael", 1700, GROUND, 1.5, POSES.batReady, true), 1.9, 260, 170)],
+      [slot.durationInFrames, faceCam(headScreenPos("michael", 1700, GROUND, 1.5, POSES.batReady, true), 2.0, 260, 170)],
     ]),
     frame,
   );

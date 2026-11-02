@@ -3,7 +3,7 @@
 // and — in the song's quiet bar — switches the booth lights on.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character, jointScreenPos } from "../characters/Character";
+import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
 import { POSES, Pose, lerpPose, withIdle } from "../characters/rig";
 import { clamp01, easeIn, easeInOut, easeOut, shake } from "../fx/anim";
 import { ImpactLines, Sweat } from "../fx/Fx";
@@ -11,7 +11,7 @@ import { beatPhase, idleMotion } from "../sync/beats";
 import { SceneSlot, beatOf } from "../sync/timeline";
 import { lineText, voiceFrames } from "../voice";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
-import { Chapter, Subtitle, camAt } from "./kit";
+import { Chapter, Subtitle, camAt, faceCam } from "./kit";
 import { camTransform } from "../world/Office";
 import { Cues, SceneProps } from "./types";
 import { LogoSvg } from "../brand/Logo";
@@ -83,7 +83,10 @@ export const S10Ali: React.FC<SceneProps> = ({ slot }) => {
   const on = easeOut(clamp01((frame - c.lights) / 6));
   const sh = shake(frame, [c.lift, ...c.walls], 9, 0.45);
   const cam = camAt(frame, [
-    [0, { x: 900, y: 560, zoom: 1.04 }],
+    // open on Ali's face, straining under the crate — "Leave the heavy lifting to me!" — out as the walls slam in
+    [0, faceCam(headScreenPos("ali", AX, G, 1.5, POSES.carry), 2.0, 140, 170)],
+    [Math.max(1, c.walls[0] - 3), faceCam(headScreenPos("ali", AX, G, 1.5, POSES.carry), 2.1, 140, 170)],
+    [c.walls[0] + 2, { x: 900, y: 560, zoom: 1.04 }],
     [c.header, { x: 1000, y: 550, zoom: 1.0 }],
     [c.lights, { x: 1080, y: 540, zoom: 0.96 }],
     [slot.durationInFrames, { x: 1060, y: 540, zoom: 1.0 }],

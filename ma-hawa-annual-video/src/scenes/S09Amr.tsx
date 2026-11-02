@@ -2,7 +2,7 @@
 // "Timeline's locked. Let's go, team!" — and Ali and Hussein rush past to get going.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character } from "../characters/Character";
+import { Character, headScreenPos } from "../characters/Character";
 import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, popIn } from "../fx/anim";
 import { SpeedLines } from "../fx/Fx";
@@ -10,7 +10,7 @@ import { beatClock, idleMotion } from "../sync/beats";
 import { SceneSlot, beatOf } from "../sync/timeline";
 import { lineText, voiceFrames } from "../voice";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
-import { Chapter, Stage, Subtitle, W, breathe, camAt } from "./kit";
+import { Chapter, Stage, Subtitle, W, breathe, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const ROWS = [
@@ -96,8 +96,11 @@ export const S09Amr: React.FC<SceneProps> = ({ slot }) => {
     camAt(frame, [
       [0, { x: 940, y: 540, zoom: 1.0 }],
       [c.lock, { x: 1000, y: 530, zoom: 1.05 }],
-      [c.lock + 6, { x: 1180, y: 520, zoom: 1.14 }],
-      [slot.durationInFrames, { x: 1160, y: 530, zoom: 1.12 }],
+      // close-up: Amr — "Timeline's locked. Let's go, team!" — then out for the rush
+      [c.lock + 5, faceCam(headScreenPos("amr", AX, G, 1.55, POSES.point), 1.9, 120, 160)],
+      [c.rush - 2, faceCam(headScreenPos("amr", AX, G, 1.55, POSES.point), 1.95, 120, 160)],
+      [c.rush + 6, { x: 1100, y: 540, zoom: 1.0 }],
+      [slot.durationInFrames, { x: 1120, y: 540, zoom: 1.04 }],
     ]),
     frame,
   );

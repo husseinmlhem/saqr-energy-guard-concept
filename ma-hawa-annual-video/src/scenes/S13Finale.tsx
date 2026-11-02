@@ -17,6 +17,7 @@ import { CAST } from "./S01Play";
 import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 import { LogoBlock } from "../brand/Logo";
+import { Battered } from "../characters/Battered";
 
 export const finaleCues = (slot: SceneSlot) => {
   const hero = slot.anchors.hero;
@@ -63,8 +64,17 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
   const proud = frame >= c.say[c.say.length - 1];
 
   // ------------------------------------------------ part A: walk back + "GREAT WORK, GUYS!"
-  const camA = breathe(camAt(frame, [[0, { x: 900, y: 560, zoom: 1.0 }], [c.hero, { x: 960, y: 520, zoom: 1.12 }]], ), frame);
   const walkEnd = c.say[0] ?? Math.round(c.hero * 0.5);
+  // close on the three battered faces as they limp in, then out wide when Michael speaks
+  const camA = breathe(
+    camAt(frame, [
+      [0, { x: WX.amr - 470, y: 470, zoom: 1.75 }],
+      [Math.max(1, walkEnd - 6), { x: WX.amr + 20, y: 470, zoom: 1.85 }],
+      [walkEnd + 4, { x: 900, y: 560, zoom: 1.0 }],
+      [c.hero, { x: 960, y: 520, zoom: 1.12 }],
+    ]),
+    frame,
+  );
   const partA = (
     <Stage cam={camA}>
       {CAST.map((id, i) => {
@@ -73,18 +83,19 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
         const t = clamp01(frame / Math.max(1, walkEnd));
         const x = startX + (WX[id] - startX) * t;
         const stride = ((WX[id] - startX) / Math.max(1, walkEnd)) * BEAT_FRAMES / 1.35;
-        let pose: Pose = frame < walkEnd ? walkPose(POSES.tired, clock / 2 + i * 0.5, stride, 1, 8) : withIdle(POSES.tired, m);
+        // limping back: short uneven steps, sagging on one leg
+        const limp = Math.max(0, Math.sin(Math.PI * 2 * (clock / 2 + i * 0.5))) * 9;
+        let pose: Pose = frame < walkEnd ? { ...walkPose(POSES.tired, clock / 2 + i * 0.5, stride * 0.8, 1, 5), hipY: POSES.tired.hipY + limp, lean: 6 + limp * 0.5 } : withIdle(POSES.tired, m);
         if (id === "hussein") pose = { ...pose, rArm: [30, 110], lArm: [-20, 80] };
         if (proud) pose = lerpPose(pose, withIdle(id === "ali" ? POSES.flex : POSES.cheer, m), easeInOut(clamp01((frame - c.say[c.say.length - 1]) / 6)));
         const h = headScreenPos(id, x, 1000, 1.35, pose);
         return (
           <React.Fragment key={id}>
             <Character id={id} x={x} y={1000} scale={1.35} pose={pose} expression={proud ? "happy" : id === "ali" ? "shocked" : "tired"} headTilt={proud ? m.headTilt : 8} right={id === "hussein" && !proud ? "laptop" : "none"} left="none" frame={frame} />
-            {!proud && (
-              <W>
-                <Sweat frame={frame + i * 7} x={h.x + h.r * 0.7} y={h.y - h.r * 0.5} />
-              </W>
-            )}
+            <W>
+              <Battered id={id} x={x} y={1000} scale={1.35} pose={pose} frame={frame} level={1} seed={i} />
+              {!proud && <Sweat frame={frame + i * 7} x={h.x + h.r * 0.7} y={h.y - h.r * 0.5} />}
+            </W>
           </React.Fragment>
         );
       })}
@@ -129,7 +140,12 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
         {front.map(({ id, x, s, pose }, i) => {
           const m = idleMotion(slow, i * 0.4, 0.35);
           return (
-            <Character key={id} id={id} x={x} y={1062} scale={s} pose={withIdle({ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 2 }, m)} expression="happy" headTilt={m.headTilt * 0.4} left={id === "amr" ? "clipboard" : "none"} wind={1} frame={slow} />
+            <React.Fragment key={id}>
+              <Character id={id} x={x} y={1062} scale={s} pose={withIdle({ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 2 }, m)} expression="happy" headTilt={m.headTilt * 0.4} left={id === "amr" ? "clipboard" : "none"} wind={1} frame={slow} />
+              <W>
+                <Battered id={id} x={x} y={1062} scale={s} pose={withIdle({ ...pose, head: pose.head + Math.sin(slow / 12 + i) * 2 }, m)} frame={slow} level={0.5} seed={id === "ali" ? 0 : id === "amr" ? 1 : 2} />
+              </W>
+            </React.Fragment>
           );
         })}
       </AbsoluteFill>

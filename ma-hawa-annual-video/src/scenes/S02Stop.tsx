@@ -14,7 +14,7 @@ import { ACCENT, FONT, INK, STROKE } from "../theme";
 import { BALLOON, CAST } from "./S01Play";
 import { HiddenProps, OFFICE_SHISHA, Shisha, Smoke, Umbrella, officeActivity } from "./playtime";
 import { CAST_S, CAST_X, GROUND } from "./S00Title";
-import { Notes, Shout, Stage, W, breathe, camAt } from "./kit";
+import { Notes, Shout, Stage, W, breathe, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 export const stopCues = (slot: SceneSlot) => {
@@ -63,11 +63,18 @@ export const S02Stop: React.FC<SceneProps> = ({ slot }) => {
   const mx = 2160 - inT * 360 + outT * 420;
   const mPose: Pose = frame < c.squint ? POSES.point : { ...POSES.armsCrossed, head: -6 };
   const sh = shake(frame, [c.enter], 14);
+  // close-ups: Amr's innocent smile, then Michael's suspicious squint, then back out as he leaves
+  const amrFace = headScreenPos("amr", CAST_X.amr, GROUND, CAST_S, POSES.hideBehind);
+  const mFace = headScreenPos("michael", 1800, GROUND, 1.55, { ...POSES.armsCrossed, head: -6 }, true, -16);
   const cam = breathe(
     camAt(frame, [
       [0, { x: 1010, y: 560, zoom: 1.06 }],
       [6, { x: 1110, y: 520, zoom: 1.16 }],
-      [c.leave, { x: 1090, y: 530, zoom: 1.14 }],
+      [c.innocent - 2, { x: 1100, y: 525, zoom: 1.15 }],
+      [c.innocent + 3, faceCam(amrFace, 2.1, 0, 170)],
+      [c.squint - 2, faceCam(amrFace, 2.2, 0, 170)],
+      [c.squint + 3, faceCam(mFace, 2.0, 140, 170)],
+      [c.leave, faceCam(mFace, 2.05, 140, 170)],
       [c.leave + 10, { x: 960, y: 560, zoom: 1.05 }],
     ]),
     frame,

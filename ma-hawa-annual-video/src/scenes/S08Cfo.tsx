@@ -16,7 +16,7 @@ import { SceneSlot, beatOf } from "../sync/timeline";
 import { lineText, voiceFrames } from "../voice";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { CAST } from "./S01Play";
-import { Chapter, Notes, Shout, Stage, Subtitle, W, camAt } from "./kit";
+import { Chapter, Notes, Shout, Stage, Subtitle, W, camAt, faceCam } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const X = { ali: 300, amr: 590, hussein: 860 } as const;
@@ -102,7 +102,9 @@ export const S08Cfo: React.FC<SceneProps> = ({ slot }) => {
     [c.freeze + 3, { x: 1430, y: 470, zoom: 1.7 }],
     [c.away + 4, { x: 1420, y: 480, zoom: 1.6 }],
     [c.weed + 4, { x: 1060, y: 540, zoom: 1.06 }],
-    [c.accept + 6, { x: 860, y: 560, zoom: 1.12 }],
+    // close-up: Amr — "Okay… no budget? No problem!"
+    [c.accept + 4, faceCam(headScreenPos("amr", X.amr, G, 1.35, POSES.pointUp), 1.9, 240, 170)],
+    [c.go - 2, faceCam(headScreenPos("amr", X.amr, G, 1.35, POSES.pointUp), 1.95, 240, 170)],
     [c.back, { x: 1000, y: 540, zoom: 1.02 }],
     [slot.durationInFrames, { x: 1200, y: 520, zoom: 1.12 }],
   ]);

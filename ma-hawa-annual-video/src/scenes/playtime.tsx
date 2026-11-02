@@ -320,3 +320,21 @@ export const HiddenProps: React.FC<{ id: "ali" | "amr" | "hussein"; x: number; g
     </>
   );
 };
+
+// ------------------------------------------------------------------ thinking: scratching the (bald) head
+/** right hand up on top of the head, fingers scratching fast; drawn in front of the head */
+export const scratchHeadPose = (id: CharId, frame: number, base: Pose): Pose => {
+  const hc = solve(base, DIMS[charCfg(id).body], HEAD_R).headCenter;
+  const wig = Math.sin(frame * 1.7) * 9;
+  return { ...base, rHand: { x: hc.x + HEAD_R * 0.32 + wig, y: hc.y - HEAD_R * 0.86 + Math.abs(wig) * 0.3 }, lArm: [-14, -70], armsFront: true, head: -4 };
+};
+
+/** little "scratch scratch" marks next to a head (screen space) */
+export const ScratchMarks: React.FC<{ x: number; y: number; r: number; frame: number }> = ({ x, y, r, frame }) => (
+  <g opacity={0.9}>
+    {[0, 1, 2].map((i) => {
+      const on = Math.floor(frame / 3 + i) % 2;
+      return <path key={i} d={`M ${x + r * (0.75 + i * 0.12)} ${y - r * (0.9 - i * 0.22)} l ${r * 0.18} ${-r * 0.1}`} stroke={INK} strokeWidth={4} strokeLinecap="round" opacity={on ? 1 : 0.25} />;
+    })}
+  </g>
+);
