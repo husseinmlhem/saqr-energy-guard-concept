@@ -7,7 +7,7 @@ import { clamp01, easeInOut, easeOut, lin, popIn } from "../fx/anim";
 import { idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, INK, PAPER } from "../theme";
-import { FloorPump, Stage, W, camAt } from "./kit";
+import { Stage, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 export const CAST_X = { ali: 470, amr: 960, hussein: 1450 } as const;
@@ -53,11 +53,6 @@ export const S00Title: React.FC<SceneProps> = ({ slot }) => {
   return (
     <AbsoluteFill style={{ background: PAPER }}>
       <Stage cam={cam}>
-        <W>
-          {(["ali", "amr", "hussein"] as const).map((id) => (
-            <FloorPump key={id} x={CAST_X[id]} ground={GROUND} s={CAST_S} h={1} side={id === "ali" ? -1 : 1} balloonR={8} balloonFill={ACCENT} frame={frame} />
-          ))}
-        </W>
         {(["ali", "amr", "hussein"] as const).map((id, i) => (
           <Character key={id} id={id} x={CAST_X[id]} y={GROUND} scale={CAST_S} pose={withIdle(POSES.relaxed, idleMotion(frame, i * 0.3, 0.6))} expression="happy" left="none" frame={frame} />
         ))}

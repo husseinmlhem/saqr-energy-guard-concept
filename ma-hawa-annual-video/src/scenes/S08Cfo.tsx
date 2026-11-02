@@ -1,173 +1,224 @@
-// Scene 8 — Finance. Balanced and clear:
-// Saeed is in a good mood at his desk (coffee, a light chuckle at his phone). The team comes in;
-// Amr: "Saeed… we need a budget." and puts the BUDGET REQUEST on the desk. Saeed sets the phone down,
-// becomes focused, reviews it ("Hmm… let me see the numbers.") — every line checks out on the beat —
-// and approves it with a calm stamp: "Approved. Spend it wisely."
+// Scene 8 — Finance: "we need a budget"… and Saeed just doesn't hear it.
+// Saeed is laughing at his phone. The team walks in; Amr: "Saeed… we need a budget."
+// The laugh stops dead (record scratch, snap zoom). "Hmm…" — a little storm cloud of displeasure.
+// Then he turns away, eyes up to the corner, sips his coffee and whistles. A tumbleweed rolls by.
+// The team shrugs: "Okay… no budget. We'll make it work!" — and heads off to do it anyway.
+// The second they're gone, Saeed is back to laughing at his phone.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character, jointScreenPos } from "../characters/Character";
+import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
 import { charCfg } from "../characters/config";
 import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
-import { clamp01, easeInOut, easeOut, popIn } from "../fx/anim";
+import { clamp01, easeIn, easeInOut, easeOut, popIn, shake } from "../fx/anim";
 import { NameTag } from "../fx/Fx";
 import { BEAT_FRAMES, beatClock, beatPhase, idleMotion } from "../sync/beats";
 import { SceneSlot, beatOf } from "../sync/timeline";
 import { lineText, voiceFrames } from "../voice";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
-import { CAST } from "./S01Pump";
-import { Chapter, Stage, Subtitle, W, camAt } from "./kit";
+import { CAST } from "./S01Play";
+import { Chapter, Notes, Shout, Stage, Subtitle, W, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const X = { ali: 300, amr: 590, hussein: 860 } as const;
 const G = 1000;
 const SX = 1440;
-const ITEMS = ["Booth build", "Production", "Media & content", "Staffing"];
 
 export const cfoCues = (slot: SceneSlot) => {
-  const arrive = beatOf(slot, 1);
-  const ask = beatOf(slot, 1);
-  const folder = beatOf(slot, 3);
-  const focus = beatOf(slot, 4);
-  const review = beatOf(slot, 5);
-  const checks = [5, 6, 7, 8].map((i) => beatOf(slot, i));
-  const approve = beatOf(slot, Math.min(slot.beats.length - 3, 9));
+  const b = (n: number) => beatOf(slot, Math.min(n, slot.beats.length - 1));
+  const arrive = b(1);
+  const ask = b(1);
+  const freeze = b(4); // the laugh stops dead — right on the word "budget"
+  const hmm = b(5);
+  const away = b(6); // turns away, eyes to the corner, whistling
+  const weed = b(7);
+  const shrug = b(7);
+  const accept = b(8); // "Okay… no budget. We'll make it work!"
+  const go = b(10);
+  const back = b(11); // they're gone — he's laughing again
   const cues: Cues = {
     marks: [
-      { f: 0, name: "Saeed relaxed, team walks in" },
+      { f: 0, name: "Saeed laughing at his phone; team walks in" },
       { f: ask, name: "Amr: Saeed… we need a budget." },
-      { f: folder, name: "BUDGET REQUEST on the desk" },
-      { f: focus, name: "Saeed sets the phone down — focused" },
-      ...checks.map((f, i) => ({ f, name: `review: ${ITEMS[i]} ✓` })),
-      { f: approve, name: "APPROVED (stamp)" },
+      { f: freeze, name: "laugh stops dead (scratch)" },
+      { f: hmm, name: "Saeed: Hmm… (annoyed)" },
+      { f: away, name: "turns away, eyes up to the corner, whistles" },
+      { f: weed, name: "tumbleweed" },
+      { f: shrug, name: "team shrugs" },
+      { f: accept, name: "Amr: Okay… no budget. We'll make it work!" },
+      { f: go, name: "team heads off to work" },
+      { f: back, name: "Saeed back to his phone, laughing" },
     ],
     sfx: [
-      { f: folder, name: "whoosh", volume: 0.4 },
-      ...checks.map((f) => ({ f, name: "tick" as const, volume: 0.5 })),
-      { f: approve, name: "stamp", volume: 0.9 },
-      { f: approve, name: "ding", volume: 0.5 },
+      { f: freeze, name: "scratch", volume: 0.8 },
+      { f: away, name: "whistle", volume: 0.55 },
+      { f: weed, name: "whoosh", volume: 0.25 },
+      { f: shrug, name: "tick", volume: 0.35 },
+      { f: accept, name: "slam", volume: 0.45 },
+      { f: go, name: "whoosh", volume: 0.5 },
     ],
     voice: [
       { f: ask, id: "amr_budget" },
-      { f: review, id: "saeed_numbers" },
-      { f: approve, id: "saeed_ok" },
+      { f: hmm, id: "saeed_hmm" },
+      { f: accept, id: "amr_nobudget" },
     ],
   };
-  return { arrive, ask, folder, focus, review, checks, approve, cues };
+  return { arrive, ask, freeze, hmm, away, weed, shrug, accept, go, back, cues };
 };
 
-/** the request document, shown as a clean insert card */
-const RequestCard: React.FC<{ frame: number; c: ReturnType<typeof cfoCues> }> = ({ frame, c }) => {
-  const k = popIn(frame, c.review - 2, 240, 18);
-  const stamp = frame >= c.approve ? popIn(frame, c.approve - 1, 500, 12) : 0;
-  const away = easeInOut(clamp01((frame - c.approve - BEAT_FRAMES * 1.5) / 10));
-  return (
-    <div style={{ position: "absolute", right: 90, top: 170, width: 560, transform: `translate(${away * 760}px, ${(1 - k) * 60}px) rotate(${2 - (1 - k) * 4}deg)`, opacity: clamp01(k * 2), fontFamily: FONT }}>
-      <div style={{ background: PAPER, border: `${STROKE}px solid ${INK}`, borderRadius: 16, padding: "30px 34px", boxShadow: `14px 14px 0 rgba(118,173,222,0.55)` }}>
-        <div style={{ fontWeight: 900, fontSize: 34, letterSpacing: 3, color: INK }}>BUDGET REQUEST</div>
-        <div style={{ fontWeight: 700, fontSize: 20, color: "#7A8496", marginTop: 4, letterSpacing: 3 }}>MA HAWA · EVENTS SEASON</div>
-        <div style={{ height: 4, background: ACCENT, margin: "18px 0 14px", borderRadius: 2 }} />
-        {ITEMS.map((it, i) => {
-          const ok = frame >= c.checks[i];
-          const pk = popIn(frame, c.checks[i], 500, 12);
-          return (
-            <div key={it} style={{ display: "flex", alignItems: "center", gap: 16, padding: "10px 0", borderBottom: "2px solid #E6EBF2" }}>
-              <span style={{ width: 34, height: 34, borderRadius: 8, border: `4px solid ${INK}`, display: "inline-flex", alignItems: "center", justifyContent: "center", background: ok ? "#3FBF6F" : PAPER, color: PAPER, fontWeight: 900, fontSize: 24, transform: `scale(${ok ? 1 + (1 - pk) * 0.4 : 1})` }}>{ok ? "✓" : ""}</span>
-              <span style={{ fontWeight: 700, fontSize: 30, color: INK, flex: 1 }}>{it}</span>
-              <span style={{ width: 120, height: 14, borderRadius: 7, background: ok ? ACCENT : "#DDE3EA" }} />
-            </div>
-          );
-        })}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 16, fontWeight: 900, fontSize: 30, color: INK }}>
-          <span>TOTAL</span>
-          <span style={{ color: frame >= c.checks[3] ? "#3FBF6F" : "#9AA3B2" }}>{frame >= c.checks[3] ? "WITHIN PLAN ✓" : "…"}</span>
-        </div>
-      </div>
-      {stamp > 0 && (
-        <div style={{ position: "absolute", left: 0, top: 160, transform: `rotate(-12deg) scale(${1 + (1 - stamp) * 1.4})`, opacity: clamp01(stamp * 3), border: "10px solid #2E9E5B", color: "#2E9E5B", borderRadius: 16, padding: "6px 24px", fontWeight: 900, fontSize: 70, letterSpacing: 7, background: "rgba(255,255,255,0.75)" }}>
-          APPROVED
-        </div>
-      )}
-    </div>
-  );
-};
+/** a scribbly storm cloud of displeasure over someone's head */
+const Grumble: React.FC<{ x: number; y: number; frame: number; k: number }> = ({ x, y, frame, k }) => (
+  <g transform={`translate(${x} ${y}) scale(${k})`} opacity={clamp01(k * 2)}>
+    {[-46, -14, 20, 50].map((cx, i) => (
+      <circle key={i} cx={cx} cy={i % 2 ? -10 : 0} r={30 + (i % 2) * 6} fill="#5A6170" stroke={INK} strokeWidth={4} />
+    ))}
+    <rect x={-60} y={-4} width={120} height={30} fill="#5A6170" />
+    <path d="M -76 26 L 76 26" stroke={INK} strokeWidth={4} />
+    <path d={`M ${-30 + Math.sin(frame) * 3} -6 l 14 -12 l 8 14 l 14 -14 l 8 12 l 14 -10`} fill="none" stroke="#FFD447" strokeWidth={5} strokeLinejoin="round" />
+    <path d="M -10 30 l -10 24 l 14 -4 l -8 24" fill="none" stroke="#FFD447" strokeWidth={6} strokeLinejoin="round" strokeLinecap="round" />
+  </g>
+);
+
+const Tumbleweed: React.FC<{ x: number; y: number; rot: number }> = ({ x, y, rot }) => (
+  <g transform={`translate(${x} ${y}) rotate(${rot}) scale(1.45)`}>
+    <circle r={44} fill="rgba(176,138,85,0.18)" stroke="#7A5A30" strokeWidth={5} />
+    {[0, 1, 2, 3, 4, 5].map((i) => (
+      <path key={i} d={`M ${Math.cos(i) * 40} ${Math.sin(i) * 40} Q ${Math.cos(i + 2) * 10} ${Math.sin(i + 3) * 10} ${Math.cos(i + 3.4) * 42} ${Math.sin(i + 3.4) * 42}`} fill="none" stroke="#6A4A22" strokeWidth={5} />
+    ))}
+  </g>
+);
 
 export const S08Cfo: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
   const c = useMemo(() => cfoCues(slot), [slot]);
-  const focused = frame >= c.focus;
-  const approved = frame >= c.approve;
-  // camera: wide on the office, then settle towards Saeed's desk for the review
+  const laughing = frame < c.freeze || frame >= c.back;
+  const turned = frame >= c.away && frame < c.back;
+  const gone = frame >= c.go;
+
+  // camera: wide → snap zoom on Saeed when the laugh stops → back out for the awkward silence → follow the team out
+  const sh = shake(frame, [c.freeze], 10);
   const cam = camAt(frame, [
-    [0, { x: 900, y: 540, zoom: 1.0 }],
-    [c.folder, { x: 980, y: 540, zoom: 1.02 }],
-    [c.review + 4, { x: 1780, y: 500, zoom: 1.3 }],
-    [c.approve + 6, { x: 1800, y: 505, zoom: 1.27 }],
-    [Math.round(c.approve + BEAT_FRAMES * 1.6), { x: 960, y: 540, zoom: 1.0 }],
+    [0, { x: 960, y: 540, zoom: 1.0 }],
+    [c.freeze - 1, { x: 1000, y: 540, zoom: 1.02 }],
+    [c.freeze + 3, { x: 1430, y: 470, zoom: 1.7 }],
+    [c.away + 4, { x: 1420, y: 480, zoom: 1.6 }],
+    [c.weed + 4, { x: 1060, y: 540, zoom: 1.06 }],
+    [c.accept + 6, { x: 860, y: 560, zoom: 1.12 }],
+    [c.back, { x: 1000, y: 540, zoom: 1.02 }],
+    [slot.durationInFrames, { x: 1200, y: 520, zoom: 1.12 }],
   ]);
-  // Saeed: relaxed, a light chuckle at his phone (small shoulder bounce) → focused, reading → calm nod
+  cam.x += sh.x;
+  cam.y += sh.y;
+
+  // ---- Saeed
   const ph = beatPhase(frame);
   const sIdle = idleMotion(frame, 0.4, 0.4);
-  const relaxed: Pose = withIdle({ ...POSES.phoneTalk, rArm: [24, 128], hipY: 2 + 2 * Math.abs(Math.sin(2 * Math.PI * ph)), head: -3 }, sIdle);
-  const reading: Pose = { ...POSES.stand, lHand: { x: -64, y: -212 }, rHand: { x: 64, y: -212 }, head: 6 };
-  const nod = approved ? Math.sin(clamp01((frame - c.approve) / (BEAT_FRAMES * 2)) * Math.PI * 2) * 5 : 0;
-  const sPose: Pose = focused ? lerpPose(relaxed, { ...reading, head: reading.head + nod }, easeInOut(clamp01((frame - c.focus) / 8))) : relaxed;
-  // the folder travels from Amr's hand to the desk
-  const amrHand = jointScreenPos("amr", X.amr, G, 1.35, POSES.point, "handR");
-  const ft = easeOut(clamp01((frame - (c.folder - 8)) / 8));
-  const fx = amrHand.x + (SX - 120 - amrHand.x) * ft;
-  const fy = amrHand.y + (752 - amrHand.y) * ft - Math.sin(ft * Math.PI) * 60;
+  const laughPose: Pose = withIdle({ ...POSES.phoneTalk, rArm: [24, 128], hipY: 3 + 4 * Math.abs(Math.sin(2 * Math.PI * ph)), head: -6 + 3 * Math.sin(2 * Math.PI * ph) }, sIdle);
+  const frozen: Pose = { ...POSES.phoneTalk, rArm: [24, 128], hipY: 2, head: 0 };
+  const grumpy: Pose = withIdle({ ...POSES.armsCrossed, lean: -3, head: -2 }, sIdle);
+  const ignore: Pose = withIdle({ ...POSES.sip, lean: -4, head: -8 }, sIdle);
+  let sPose: Pose = laughPose;
+  if (!laughing) {
+    if (frame < c.hmm) sPose = frozen;
+    else if (frame < c.away) sPose = lerpPose(frozen, grumpy, easeInOut(clamp01((frame - c.hmm) / 6)));
+    else sPose = lerpPose(grumpy, ignore, easeInOut(clamp01((frame - c.away) / 6)));
+  }
+  const sRight = laughing || frame < c.hmm ? "phone" : turned && frame >= c.away + 3 ? "coffee" : "none";
+  const sHead = headScreenPos("saeed", SX, G, 1.45, sPose, turned);
+
+  // ---- the team
+  const team = CAST.map((id, i) => {
+    const m = idleMotion(frame, i * 0.3, 0.5);
+    const tIn = clamp01(frame / c.arrive);
+    const startX = X[id] - 600;
+    let x = startX + (X[id] - startX) * tIn;
+    let pose: Pose = frame < c.arrive ? walkPose(POSES.relaxed, beatClock(frame) / 2 + i * 0.5, ((X[id] - startX) / Math.max(1, c.arrive)) * BEAT_FRAMES / 1.35) : withIdle(POSES.relaxed, m);
+    let flip = false;
+    let tilt = m.headTilt;
+    if (id === "amr" && frame >= c.ask - 4 && frame < c.weed) pose = withIdle(POSES.holdSign, m);
+    if (frame >= c.weed && frame < c.shrug) tilt = (i === 0 ? 8 : i === 2 ? -8 : 0) + m.headTilt; // look at each other
+    if (frame >= c.shrug && frame < c.accept) pose = lerpPose(pose, withIdle(POSES.shrug, m), easeOut(clamp01((frame - c.shrug) / 5)));
+    if (frame >= c.accept && frame < c.go) pose = lerpPose(withIdle(POSES.shrug, m), withIdle(id === "ali" ? POSES.flex : id === "amr" ? POSES.pointUp : POSES.thumbsUp, m), easeOut(clamp01((frame - c.accept) / 6)));
+    if (gone) {
+      const t = (frame - c.go) / BEAT_FRAMES;
+      x = X[id] - easeIn(clamp01(t / 1.6)) * 1400;
+      pose = walkPose(POSES.relaxed, beatClock(frame) + i * 0.5, 70, -1, 22);
+      flip = true;
+    }
+    return { id, x, pose, flip, tilt };
+  });
+  const amr = team[1];
+  const hl = jointScreenPos("amr", amr.x, G, 1.35, amr.pose, "handL", amr.flip);
+  const hr = jointScreenPos("amr", amr.x, G, 1.35, amr.pose, "handR", amr.flip);
+  const folderAt = { x: (hl.x + hr.x) / 2, y: (hl.y + hr.y) / 2 };
+  const weedT = clamp01((frame - c.weed + 6) / (c.accept - c.weed + 6));
 
   return (
     <AbsoluteFill>
       <Stage cam={cam} variant="cfo">
-        <Character id="saeed" x={SX} y={G} scale={1.45} pose={sPose} expression="neutral" right={focused ? "none" : "phone"} headTilt={0} frame={frame} />
+        <Character id="saeed" x={SX} y={G} scale={1.45} pose={sPose} flip={turned} expression={turned ? "away" : "neutral"} right={sRight} left="none" headTilt={turned ? -6 : 0} frame={frame} />
         <W>
+          {/* desk */}
           <rect x={SX - 300} y={760} width={600} height={26} rx={6} fill="#8C6A4A" stroke={INK} strokeWidth={STROKE} />
           <rect x={SX - 280} y={786} width={560} height={230} fill="#A47E58" stroke={INK} strokeWidth={STROKE} />
           <rect x={SX - 250} y={810} width={500} height={6} fill="#8C6A4A" />
-          <g transform={`translate(${SX + 190} 760)`}>
-            <path d="M -16 -34 L 16 -34 L 12 0 L -12 0 Z" fill={PAPER} stroke={INK} strokeWidth={STROKE * 0.6} />
-            <rect x={-16} y={-24} width={32} height={8} fill={ACCENT} />
-            {!focused && <path d={`M -4 -42 q ${4 + Math.sin(frame / 6) * 4} -10 0 -20`} fill="none" stroke={INK} strokeWidth={3} opacity={0.6} />}
-          </g>
           <path d={`M ${SX - 230} 760 l 20 -46 l 50 0 l 10 46 Z`} fill="#3B4A63" stroke={INK} strokeWidth={STROKE * 0.6} />
-          {frame >= c.folder - 8 && (
-            <g transform={`translate(${fx} ${fy}) rotate(${-8 + ft * 6})`}>
-              <rect x={-70} y={-48} width={140} height={96} rx={6} fill="#F4D58A" stroke={INK} strokeWidth={STROKE * 0.8} />
-              <rect x={-70} y={-48} width={56} height={14} rx={4} fill="#E9C266" stroke={INK} strokeWidth={STROKE * 0.5} />
-              <text y={10} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={17} fill={INK}>
+          {/* "haha" while laughing; it pops when the laugh stops */}
+          {laughing && frame > 4 && (
+            <g transform={`translate(${SX + 170} ${350 + Math.sin(frame / 4) * 4}) scale(${popIn(frame, frame < c.freeze ? 4 : c.back, 300, 16)})`}>
+              <rect x={-70} y={-36} width={140} height={60} rx={22} fill={PAPER} stroke={INK} strokeWidth={4} />
+              <path d="M -24 24 L -36 44 L -6 24" fill={PAPER} stroke={INK} strokeWidth={4} strokeLinejoin="round" />
+              <text y={8} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={32} fill={INK}>
+                {Math.floor(frame / 5) % 2 ? "HAHA" : "haha"}
+              </text>
+            </g>
+          )}
+          {!laughing && frame < c.hmm + 4 && (
+            <g opacity={1 - clamp01((frame - c.freeze) / 8)}>
+              {[0, 1, 2, 3, 4].map((k) => (
+                <circle key={k} cx={SX + 170 + Math.cos(k * 1.3) * (20 + (frame - c.freeze) * 6)} cy={350 + Math.sin(k * 1.3) * (20 + (frame - c.freeze) * 6)} r={6} fill={PAPER} stroke={INK} strokeWidth={3} />
+              ))}
+            </g>
+          )}
+          {/* displeasure: a little storm cloud */}
+          {frame >= c.hmm && frame < c.away + 6 && <Grumble x={sHead.x} y={sHead.y - sHead.r - 70} frame={frame} k={popIn(frame, c.hmm, 380, 13) * (1 - clamp01((frame - c.away - 2) / 4))} />}
+          {/* ignoring: whistling, eyes on the corner */}
+          {turned && <Notes frame={frame} at={c.away + 2} x={sHead.x + sHead.r * 0.7} y={sHead.y - sHead.r * 0.3} />}
+          {/* the folder in Amr's hand */}
+          {!gone && frame >= c.ask - 4 && frame < c.shrug && (
+            <g transform={`translate(${folderAt.x} ${folderAt.y - 8}) rotate(${-4})`}>
+              <rect x={-60} y={-42} width={120} height={84} rx={6} fill="#F4D58A" stroke={INK} strokeWidth={STROKE * 0.8} />
+              <rect x={-60} y={-42} width={48} height={12} rx={4} fill="#E9C266" stroke={INK} strokeWidth={STROKE * 0.5} />
+              <text y={8} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={16} fill={INK}>
                 BUDGET
               </text>
             </g>
           )}
-          {!focused && frame > 4 && (
-            <g transform={`translate(${SX + 150} 360) scale(${popIn(frame, 4, 300, 16)})`} opacity={0.95}>
-              <rect x={-58} y={-34} width={116} height={56} rx={20} fill={PAPER} stroke={INK} strokeWidth={4} />
-              <path d="M -20 22 L -32 40 L -4 22" fill={PAPER} stroke={INK} strokeWidth={4} strokeLinejoin="round" />
-              <text y={6} textAnchor="middle" fontFamily={FONT} fontWeight={800} fontSize={28} fill={INK}>
-                haha
+          {/* awkward silence */}
+          {frame >= c.weed - 6 && frame < c.accept + 10 && <Tumbleweed x={1900 - weedT * 1700} y={G - 60 - Math.abs(Math.sin(weedT * 9)) * 50} rot={-weedT * 900} />}
+        </W>
+        {team.map(({ id, x, pose, flip, tilt }) => (
+          <Character key={id} id={id} x={x} y={G} scale={1.35} pose={pose} flip={flip} expression={frame >= c.accept ? "happy" : frame >= c.freeze ? "neutral" : "happy"} left="none" right="none" headTilt={tilt} frame={frame} />
+        ))}
+        {frame >= c.weed && frame < c.accept && (
+          <W>
+            <g transform={`translate(${X.amr + 40} ${G - 600}) scale(${popIn(frame, c.weed + 2, 380, 14)})`}>
+              <rect x={-62} y={-40} width={124} height={64} rx={24} fill={PAPER} stroke={INK} strokeWidth={4} />
+              <path d="M -10 24 L -20 46 L 10 24" fill={PAPER} stroke={INK} strokeWidth={4} strokeLinejoin="round" />
+              <text y={8} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={40} fill={INK}>
+                …
               </text>
             </g>
-          )}
-        </W>
-        {CAST.map((id, i) => {
-          const m = idleMotion(frame, i * 0.3, 0.5);
-          const t = clamp01(frame / c.arrive);
-          const startX = X[id] - 600;
-          const x = startX + (X[id] - startX) * t;
-          const stride = ((X[id] - startX) / Math.max(1, c.arrive)) * BEAT_FRAMES / 1.35;
-          let pose: Pose = frame < c.arrive ? walkPose(POSES.relaxed, beatClock(frame) / 2 + i * 0.5, stride) : withIdle(POSES.relaxed, m);
-          if (id === "amr" && frame >= c.ask && frame < c.folder + 6) pose = withIdle(POSES.point, m);
-          if (approved) pose = lerpPose(pose, withIdle(id === "ali" ? POSES.flex : POSES.thumbsUp, m), easeInOut(clamp01((frame - c.approve - 2) / 8)));
-          return <Character key={id} id={id} x={x} y={G} scale={1.35} pose={pose} expression={approved ? "happy" : "neutral"} left="none" headTilt={m.headTilt} frame={frame} />;
-        })}
+          </W>
+        )}
       </Stage>
-      {frame >= c.review - 2 && <RequestCard frame={frame} c={c} />}
+      <Shout frame={frame} x={700} y={300} size={110} speaker="AMR" lines={[[{ text: "NO BUDGET?", at: c.accept }], [{ text: "NO PROBLEM!", at: c.accept + 6 }]]} hideAt={c.go + 4} />
       <Chapter frame={frame} title="FINANCE" sub="SAEED'S OFFICE" />
       <NameTag frame={frame} at={6} x={SX} y={150} text={charCfg("saeed").tag ?? "Saeed"} />
-      <Subtitle frame={frame} at={c.ask} frames={voiceFrames("amr_budget")} speaker="Amr" text={lineText("amr_budget")} />
-      <Subtitle frame={frame} at={c.review} frames={voiceFrames("saeed_numbers")} speaker="Saeed" text={lineText("saeed_numbers")} />
-      <Subtitle frame={frame} at={c.approve} frames={voiceFrames("saeed_ok")} speaker="Saeed" text={lineText("saeed_ok")} />
+      <Subtitle frame={frame} at={c.ask} frames={Math.min(voiceFrames("amr_budget"), c.hmm - c.ask - 2)} speaker="Amr" text={lineText("amr_budget")} />
+      <Subtitle frame={frame} at={c.hmm} frames={Math.max(voiceFrames("saeed_hmm"), Math.round(BEAT_FRAMES * 1.6))} speaker="Saeed" text={lineText("saeed_hmm")} />
+      <Subtitle frame={frame} at={c.accept} frames={voiceFrames("amr_nobudget")} speaker="Amr" text={lineText("amr_nobudget")} />
+      {/* a little accent flash on the record scratch */}
+      <AbsoluteFill style={{ background: ACCENT, opacity: frame >= c.freeze ? Math.exp(-(frame - c.freeze) / 2) * 0.25 : 0, pointerEvents: "none" }} />
     </AbsoluteFill>
   );
 };

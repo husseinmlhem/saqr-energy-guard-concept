@@ -1,25 +1,109 @@
-// The 60-second video: scenes on downbeat-snapped slots, music, beat-locked SFX, optional debug overlay.
+// The video: scenes on downbeat-snapped slots, music, beat-locked SFX, optional debug overlay.
 import React, { useEffect, useMemo, useState } from "react";
 import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, prefetch, staticFile, useCurrentFrame } from "remotion";
 import { allFacePaths } from "./characters/config";
 import { BeatDebug } from "./debug/BeatDebug";
 import { SCENES } from "./scenes";
 import { BEATS, DURATION_IN_FRAMES, FPS } from "./sync/beats";
-import { PLAN, VIDEO } from "./sync/timeline";
+import { PLAN, SceneId, VIDEO } from "./sync/timeline";
 import { PAPER } from "./theme";
 import { voiceFile, voiceFrames } from "./voice";
 
 export type MaHawaProps = { debug: boolean; sfx?: boolean };
 
-/** every cut lands on a downbeat: give it a little zoom-punch and a flash so it hits like the music */
-const CutPunch: React.FC<{ children: React.ReactNode; enabled: boolean }> = ({ children, enabled }) => {
+type Cut = "none" | "punch" | "whip" | "zoom";
+/** how each scene comes in. Every cut still lands exactly on its downbeat: the incoming move resolves in a few frames. */
+const CUT_IN: Record<SceneId, Cut> = {
+  title: "none",
+  play: "none", // the panels slam in on their own
+  stop: "punch", // the hard break
+  bonk: "whip",
+  brainstorm: "zoom",
+  moreCreative: "punch",
+  creative: "zoom",
+  pitch: "whip",
+  cfo: "whip",
+  amr: "zoom",
+  ali: "whip",
+  hussein: "zoom",
+  events: "none", // opens out of Hussein's monitor
+  finale: "punch",
+};
+
+const Streaks: React.FC<{ k: number; dir: 1 | -1 }> = ({ k, dir }) => (
+  <svg width={1920} height={1080} style={{ position: "absolute", inset: 0, opacity: k, pointerEvents: "none" }}>
+    {Array.from({ length: 14 }, (_, i) => {
+      const y = 40 + ((i * 397) % 1000);
+      const len = 380 + ((i * 211) % 700);
+      const x = ((i * 523) % 1920) - len / 2 + dir * (1 - k) * 600;
+      return <rect key={i} x={x} y={y} width={len} height={3 + (i % 3) * 3} rx={3} fill="#FFFFFF" opacity={0.55} />;
+    })}
+  </svg>
+);
+
+/** cut styles: punch (zoom-kick + flash), whip (fast pan with motion streaks), zoom (zoom-through with blur) */
+const SceneCut: React.FC<{ children: React.ReactNode; cutIn: Cut; cutOut: Cut; dur: number }> = ({ children, cutIn, cutOut, dur }) => {
   const f = useCurrentFrame();
-  const k = enabled ? Math.exp(-f / 4) : 0;
+  let transform = "";
+  let filter = "";
+  let flash = 0;
+  let streak = 0;
+  // ---- in
+  if (cutIn === "punch") {
+    const k = Math.exp(-f / 4);
+    transform = `scale(${1 + 0.035 * k})`;
+    flash = f < 8 ? 0.35 * Math.exp(-f / 2) : 0;
+  } else if (cutIn === "whip" && f < 6) {
+    const k = 1 - easeOutCubic(f / 6);
+    transform = `translateX(${-k * 170}px) scale(${1 + k * 0.2})`;
+    filter = `blur(${k * 9}px)`;
+    streak = k;
+  } else if (cutIn === "zoom" && f < 8) {
+    const k = 1 - easeOutCubic(f / 8);
+    transform = `scale(${1 + k * 0.28})`;
+    filter = `blur(${k * 8}px)`;
+    flash = 0.18 * k;
+  }
+  // ---- out (only the last 3 frames, so nothing on a beat is lost)
+  const left = dur - 1 - f;
+  if (left < 3) {
+    const k = (3 - left) / 3;
+    if (cutOut === "whip") {
+      transform = `translateX(${k * 150}px) scale(${1 + k * 0.18})`;
+      filter = `blur(${k * 8}px)`;
+      streak = Math.max(streak, k);
+    } else if (cutOut === "zoom") {
+      transform = `scale(${1 + k * 0.16})`;
+      filter = `blur(${k * 5}px)`;
+      flash = Math.max(flash, 0.14 * k);
+    }
+  }
   return (
-    <AbsoluteFill>
-      <AbsoluteFill style={{ transform: `scale(${1 + 0.035 * k})` }}>{children}</AbsoluteFill>
-      {enabled && f < 8 && <AbsoluteFill style={{ background: "#FFFFFF", opacity: 0.35 * Math.exp(-f / 2), pointerEvents: "none" }} />}
+    <AbsoluteFill style={{ overflow: "hidden" }}>
+      <AbsoluteFill style={{ transform: transform || undefined, filter: filter || undefined }}>{children}</AbsoluteFill>
+      {streak > 0.02 && <Streaks k={streak} dir={left < 3 ? 1 : -1} />}
+      {flash > 0.01 && <AbsoluteFill style={{ background: "#FFFFFF", opacity: flash, pointerEvents: "none" }} />}
     </AbsoluteFill>
+  );
+};
+
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+
+/** fine film grain over everything: six noise tiles, cycled and offset every frame */
+const Grain: React.FC = () => {
+  const f = useCurrentFrame();
+  const i = f % 6;
+  return (
+    <AbsoluteFill
+      style={{
+        backgroundImage: `url(${staticFile(`fx/grain_${i}.png`)})`,
+        backgroundSize: "384px 384px",
+        backgroundPosition: `${(f * 137) % 384}px ${(f * 89) % 384}px`,
+        mixBlendMode: "overlay",
+        opacity: 0.09,
+        pointerEvents: "none",
+      }}
+    />
   );
 };
 
@@ -72,16 +156,18 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
 
   return (
     <AbsoluteFill style={{ background: PAPER }}>
-      {PLAN.scenes.map((slot) => {
+      {PLAN.scenes.map((slot, i) => {
         const { Component } = SCENES[slot.id];
         return (
           <Sequence key={slot.id} from={slot.from} durationInFrames={slot.durationInFrames} name={`${slot.title}`}>
-            <CutPunch enabled={slot.from > 0 && slot.id !== "events"}>
+            <SceneCut cutIn={CUT_IN[slot.id]} cutOut={CUT_IN[PLAN.scenes[i + 1]?.id] ?? "none"} dur={slot.durationInFrames}>
               <Component slot={slot} />
-            </CutPunch>
+            </SceneCut>
           </Sequence>
         );
       })}
+
+      <Grain />
 
       {/* dialogue: each line on its beat cue */}
       {voiceCues.map((v, i) => (

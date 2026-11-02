@@ -6,23 +6,88 @@
     "voiceId = the ElevenLabs voice used to generate the line (prompt = what was sent, with v4 audio tags)."
   ],
   "speakers": {
-    "michael": { "voiceId": "rLl4PSDTzX3VHL4wjSFI", "voiceName": "Jesse — Animation Character, Friendly" },
-    "saeed": { "voiceId": "Hvlnv5DwiIO2CQ6oYMZ3", "voiceName": "ALI — Saudi Arabic & English" },
-    "amr": { "voiceId": "vszNunPGBVqJg1Qd4H7Z", "voiceName": "Mohammad — Warm Arabic Commercial" },
-    "ali": { "voiceId": "BrKeRgI6Ivb2zWjD6qte", "voiceName": "Celil — Arabic Narrator" },
-    "hussein": { "voiceId": "NeokBGcPJaElDOj380Qt", "voiceName": "Bader Eshtaya — Palestine" }
+    "michael": {
+      "voiceId": "rLl4PSDTzX3VHL4wjSFI",
+      "voiceName": "Jesse — Animation Character, Friendly"
+    },
+    "saeed": {
+      "voiceId": "Hvlnv5DwiIO2CQ6oYMZ3",
+      "voiceName": "ALI — Saudi Arabic & English"
+    },
+    "amr": {
+      "voiceId": "vszNunPGBVqJg1Qd4H7Z",
+      "voiceName": "Mohammad — Warm Arabic Commercial"
+    },
+    "ali": {
+      "voiceId": "BrKeRgI6Ivb2zWjD6qte",
+      "voiceName": "Celil — Arabic Narrator"
+    },
+    "hussein": {
+      "voiceId": "NeokBGcPJaElDOj380Qt",
+      "voiceName": "Bader Eshtaya — Palestine"
+    }
   },
   "lines": {
-    "michael_stop": { "speaker": "michael", "text": "Stop playing!", "prompt": "[shouting] Stop playing!" },
-    "michael_ideas": { "speaker": "michael", "text": "I want ideas!", "prompt": "[shouting] I want ideas!" },
-    "michael_more": { "speaker": "michael", "text": "I want MORE creative ideas!", "prompt": "[exasperated] I want MORE... creative ideas!" },
-    "michael_ok": { "speaker": "michael", "text": "Excellent! Make it happen!", "prompt": "[excited] Excellent! Make it happen!" },
-    "amr_budget": { "speaker": "amr", "text": "Saeed… we need a budget.", "prompt": "[confident, polite] Saeed... we need a budget." },
-    "saeed_numbers": { "speaker": "saeed", "text": "Hmm… let me see the numbers.", "prompt": "[calm, thoughtful] Hmm... let me see the numbers." },
-    "saeed_ok": { "speaker": "saeed", "text": "Approved. Spend it wisely.", "prompt": "[warm, measured] Approved. Spend it wisely." },
-    "amr_lead": { "speaker": "amr", "text": "Timeline's locked. Let's go, team!", "prompt": "[energetic] Timeline's locked. Let's go, team!" },
-    "ali_lift": { "speaker": "ali", "text": "Leave the heavy lifting to me!", "prompt": "[confident, playful] Leave the heavy lifting to me!" },
-    "hussein_done": { "speaker": "hussein", "text": "And… done!", "prompt": "[tired but proud] And... done!" },
-    "michael_great": { "speaker": "michael", "text": "Great work, guys!", "prompt": "[warmly, proud] Great work, guys!" }
+    "michael_stop": {
+      "speaker": "michael",
+      "text": "Stop playing!",
+      "prompt": "[shouting] Stop playing!"
+    },
+    "michael_ideas": {
+      "speaker": "michael",
+      "text": "I want ideas!",
+      "prompt": "[shouting] I want ideas!"
+    },
+    "michael_more": {
+      "speaker": "michael",
+      "text": "I want MORE creative ideas!",
+      "prompt": "[exasperated] I want MORE... creative ideas!"
+    },
+    "michael_ok": {
+      "speaker": "michael",
+      "text": "Excellent! Make it happen!",
+      "prompt": "[excited] Excellent! Make it happen!"
+    },
+    "amr_budget": {
+      "speaker": "amr",
+      "text": "Saeed… we need a budget.",
+      "prompt": "[confident, polite] Saeed... we need a budget."
+    },
+    "saeed_hmm": {
+      "speaker": "saeed",
+      "text": "Hmm…",
+      "prompt": "[annoyed, reluctant] Hmm...",
+      "clipFrom": {
+        "raw": "saeed_numbers",
+        "start": 0.0,
+        "end": 0.95,
+        "_note": "until a dedicated take exists, the 'Hmm…' is cut from the start of an earlier Saeed take"
+      }
+    },
+    "amr_nobudget": {
+      "speaker": "amr",
+      "text": "Okay… no budget. We'll make it work!",
+      "prompt": "[resigned sigh, then upbeat] Okay... no budget. We'll make it work!"
+    },
+    "amr_lead": {
+      "speaker": "amr",
+      "text": "Timeline's locked. Let's go, team!",
+      "prompt": "[energetic] Timeline's locked. Let's go, team!"
+    },
+    "ali_lift": {
+      "speaker": "ali",
+      "text": "Leave the heavy lifting to me!",
+      "prompt": "[confident, playful] Leave the heavy lifting to me!"
+    },
+    "hussein_done": {
+      "speaker": "hussein",
+      "text": "And… done!",
+      "prompt": "[tired but proud] And... done!"
+    },
+    "michael_great": {
+      "speaker": "michael",
+      "text": "Great work, guys!",
+      "prompt": "[warmly, proud] Great work, guys!"
+    }
   }
 }

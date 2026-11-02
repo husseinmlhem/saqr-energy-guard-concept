@@ -1,9 +1,9 @@
 // Scene 2 — "STOP PLAYING!" on the song's hard break.
-// Michael leans in from the edge of the screen; the three freeze, whip the balloons behind their backs,
-// smile innocently. He leaves when the groove comes back — and the party resumes.
+// Michael leans in from the edge of the screen; the three freeze, whip the dumbbells / balloons / shisha hose
+// behind their backs and smile innocently (the shisha keeps smoking). He leaves when the groove comes back — and they carry on.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
+import { Character, headScreenPos } from "../characters/Character";
 import { charCfg } from "../characters/config";
 import { POSES, Pose, lerpPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, lin, shake } from "../fx/anim";
@@ -11,14 +11,16 @@ import { Exclaim, NameTag, SpeedLines } from "../fx/Fx";
 import { idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, INK, STROKE } from "../theme";
-import { BALLOON, CAST, balloonR, dancePose } from "./S01Pump";
+import { BALLOON, CAST } from "./S01Play";
+import { HiddenProps, OFFICE_SHISHA, Shisha, Smoke, Umbrella, officeActivity } from "./playtime";
 import { CAST_S, CAST_X, GROUND } from "./S00Title";
-import { HeldBalloon, Notes, Shout, Stage, W, breathe, camAt } from "./kit";
+import { Notes, Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 export const stopCues = (slot: SceneSlot) => {
   const enter = beatOf(slot, 0);
-  const words = [beatOf(slot, 0), beatOf(slot, 1)];
+  // both words land together (a few frames apart) so the shout never sits half-finished over the logo wall
+  const words = [beatOf(slot, 0), beatOf(slot, 0) + 5];
   const hide = beatOf(slot, 1);
   const innocent = beatOf(slot, 2);
   const squint = beatOf(slot, 3);
@@ -28,7 +30,8 @@ export const stopCues = (slot: SceneSlot) => {
   const cues: Cues = {
     marks: [
       { f: enter, name: "Michael leans in: STOP" },
-      { f: words[1], name: "PLAYING! — balloons behind backs" },
+      { f: words[1], name: "PLAYING!" },
+      { f: hide, name: "props behind backs" },
       { f: innocent, name: "innocent smiles ♪" },
       { f: squint, name: "Michael suspicious" },
       { f: leave, name: "Michael leaves (groove back)" },
@@ -71,27 +74,34 @@ export const S02Stop: React.FC<SceneProps> = ({ slot }) => {
   );
   cam.x += sh.x;
   cam.y += sh.y;
-  const r = balloonR(12) * CAST_S;
 
   return (
     <AbsoluteFill>
       <Stage cam={cam}>
+        <W>
+          {/* "beach mode" and the shisha, right there in the office */}
+          <Umbrella x={1150} ground={GROUND - 4} s={0.8} tilt={-10} base="#FFD36B" />
+          <Shisha x={OFFICE_SHISHA.x} ground={GROUND} s={OFFICE_SHISHA.s} glow={0.5} frame={frame} />
+          <Smoke frame={frame} x={OFFICE_SHISHA.x} y={GROUND - 400 * OFFICE_SHISHA.s} amount={0.6} spread={0.55} seed={3} />
+        </W>
         {CAST.map((id, i) => {
           const m = idleMotion(frame, i * 0.3, 0.6);
+          // before the freeze: busy (curls / balloon / shisha); frozen on "STOP"; hidden; then back at it
+          const busyAt = frame < c.hide ? Math.min(frame, c.enter) : frame;
+          const busy = officeActivity(id, busyAt, CAST_X[id], GROUND, CAST_S, BALLOON);
           let pose: Pose;
-          if (frame < c.hide) pose = { ...dancePose(c.enter, i * 0.3) }; // frozen mid-dance
-          else if (hiding) pose = lerpPose(dancePose(c.enter, i * 0.3), withIdle({ ...POSES.hideBehind, lean: peekT * 8, hipX: peekT * 14 }, m), hideT);
-          else pose = lerpPose(withIdle(POSES.hideBehind, m), dancePose(frame, i * 0.3), resumeT);
-          const hand = jointScreenPos(id, CAST_X[id], GROUND, CAST_S, pose, "handR");
+          if (frame < c.hide) pose = busy.pose;
+          else if (hiding) pose = lerpPose(busy.pose, withIdle({ ...POSES.hideBehind, lean: peekT * 8, hipX: peekT * 14 }, m), hideT);
+          else pose = lerpPose(withIdle(POSES.hideBehind, m), busy.pose, resumeT);
           const head = headScreenPos(id, CAST_X[id], GROUND, CAST_S, pose);
-          // behind the back: the balloon peeks over the shoulder
-          const bx = hiding ? head.x + (i === 0 ? -90 : 90) : hand.x + 10;
-          const by = hiding ? head.y + 40 : hand.y - 310;
+          const showBusy = !hiding || hideT < 0.5;
           return (
             <React.Fragment key={id}>
-              <W>
-                <HeldBalloon x={bx} y={by} r={r * (hiding ? 0.92 : 1)} fill={BALLOON[id]} hand={hiding ? { x: head.x + 30, y: head.y + 260 } : hand} frame={frame} seed={i} />
-              </W>
+              {hiding && hideT >= 0.5 && (
+                <W>
+                  <HiddenProps id={id} x={CAST_X[id]} g={GROUND} s={CAST_S} pose={pose} fill={BALLOON[id]} frame={frame} side={i === 0 ? -1 : 1} />
+                </W>
+              )}
               <Character
                 id={id}
                 x={CAST_X[id]}
@@ -101,9 +111,11 @@ export const S02Stop: React.FC<SceneProps> = ({ slot }) => {
                 expression={frame < c.innocent ? "shocked" : "happy"}
                 headTilt={frame < c.hide ? 0 : m.headTilt + peekT * 8}
                 left="none"
+                right="none"
                 frame={frame}
               />
               <W>
+                {showBusy && (frame >= c.resume || frame < c.hide) && busy.front}
                 <Exclaim frame={frame} at={c.enter + i} x={head.x} y={head.y - head.r - 30} hold={12} />
                 {hiding && frame < c.leave && <Notes frame={frame} at={c.innocent + i * 3} x={head.x + head.r * 0.6} y={head.y - head.r * 0.2} />}
               </W>

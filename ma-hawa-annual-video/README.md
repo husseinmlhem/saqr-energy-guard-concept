@@ -1,34 +1,34 @@
-# Ma Hawa — Annual Meeting Video (~91 s, beat-synced, with voices)
+# Ma Hawa — Annual Meeting Video (~86 s, beat-synced, with voices)
 
-A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo) and is set in a Ma Hawa office with depth, camera moves, and day/night lighting. It has spoken dialogue (ElevenLabs), with the music ducking under every line. Every cut, hit, caption and line comes from the music analysis in `config/beats.json`.
+A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo) and is set in a Ma Hawa office with depth, camera moves, and day/night lighting. It has spoken dialogue (ElevenLabs), with the music ducking under every line. The team wears Ma Hawa prints (Ali's chest print, Hussein's tee, Amr's pocket logo, Michael's lapel pin). Cuts alternate punch / whip-pan / zoom-through, with a fine film grain on top. Every cut, hit, caption and line comes from the music analysis in `config/beats.json`.
 
 ### Storyline (one React component per scene, `src/scenes/S00…S13`)
 
 | # | Scene | Music moment |
 |---|---|---|
 | 0 | **Title**: the camera glides across the office, MA HAWA slams in on the beats | 1 bar |
-| 1 | **Pump party**: Ali, Amr (centre) and Hussein inflate balloons with floor pumps. The handle goes down on every beat. Then they dance | 4 bars |
-| 2 | **"STOP PLAYING!"** (voiced): Michael leans in from the edge of the screen. Balloons go behind backs. He leaves and the party resumes | **first hard break** (bass drops out) |
-| 3 | **BONK**: the bat swings in from the edge. "I WANT IDEAS!" | 1 bar |
+| 1 | **Playtime** (split screen, three angled panels slam in): Ali curls dumbbells (a rep on every beat), Amr on a sun lounger at the beach blowing up a balloon (a breath on every beat), Hussein with a shisha, blowing the smoke into his balloon | 2 bars |
+| 2 | **"STOP PLAYING!"** (voiced): back in the office, caught mid-curl / mid-balloon / mid-shisha. Michael leans in from the edge; dumbbells, balloons and the hose go behind backs (the shisha keeps smoking). He leaves, they carry on | **first hard break** (bass drops out) |
+| 3 | **BONK**: the bat swings in from the edge; balloons pop, dumbbells clatter, the umbrella keels over. "I WANT IDEAS!" | 1 bar |
 | 4 | **Lots of ideas**: a sticky note flies onto the board on every beat, then goes to Michael | 2 bars |
 | 5 | **"I WANT MORE CREATIVE IDEAS!"** | 1 bar |
-| 6 | **Creative huddle** (top-down), EUREKA | 2 bars |
-| 7 | **The pitch**: Hussein drives the deck. "EXCELLENT! MAKE IT HAPPEN!" | the song's accent bar |
-| 8 | **Finance**: Saeed is relaxed with his coffee. "Saeed… we need a budget." He becomes focused and reviews the request; each line checks out on the beat. "Approved. Spend it wisely." | 3 bars |
+| 6 | **Planning · the war room**: a hologram of the booth builds itself on the beat (grid, floor, walls, LED wall + logo, stage, lights, VR zone / drone show / LED tunnel); Hussein drives it from his laptop, Amr directs. EUREKA in gold | 2 bars |
+| 7 | **The pitch**: Hussein drives the deck. "EXCELLENT! MAKE IT HAPPEN!" | 2 bars |
+| 8 | **Finance**: Saeed is laughing at his phone. "Saeed… we need a budget." The laugh stops dead (record scratch, snap zoom), "Hmm…", a storm cloud; then he turns away, eyes up to the corner, sips his coffee and whistles. Tumbleweed. "Okay… no budget. We'll make it work!" (NO BUDGET? NO PROBLEM!) — they leave, he goes back to laughing | 3 bars |
 | 9 | **AMR · The plan**: client call, the project timeline locks in row by row on the beat. "Timeline's locked. Let's go, team!" | 2 bars |
 | 10 | **ALI · The build**: at the exhibition hall he lifts the LED-wall crate ("Leave the heavy lifting to me!"), the booth walls slam in on the beat, and the lights come on in the quiet bar | 2 bars (2nd = breakdown) |
 | 11 | **HUSSEIN · The night shift**: everyone heads home, he stays. Exports fill on every beat of the build-up. "And… done!", then a dive into his screen | quiet bar + build-up |
 | 12 | **Events**: the wall bursts out of his screen, one stamp per beat, gold badge, 45+ | **the biggest drop** |
 | 13 | **Finale**: they walk back, "GREAT WORK, GUYS!" in the song's second break, then the **hero shot as the beat returns**, then the logo | 6 bars |
 
-It is synced to *7mama — Sheshtawy* (95 BPM), song window **27.9 s → 118.8 s** (`musicWindow` in `config/video.json`).
+It is synced to *7mama — Sheshtawy* (95 BPM), song window **32.9 s → 118.8 s** (a 3-bar intro before the break) (`musicWindow` in `config/video.json`).
 
 ### Voices
 - **Lines and speakers:** `config/voices.json`. Each speaker has a fixed ElevenLabs voice; the `prompt` is what was generated, including v4 tags like `[shouting]`.
-- **Audio files:** `assets/voice/raw/<line>.mp3`. Running `npm run voices` trims silence, levels loudness to -16 LUFS, and measures durations into `assets/voice/durations.json`.
+- **Audio files:** `assets/voice/raw/<line>.mp3`. Running `npm run voices` trims silence, runs a voice chain (high-pass, presence lift, gentle compression), levels every line to -14 LUFS with a true-peak limiter, and measures durations into `assets/voice/durations.json`. A line can borrow a slice of another take via `clipFrom` until it has its own.
 - **Missing lines:** a line with no audio file still shows its caption or subtitle, so the video always renders.
 - **Real recordings:** to use real recordings of the actual people, record the line, save it as `assets/voice/raw/<line>.wav`, run `npm run voices` and re-render.
-- **Ducking:** the music drops to `audio.duckTo` (45%) under each line. Voice level is set by `audio.voiceVolume`.
+- **Mix:** the music plays at `audio.musicVolume` (72%) and drops to `audio.duckTo` (28%, about -11 dB) under each line, so the voices sit well above it. Voice level is set by `audio.voiceVolume`.
 
 ## Quick start
 
@@ -52,7 +52,7 @@ Remotion downloads its own headless Chrome on first render. To use one you alrea
 ## Swap a face
 
 1. Put the photo(s) in `assets/faces/raw/` named `<id>_<expression>.jpg`.
-   Ids: `amr`, `ali`, `hussein`, `michael`, `saeed`. Expressions: `neutral`, `happy`, `shocked`, `tired`.
+   Ids: `amr`, `ali`, `hussein`, `michael`, `saeed`. Expressions: `neutral`, `happy`, `shocked`, `tired`, `away` (looking off to the side — used for Saeed ignoring the budget).
    Example: `michael_neutral.jpg`, `michael_happy.jpg`.
 2. Run `npm run faces` (or `npm run faces -- michael` to process only Michael).
    This removes the background, finds the face landmarks, levels the eyes, crops and scales every face to the
@@ -137,7 +137,7 @@ If any cue is off-beat, the panel flags it.
 | Video length + where the break/drop should sit when re-syncing | `config/video.json` → `musicWindow` |
 | Office set (walls, windows, brand wall, CFO office) | `src/world/Office.tsx` |
 | Realistic screens (3D, edit, code, dashboard, export) | `src/world/Screens.tsx` |
-| Logo | put the file in `assets/logo/` and set `brand.logo` (e.g. `"logo/ma-hawa.png"`) — until then a wordmark placeholder is shown |
+| Logo | put the file in `assets/logo/` and set `brand.logo` (e.g. `"logo/ma-hawa.png"`) — it then replaces the wordmark on the end card **and on everyone's clothes**; until then the MA HAWA wordmark is used |
 | Colours | `config/video.json` → `brand` (accent `#76ADDE`) |
 | Music / SFX volume, SFX on/off | `config/video.json` → `audio` |
 | A scene's animation | `src/scenes/S00Title.tsx` … `S11Finale.tsx` (one component per scene; shared pieces in `kit.tsx`) |

@@ -8,7 +8,7 @@ import { clamp01, easeInOut, easeOut, popIn, rand } from "../fx/anim";
 import { BEAT_FRAMES, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
-import { CAST } from "./S01Pump";
+import { CAST } from "./S01Play";
 import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 

@@ -2,7 +2,7 @@
 import React from "react";
 import type { SceneId, SceneSlot } from "../sync/timeline";
 import { S00Title, titleCues } from "./S00Title";
-import { S01Pump, pumpCues } from "./S01Pump";
+import { S01Play, playCues } from "./S01Play";
 import { S02Stop, stopCues } from "./S02Stop";
 import { S03Bonk, bonkCues } from "./S03Bonk";
 import { S04Brainstorm, brainstormCues } from "./S04Brainstorm";
@@ -19,7 +19,7 @@ import { Cues, SceneProps } from "./types";
 
 export const SCENES: Record<SceneId, { Component: React.FC<SceneProps>; cues: (slot: SceneSlot) => { cues: Cues } }> = {
   title: { Component: S00Title, cues: titleCues },
-  pump: { Component: S01Pump, cues: pumpCues },
+  play: { Component: S01Play, cues: playCues },
   stop: { Component: S02Stop, cues: stopCues },
   bonk: { Component: S03Bonk, cues: bonkCues },
   brainstorm: { Component: S04Brainstorm, cues: brainstormCues },

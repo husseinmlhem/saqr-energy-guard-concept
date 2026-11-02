@@ -21,6 +21,9 @@
     "tired": [
       "shocked",
       "neutral"
+    ],
+    "away": [
+      "neutral"
     ]
   },
   "faceGeometry": {
@@ -121,7 +124,8 @@
       "tag": "Saeed — CFO",
       "body": "money",
       "faces": {
-        "neutral": "faces/saeed_neutral.png"
+        "neutral": "faces/saeed_neutral.png",
+        "away": "faces/saeed_away.png"
       },
       "placeholder": {
         "initials": "S",

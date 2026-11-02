@@ -4,6 +4,9 @@
 import React from "react";
 import { Img, staticFile } from "remotion";
 import { ACCENT, ACCENT_SOFT, INK, PAPER, STROKE } from "../theme";
+import videoJson from "../../config/video.json";
+
+const BRAND_LOGO: string | null = (videoJson as { brand?: { logo?: string | null } }).brand?.logo ?? null;
 import { CHARS, CharId, Expression, HEAD_R, Outfit, charCfg, facePath, outfitOf } from "./config";
 import { Goggles, Prop, PropName } from "./props";
 import { DIMS, Pose, Pt, Skeleton, add, pts, solve } from "./rig";
@@ -141,7 +144,7 @@ export const Character: React.FC<CharacterProps> = (p) => {
         {armsBack && arms}
         <Legs sk={sk} d={d} o={o} sw={sw} body={body} />
         <Neck sk={sk} o={o} sw={sw} w={body === "muscle" ? 40 : 28} />
-        <Torso sk={sk} d={d} o={o} sw={sw} body={body} id={p.id} wind={wind} frame={frame} />
+        <Torso sk={sk} d={d} o={o} sw={sw} body={body} id={p.id} wind={wind} frame={frame} flip={flip} back={!!p.back} />
         {body === "money" && !p.back && <GhutraDrape hc={hc} r={r} sw={sw} wind={wind} frame={frame} sk={sk} />}
         {!armsFront && !armsBack && arms}
         {!face && !p.back && <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} />}
@@ -322,8 +325,39 @@ const Neck: React.FC<{ sk: Skeleton; o: Outfit; sw: number; w: number }> = ({ sk
   return <Tube p={[a, b]} w={[w]} color={o.skin} sw={sw} cap="butt" />;
 };
 
-const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: number; body: string; id: CharId; wind: number; frame: number }> = ({
-  sk, d, o, sw, body, id, wind, frame,
+// ------------------------------------------------------------------- Ma Hawa logo on the clothes
+/** the brand mark, drawn in torso space (centre c, along the torso's axes); counter-flipped so it never reads backwards.
+ *  Uses config/video.json → brand.logo when a logo file is set, else the MA HAWA wordmark with its wave. */
+const BrandPrint: React.FC<{ c: Pt; sk: Skeleton; w: number; flip: number; style: "bold" | "tee" | "pocket" | "pin"; ink?: string }> = ({ c, sk, w, flip, style, ink = INK }) => {
+  const ang = (Math.atan2(sk.side.y, sk.side.x) * 180) / Math.PI;
+  const logo = BRAND_LOGO;
+  const k = w / 100; // design box is 100 units wide
+  return (
+    <g transform={`translate(${c.x} ${c.y}) rotate(${ang}) scale(${flip * k} ${k})`}>
+      {style === "pin" ? (
+        <g>
+          <circle r={34} fill={ACCENT} stroke={INK} strokeWidth={8} />
+          <path d="M -20 6 C -10 -6, 0 14, 10 2 S 22 -4, 24 0" fill="none" stroke={PAPER} strokeWidth={8} strokeLinecap="round" />
+        </g>
+      ) : logo ? (
+        <image href={staticFile(logo)} x={-50} y={-30} width={100} height={60} preserveAspectRatio="xMidYMid meet" opacity={style === "pocket" ? 0.9 : 1} />
+      ) : (
+        <g>
+          {style === "pocket" && <rect x={-56} y={-44} width={112} height={92} rx={10} fill="none" stroke={ink} strokeWidth={4} strokeDasharray="7 6" opacity={0.75} />}
+          {style === "bold" && <path d="M -58 -12 C -30 -40, 20 18, 58 -18" fill="none" stroke={ACCENT} strokeWidth={22} strokeLinecap="round" opacity={0.35} />}
+          <text y={4} textAnchor="middle" fontFamily="Poppins, sans-serif" fontWeight={900} fontSize={style === "pocket" ? 22 : 25} letterSpacing={style === "pocket" ? 1 : 2}>
+            <tspan fill={ink}>MA</tspan>
+            <tspan fill={ACCENT}> HAWA</tspan>
+          </text>
+          <path d="M -44 18 C -24 6, -6 28, 12 16 S 38 8, 46 14" fill="none" stroke={ACCENT} strokeWidth={style === "pocket" ? 4.5 : 6} strokeLinecap="round" />
+        </g>
+      )}
+    </g>
+  );
+};
+
+const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: number; body: string; id: CharId; wind: number; frame: number; flip: number; back: boolean }> = ({
+  sk, d, o, sw, body, id, wind, frame, flip, back,
 }) => {
   const L = lineStyle(sw);
   const T = d.torso;
@@ -353,6 +387,7 @@ const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: n
           {/* tie */}
           <path d={`M ${pts(q(-7, T - 6))} L ${pts(q(7, T - 6))} L ${pts(q(5, T - 20))} L ${pts(q(-5, T - 20))} Z`} {...L} fill={o.accent} strokeWidth={sw * 0.8} />
           <path d={`M ${pts(q(-5, T - 20))} L ${pts(q(-11 + flutter * 0.3, T * 0.32))} L ${pts(q(0 + flutter * 0.6, T * 0.22))} L ${pts(q(11 + flutter * 0.3, T * 0.32))} L ${pts(q(5, T - 20))} Z`} {...L} fill={o.accent} strokeWidth={sw * 0.8} />
+          {!back && <BrandPrint c={q(-chest * 0.5, T * 0.68)} sk={sk} w={30} flip={flip} style="pocket" ink={o.accent ?? INK} />}
           {/* collar */}
           <path d={`M ${pts(q(-neckW - 2, T + 1))} L ${pts(q(-6, T - 16))} L ${pts(q(-2, T - 2))}`} {...L} fill={o.top} strokeWidth={sw * 0.8} />
           <path d={`M ${pts(q(neckW + 2, T + 1))} L ${pts(q(6, T - 16))} L ${pts(q(2, T - 2))}`} {...L} fill={o.top} strokeWidth={sw * 0.8} />
@@ -366,6 +401,7 @@ const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: n
           {shirt(o.top)}
           <path d={`M ${pts(q(-neckW - 1, T + 1))} Q ${pts(q(0, T - 16))} ${pts(q(neckW + 1, T + 1))}`} fill="none" stroke="#3A4766" strokeWidth={sw * 1.2} />
           <path d={`M ${pts(q(-waist + 4, hemV + 6))} L ${pts(q(waist - 4, hemV + 6))}`} stroke="#3A4766" strokeWidth={sw * 0.6} />
+          {!back && <BrandPrint c={q(0, T * 0.62)} sk={sk} w={64} flip={flip} style="tee" ink={PAPER} />}
         </g>
       );
     case "muscle":
@@ -377,6 +413,7 @@ const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: n
           <path d={`M ${pts(q(-S + 4, T - 44))} Q ${pts(q(-S * 0.45, T - 70))} ${pts(q(-3, T - 50))}`} fill="none" stroke="#B9AC98" strokeWidth={sw * 0.8} strokeLinecap="round" />
           <path d={`M ${pts(q(S - 4, T - 44))} Q ${pts(q(S * 0.45, T - 70))} ${pts(q(3, T - 50))}`} fill="none" stroke="#B9AC98" strokeWidth={sw * 0.8} strokeLinecap="round" />
           <path d={`M ${pts(q(0, T - 52))} L ${pts(q(0, 40))}`} stroke="#C8BCA9" strokeWidth={sw * 0.5} />
+          {!back && <BrandPrint c={q(0, T * 0.5)} sk={sk} w={92} flip={flip} style="bold" />}
         </g>
       );
     case "boss": {
@@ -389,6 +426,7 @@ const Torso: React.FC<{ sk: Skeleton; d: (typeof DIMS)[string]; o: Outfit; sw: n
           <path d={`M ${pts(q(neckW + 1, T + 1))} L ${pts(q(7, T - 18))} L ${pts(q(2, T - 4))}`} fill={PAPER} stroke={INK} strokeWidth={sw * 0.6} />
           <path d={`M ${pts(q(-neckW - 4, T))} L ${pts(q(-24, T * 0.62))} L ${pts(q(-2, T * 0.42))}`} fill="none" stroke="#5A606B" strokeWidth={sw * 0.8} strokeLinejoin="round" />
           <path d={`M ${pts(q(neckW + 4, T))} L ${pts(q(24, T * 0.62))} L ${pts(q(2, T * 0.42))}`} fill="none" stroke="#5A606B" strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          {!back && <BrandPrint c={q(-24, T * 0.74)} sk={sk} w={13} flip={flip} style="pin" />}
           <circle cx={q(0, T * 0.32).x} cy={q(0, T * 0.32).y} r={3.5} fill="#5A606B" />
           <circle cx={q(0, T * 0.16).x} cy={q(0, T * 0.16).y} r={3.5} fill="#5A606B" />
         </g>
@@ -512,6 +550,7 @@ const PlaceholderHead: React.FC<{ id: CharId; hc: Pt; r: number; sw: number; exp
     neutral: <path d={`M ${hc.x - r * 0.22} ${my} Q ${hc.x} ${my + r * 0.08} ${hc.x + r * 0.22} ${my}`} {...L} />,
     shocked: <ellipse cx={hc.x} cy={my + 4} rx={r * 0.13} ry={r * 0.18} {...L} />,
     tired: <path d={`M ${hc.x - r * 0.2} ${my + 4} q ${r * 0.1} ${-r * 0.08} ${r * 0.2} 0 q ${r * 0.1} ${r * 0.08} ${r * 0.2} 0`} {...L} />,
+    away: <path d={`M ${hc.x - r * 0.12} ${my + 2} l ${r * 0.26} ${-r * 0.04}`} {...L} />,
   }[expression];
   const eyeR = expression === "shocked" ? 9 : 7;
   return (

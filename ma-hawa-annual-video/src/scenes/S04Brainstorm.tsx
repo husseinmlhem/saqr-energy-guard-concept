@@ -7,7 +7,7 @@ import { POSES, Pose, lerpPose, withIdle } from "../characters/rig";
 import { arc, clamp01, easeInOut, easeOut, rand } from "../fx/anim";
 import { BEAT_FRAMES, beatPulse, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
-import { CAST } from "./S01Pump";
+import { CAST } from "./S01Play";
 import { CAST_S, GROUND } from "./S00Title";
 import { STICKY_COLORS, Stage, Sticky, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";

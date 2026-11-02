@@ -1,4 +1,5 @@
-// Scene 3 — the party is back on… a bat swings in from the edge of the screen: BONK!
+// Scene 3 — back at it (curls, balloon, shisha)… a bat swings in from the edge of the screen: BONK!
+// Balloons pop, dumbbells clatter, the beach umbrella keels over.
 // The three tumble down dazed; Michael steps in: "I WANT IDEAS!"
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
@@ -8,9 +9,10 @@ import { clamp01, easeIn, easeInOut, easeOut, lin, shake } from "../fx/anim";
 import { Burst, ImpactLines, OrbitStars, Shreds, SpeedLines } from "../fx/Fx";
 import { BEAT_FRAMES, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
-import { BALLOON, CAST, balloonR, dancePose } from "./S01Pump";
+import { BALLOON, CAST } from "./S01Play";
+import { Dumbbell, OFFICE_SHISHA, Shisha, Smoke, Umbrella, officeActivity } from "./playtime";
 import { CAST_S, CAST_X, GROUND } from "./S00Title";
-import { HeldBalloon, Shout, Stage, W, breathe, camAt } from "./kit";
+import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 
 const LAND = [
@@ -23,7 +25,7 @@ export const bonkCues = (slot: SceneSlot) => {
   const hit = beatOf(slot, 1);
   const windup = Math.round(hit - BEAT_FRAMES * 0.6);
   const land = beatOf(slot, 2);
-  const words = [beatOf(slot, 2), beatOf(slot, 3)];
+  const words = [beatOf(slot, 2), beatOf(slot, 2) + 6];
   const cues: Cues = {
     marks: [
       { f: 0, name: "party (dance)" },
@@ -37,7 +39,7 @@ export const bonkCues = (slot: SceneSlot) => {
       { f: hit, name: "bonk", volume: 1 },
       { f: hit, name: "pop", volume: 0.8 },
       { f: land, name: "stamp", volume: 0.7 },
-      { f: words[1], name: "slam", volume: 0.5 },
+      { f: beatOf(slot, 3), name: "slam", volume: 0.5 },
     ],
   };
   cues.voice = [{ f: words[0], id: "michael_ideas" }];
@@ -70,13 +72,19 @@ export const S03Bonk: React.FC<SceneProps> = ({ slot }) => {
   return (
     <AbsoluteFill>
       <Stage cam={cam}>
+        <W>
+          <Umbrella x={1150} ground={GROUND - 4} s={0.8} base="#FFD36B" tilt={-8 + (frame >= c.hit ? Math.min(1, (frame - c.hit) / 10) * -70 : 0)} />
+          <Shisha x={OFFICE_SHISHA.x} ground={GROUND} s={OFFICE_SHISHA.s} glow={0.4} frame={frame} />
+          <Smoke frame={frame} x={OFFICE_SHISHA.x} y={GROUND - 400 * OFFICE_SHISHA.s} amount={0.5} spread={0.55} seed={3} />
+        </W>
         {CAST.map((id, i) => {
           const order = 2 - i; // Hussein (right) gets hit first
           const t = clamp01((frame - c.hit - order * 2) / Math.max(6, c.land - c.hit - order * 2));
           const flying = frame >= c.hit + order * 2;
           const landed = frame >= c.land;
           const tgt = LAND[i];
-          let pose: Pose = dancePose(frame, i * 0.3);
+          const busy = officeActivity(id, Math.min(frame, c.hit), CAST_X[id], GROUND, CAST_S, BALLOON);
+          let pose: Pose = busy.pose;
           let x = CAST_X[id];
           let y = GROUND;
           let rot = 0;
@@ -90,20 +98,25 @@ export const S03Bonk: React.FC<SceneProps> = ({ slot }) => {
           }
           const s = flying ? CAST_S * 0.95 : CAST_S;
           const head = headScreenPos(id, x, y, s, pose, false, rot);
-          const hand = jointScreenPos(id, x, y, s, pose, "handR");
           return (
             <React.Fragment key={id}>
-              {!flying && (
+              {flying && frame - c.hit < 24 && id !== "ali" && (
                 <W>
-                  <HeldBalloon x={hand.x + 10} y={hand.y - 310} r={balloonR(12) * CAST_S} fill={BALLOON[id]} hand={hand} frame={frame} seed={i} />
+                  <Shreds frame={frame} at={c.hit + order * 2} x={CAST_X[id] + 120} y={GROUND - 470} />
                 </W>
               )}
-              {flying && frame - c.hit < 24 && (
+              <Character id={id} x={x} y={y} scale={s} pose={pose} rotate={rot} expression={flying ? (id === "ali" ? "shocked" : "tired") : "happy"} left="none" right="none" shadow={!flying || landed} frame={frame} />
+              {!flying && <W>{busy.front}</W>}
+              {flying && id === "ali" && (
                 <W>
-                  <Shreds frame={frame} at={c.hit + order * 2} x={CAST_X[id] + 20} y={GROUND - 640} />
+                  {[-1, 1].map((k) => {
+                    const ft = clamp01((frame - c.hit) / 12);
+                    const dx = CAST_X.ali + k * (90 + ft * 120);
+                    const dy = GROUND - 420 + ft * ft * 400 - Math.sin(ft * Math.PI) * 120;
+                    return <Dumbbell key={k} x={dx} y={Math.min(GROUND - 14, dy)} s={CAST_S * 0.9} rot={ft * 200 * k} />;
+                  })}
                 </W>
               )}
-              <Character id={id} x={x} y={y} scale={s} pose={pose} rotate={rot} expression={flying ? (id === "ali" ? "shocked" : "tired") : "happy"} left="none" shadow={!flying || landed} frame={frame} />
               {flying && (
                 <W>
                   <OrbitStars frame={frame} x={head.x} y={head.y - head.r * 1.05} rx={head.r * 0.95} n={landed ? 4 : 3} />

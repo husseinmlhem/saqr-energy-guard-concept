@@ -13,7 +13,7 @@ import { BEAT_FRAMES, beatClock, energyAt, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO } from "../sync/timeline";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { Ground } from "./common";
-import { CAST } from "./S01Pump";
+import { CAST } from "./S01Play";
 import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
 

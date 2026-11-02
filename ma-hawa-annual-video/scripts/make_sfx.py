@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Generate the cartoon SFX kit (pop, whoosh, bonk, stamp, ding, slam, sparkle,
-tick, boing, sip). All synthesised, so there are no licensing questions.
+tick, boing, sip, puff, scratch, whistle). All synthesised, so there are no licensing questions.
 Every sound has its transient at t=0 so it lands exactly on the beat it is
 scheduled on.
 
@@ -140,10 +140,24 @@ def scratch():
     return norm((out + tone) * env, 0.8)
 
 
+def whistle():
+    # innocent "nothing to see here" whistle: two short notes, the second sliding down
+    parts = []
+    for f0, f1, d in [(1650, 2050, 0.22), (2050, 1450, 0.42)]:
+        t = t_arr(d)
+        f = f0 + (f1 - f0) * (t / d) ** 0.7 + 18 * np.sin(2 * np.pi * 6 * t)
+        tone = np.sin(2 * np.pi * np.cumsum(f) / SR)
+        breath = filt(rng.standard_normal(len(t)), "high", 3000) * 0.05
+        env = np.minimum(1, t / 0.012) * np.minimum(1, (d - t) / 0.04)
+        parts.append((tone + breath) * env)
+        parts.append(np.zeros(int(0.03 * SR)))
+    return norm(np.concatenate(parts), 0.6)
+
+
 def write_all(dest: Path):
     dest.mkdir(parents=True, exist_ok=True)
     for name, fn in [("pop", pop), ("whoosh", whoosh), ("bonk", bonk), ("stamp", stamp), ("ding", ding),
-                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip), ("puff", puff), ("scratch", scratch)]:
+                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip), ("puff", puff), ("scratch", scratch), ("whistle", whistle)]:
         x = fn()
         fade = int(0.01 * SR)
         x[-fade:] *= np.linspace(1, 0, fade)

@@ -3,7 +3,7 @@ import { getStaticFiles } from "remotion";
 import charactersJson from "../../config/characters.json";
 
 export type CharId = "amr" | "ali" | "hussein" | "michael" | "saeed";
-export type Expression = "neutral" | "happy" | "shocked" | "tired";
+export type Expression = "neutral" | "happy" | "shocked" | "tired" | "away";
 export type BodyType = "leader" | "muscle" | "genius" | "boss" | "money";
 
 export type Outfit = {

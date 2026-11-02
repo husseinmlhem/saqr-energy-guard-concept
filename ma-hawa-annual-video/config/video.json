@@ -13,10 +13,10 @@
       "minSeconds": 2
     },
     {
-      "id": "pump",
-      "title": "Pump party",
-      "target": 10,
-      "minSeconds": 6
+      "id": "play",
+      "title": "Playtime (gym · beach · shisha)",
+      "target": 5.0,
+      "minSeconds": 4
     },
     {
       "id": "stop",
@@ -45,7 +45,7 @@
     },
     {
       "id": "creative",
-      "title": "Creative huddle",
+      "title": "Planning table (hologram)",
       "target": 5,
       "minSeconds": 4
     },
@@ -94,10 +94,10 @@
     }
   ],
   "anchors": {
-    "breakTarget": 12.6,
+    "breakTarget": 7.6,
     "breakWindow": [
-      6,
-      25
+      5,
+      20
     ],
     "dropWindowFraction": [
       0.5,
@@ -170,18 +170,18 @@
     "gold": "#D4A62A"
   },
   "audio": {
-    "musicVolume": 1.0,
+    "musicVolume": 0.72,
     "sfx": true,
     "sfxVolume": 0.55,
     "voiceVolume": 1.0,
-    "duckTo": 0.45
+    "duckTo": 0.28
   },
   "musicWindow": {
     "track": "sheshtawy.mp3",
-    "start": 27.867,
-    "duration": 90.95,
-    "breakAt": 0.139,
-    "dropAt": 0.694
+    "start": 32.925,
+    "duration": 85.91,
+    "breakAt": 0.088,
+    "dropAt": 0.676
   },
   "ideas": [
     "Pop-up booth",

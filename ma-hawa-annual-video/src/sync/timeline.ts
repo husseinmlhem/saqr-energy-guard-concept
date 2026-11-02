@@ -10,7 +10,7 @@ import { BEATS, BEAT_FRAMES, BEAT_FRAMES_INT, DOWNBEAT_FRAMES, DURATION_IN_FRAME
 
 export type SceneId =
   | "title"
-  | "pump"
+  | "play"
   | "stop"
   | "bonk"
   | "brainstorm"
