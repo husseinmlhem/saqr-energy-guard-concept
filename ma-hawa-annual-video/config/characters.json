@@ -51,12 +51,13 @@
         "initials": "A"
       },
       "outfit": {
-        "top": "#A9C7EE",
+        "top": "#76ADDE",
         "bottom": "#2C3448",
         "shoes": "#2A211C",
         "skin": "#C49A84",
         "accent": "#24406E",
-        "sleeves": "long"
+        "sleeves": "short",
+        "tee": true
       }
     },
     "ali": {
@@ -72,11 +73,12 @@
         "initials": "AL"
       },
       "outfit": {
-        "top": "#D9CDBB",
+        "top": "#76ADDE",
         "bottom": "#36404F",
         "shoes": "#2B2B2B",
         "skin": "#9C7865",
-        "sleeves": "short"
+        "sleeves": "short",
+        "tee": true
       }
     },
     "hussein": {
@@ -92,11 +94,12 @@
         "initials": "H"
       },
       "outfit": {
-        "top": "#1F2840",
+        "top": "#76ADDE",
         "bottom": "#4B5160",
         "shoes": "#2B2B2B",
         "skin": "#A88472",
-        "sleeves": "short"
+        "sleeves": "short",
+        "tee": true
       }
     },
     "michael": {

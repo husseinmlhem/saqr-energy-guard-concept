@@ -1,161 +1,150 @@
-// Scene 6 — Events: one stamp per beat, then the gold award badge, then "45+ EVENTS".
+// Scene 12 — EVENTS, fast: it should feel like a LOT, not be read.
+// The drop hits: 45 event tiles flash onto a full-screen wall at 8 per beat while the camera pulls back and a
+// counter races 1 → 45; on the next downbeat "45+ EVENTS" slams in, the gold award badge lands, and rows of
+// event names race past behind them until the finale.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { clamp01, easeIn, easeInOut, easeOut, lin, popIn, rand, shake } from "../fx/anim";
+import { LogoSvg } from "../brand/Logo";
+import { clamp01, easeIn, easeOut, lin, popIn, rand, shake } from "../fx/anim";
 import { LightRays, StarShape, Svg } from "../fx/Fx";
-import { beatPulse } from "../sync/beats";
+import { BEAT_FRAMES, beatPulse } from "../sync/beats";
 import { SceneSlot, VIDEO, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { Cues, SceneProps } from "./types";
 
-type Stamp = { label: string; x: number; y: number; w: number; h: number; big?: boolean; chip?: boolean };
+const COLS = 9;
+const ROWS = 5;
+const TW = 200;
+const TH = 200;
+const GAP = 12;
+const X0 = (1920 - (COLS * TW + (COLS - 1) * GAP)) / 2;
+const Y0 = (1080 - (ROWS * TH + (ROWS - 1) * GAP)) / 2;
+const PER_BEAT = 8; // tiles per beat (32nd notes)
 
-const buildStamps = (): Stamp[] => {
-  const out: Stamp[] = [];
-  const rows: { name: string; years?: string[] }[] = VIDEO.events;
-  const head = rows[0];
-  const rest = rows.slice(1);
-  // first event (with years) across the top: name + one chip per year
-  if (head.years?.length) {
-    out.push({ label: `${head.name} ${head.years[0]}`, x: 640, y: 120, w: 620, h: 120, big: true });
-    head.years.slice(1).forEach((y, i) => out.push({ label: y, x: 1080 + i * 250, y: 120, w: 220, h: 120, chip: true, big: true }));
-  } else rest.unshift(head);
-  const cols = 2;
-  const perCol = Math.ceil(rest.length / cols);
-  rest.forEach((e, i) => {
-    const col = Math.floor(i / perCol);
-    const row = i % perCol;
-    out.push({ label: e.name, x: 500 + col * 920, y: 300 + row * 150, w: 840, h: 122 });
-  });
-  return out;
-};
+/** every event name we know (Gulfood once per year), cycled over the 45 tiles */
+const LABELS: string[] = (VIDEO.events as { name: string; years?: string[] }[]).flatMap((e) => (e.years?.length ? e.years.map((y) => `${e.name} ${y}`) : [e.name]));
+const STYLES = [
+  { bg: PAPER, fg: INK, line: ACCENT },
+  { bg: INK, fg: PAPER, line: ACCENT },
+  { bg: ACCENT, fg: PAPER, line: PAPER },
+  { bg: "#EAF3FB", fg: INK, line: ACCENT },
+  { bg: "#1F3B66", fg: PAPER, line: ACCENT },
+];
+
+type Tile = { i: number; col: number; row: number; label: string; style: number; logo: boolean };
+const TILES: Tile[] = (() => {
+  // scattered fill order (seeded), so the wall lights up all over instead of row by row
+  const order = Array.from({ length: COLS * ROWS }, (_, i) => i).sort((p, q) => rand(p * 13 + 7) - rand(q * 13 + 7));
+  return order.map((cell, k) => ({ i: k, col: cell % COLS, row: Math.floor(cell / COLS), label: LABELS[k % LABELS.length], style: Math.floor(rand(k * 5 + 1) * STYLES.length), logo: k % 9 === 4 }));
+})();
 
 export const eventsCues = (slot: SceneSlot) => {
-  const stamps = buildStamps();
-  const hits = stamps.map((_, i) => beatOf(slot, i));
-  // gold badge on the beat after the last stamp, counter starts a beat later
-  // and lands "45+" on the next downbeat
-  const S = stamps.length;
-  const badge = beatOf(slot, S);
-  const countStart = beatOf(slot, S + 1);
-  const countEnd = slot.downbeats.find((d) => d >= beatOf(slot, S + 2) - 0.5) ?? beatOf(slot, Math.min(S + 2, slot.beats.length - 1));
-  const countBeats = slot.beats.filter((b) => b > countStart && b < countEnd);
+  const n = TILES.length;
+  // tile k lands on the k-th 32nd note after the drop (8 per beat, locked to the beat grid)
+  const hits = TILES.map((_, k) => beatOf(slot, Math.floor(k / PER_BEAT)) + Math.round(((k % PER_BEAT) * BEAT_FRAMES) / PER_BEAT));
+  const wallBeats = Math.ceil(n / PER_BEAT);
+  const slam = slot.downbeats.find((d) => d >= beatOf(slot, wallBeats) - 0.5) ?? beatOf(slot, wallBeats + 1); // "45+ EVENTS"
+  const badge = slot.beats.find((b) => b > slam) ?? slam + Math.round(BEAT_FRAMES);
   const cues: Cues = {
     marks: [
-      ...hits.map((f, i) => ({ f, name: `stamp: ${stamps[i].label}` })),
-      { f: badge, name: "gold badge" },
-      { f: countStart, name: "counter starts" },
-      { f: countEnd, name: `${VIDEO.eventCount}+ EVENTS lands` },
+      { f: hits[0], name: "wall blitz: 45 tiles, 8 per beat" },
+      { f: hits[n - 1], name: "wall complete" },
+      { f: slam, name: `${VIDEO.eventCount}+ EVENTS` },
+      { f: badge, name: "gold award badge" },
     ],
     sfx: [
-      ...hits.map((f) => ({ f, name: "stamp" as const, volume: 0.9 })),
-      { f: badge, name: "slam", volume: 0.8 },
-      { f: badge, name: "sparkle", volume: 0.9 },
-      ...[countStart, ...countBeats].map((f) => ({ f, name: "tick" as const, volume: 0.6 })),
-      { f: countEnd, name: "stamp", volume: 1 },
-      { f: countEnd, name: "sparkle", volume: 0.7 },
+      ...Array.from({ length: wallBeats }, (_, b) => ({ f: beatOf(slot, b), name: "tick" as const, volume: 0.35 + (b / wallBeats) * 0.4 })),
+      { f: hits[0], name: "whoosh" as const, volume: 0.6 },
+      { f: slam, name: "slam" as const, volume: 0.9 },
+      { f: slam, name: "stamp" as const, volume: 0.9 },
+      { f: badge, name: "sparkle" as const, volume: 0.9 },
     ],
   };
-  return { stamps, hits, badge, countStart, countEnd, cues };
+  return { hits, slam, badge, cues };
 };
 
-const fontFor = (s: Stamp) => {
-  if (s.chip) return 54;
-  if (s.big) return 50;
-  const n = s.label.length;
-  return n <= 16 ? 46 : n <= 28 ? 38 : n <= 40 ? 30 : 26;
-};
+const fit = (label: string) => (label.length <= 10 ? 34 : label.length <= 18 ? 28 : label.length <= 30 ? 23 : 18);
 
-const StampBox: React.FC<{ s: Stamp; i: number; frame: number; hit: number; dim: number }> = ({ s, i, frame, hit, dim }) => {
-  const pre = 4;
-  if (frame < hit - pre) return null;
-  const t = clamp01((frame - (hit - pre)) / pre);
-  const inScale = frame < hit ? 1.9 - 0.9 * easeIn(t) : 1;
-  const settle = frame >= hit ? 1 + Math.exp(-(frame - hit) / 2.5) * 0.07 * Math.cos((frame - hit) * 1.4) : 1;
-  const rot = (rand(i + 3) - 0.5) * 6;
-  const fs = fontFor(s);
+const TileBox: React.FC<{ t: Tile; frame: number; hit: number }> = ({ t, frame, hit }) => {
+  if (frame < hit - 1) return null;
+  const k = popIn(frame, hit - 1, 700, 16);
+  const st = STYLES[t.style];
+  const x = X0 + t.col * (TW + GAP);
+  const y = Y0 + t.row * (TH + GAP);
+  const flash = Math.exp(-(frame - hit) / 2);
   return (
     <div
       style={{
         position: "absolute",
-        left: s.x - s.w / 2,
-        top: s.y - s.h / 2,
-        width: s.w,
-        height: s.h,
-        transform: `rotate(${rot}deg) scale(${inScale * settle})`,
-        opacity: (frame < hit ? t : 1) * (1 - dim * 0.85),
+        left: x,
+        top: y,
+        width: TW,
+        height: TH,
+        transform: `scale(${0.2 + 0.8 * k}) rotate(${(1 - clamp01(k)) * (rand(t.i) - 0.5) * 40}deg)`,
+        background: st.bg,
         border: `${STROKE}px solid ${INK}`,
-        borderRadius: 16,
-        background: s.chip ? ACCENT : PAPER,
+        borderRadius: 14,
+        boxSizing: "border-box",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        boxSizing: "border-box",
-        padding: "0 28px",
+        padding: 14,
         textAlign: "center",
         fontFamily: FONT,
-        fontWeight: 800,
-        fontSize: fs,
-        lineHeight: 1.08,
-        letterSpacing: 0.5,
-        color: s.chip ? PAPER : INK,
+        fontWeight: 900,
+        fontSize: fit(t.label),
+        lineHeight: 1.05,
+        color: st.fg,
         textTransform: "uppercase",
-        boxShadow: frame >= hit ? `8px 8px 0 ${s.chip ? INK : ACCENT}` : "none",
+        boxShadow: `inset 0 0 0 ${4 + flash * 40}px ${flash > 0.05 ? PAPER : "transparent"}`,
+        overflow: "hidden",
       }}
     >
-      <div style={{ position: "absolute", inset: 7, border: `3px dashed ${s.chip ? PAPER : ACCENT}`, borderRadius: 10 }} />
-      {s.label}
+      <div style={{ position: "absolute", left: 14, right: 14, bottom: 14, height: 5, borderRadius: 3, background: st.line }} />
+      {t.logo ? (
+        <svg width={150} height={150 / 3.4} style={{ overflow: "visible" }}>
+          <LogoSvg width={150} color={st.fg} />
+        </svg>
+      ) : (
+        t.label
+      )}
     </div>
   );
 };
 
-/** ink splats around a stamp at the moment it lands */
-const Splat: React.FC<{ s: Stamp; frame: number; hit: number; i: number }> = ({ s, frame, hit, i }) => {
-  const t = frame - hit;
-  if (t < 0 || t > 9) return null;
-  const k = t / 9;
+/** rows of event names racing past (after the slam) */
+const Ticker: React.FC<{ frame: number; from: number }> = ({ frame, from }) => {
+  const t = frame - from;
+  if (t < 0) return null;
+  const rowsY = [70, 230, 390, 550, 710, 870, 1030];
+  const text = LABELS.map((l) => l.toUpperCase()).join("   •   ");
   return (
-    <g opacity={1 - k}>
-      {Array.from({ length: 8 }, (_, j) => {
-        const side = j % 4;
-        const x = side === 0 ? s.x - s.w / 2 - 10 - k * 40 : side === 1 ? s.x + s.w / 2 + 10 + k * 40 : s.x - s.w / 2 + rand(i * 9 + j) * s.w;
-        const y = side < 2 ? s.y - s.h / 2 + rand(i * 7 + j) * s.h : side === 2 ? s.y - s.h / 2 - 10 - k * 30 : s.y + s.h / 2 + 10 + k * 30;
-        return <circle key={j} cx={x} cy={y} r={5 + rand(j + i) * 6} fill={j % 2 ? ACCENT : INK} />;
+    <AbsoluteFill style={{ opacity: clamp01(t / 4) * 0.9 }}>
+      {rowsY.map((y, r) => {
+        const dir = r % 2 ? 1 : -1;
+        const speed = 34 + (r % 3) * 12;
+        const off = ((t * speed + r * 900) % 4200) * dir;
+        return (
+          <div
+            key={r}
+            style={{
+              position: "absolute",
+              top: y - 50,
+              left: dir > 0 ? -4200 + off : off,
+              whiteSpace: "nowrap",
+              fontFamily: FONT,
+              fontWeight: 900,
+              fontSize: 84,
+              letterSpacing: 4,
+              color: "transparent",
+              WebkitTextStroke: `3px ${r % 2 ? ACCENT : "#C9D8EA"}`,
+            }}
+          >
+            {text}   •   {text}   •   {text}
+          </div>
+        );
       })}
-    </g>
-  );
-};
-
-/** the big rubber stamp that hops from slot to slot */
-const StampTool: React.FC<{ frame: number; hits: number[]; stamps: Stamp[] }> = ({ frame, hits, stamps }) => {
-  const last = hits[hits.length - 1];
-  if (frame < hits[0] - 8 || frame > last + 14) return null;
-  let x: number;
-  let y: number;
-  let lift: number;
-  if (frame <= hits[0]) {
-    const t = clamp01((frame - (hits[0] - 8)) / 8);
-    x = stamps[0].x;
-    y = stamps[0].y;
-    lift = (1 - easeIn(t)) * 300;
-  } else if (frame >= last) {
-    const t = clamp01((frame - last) / 14);
-    x = stamps[stamps.length - 1].x + t * 400;
-    y = stamps[stamps.length - 1].y;
-    lift = easeOut(t) * 900;
-  } else {
-    const i = hits.findIndex((h, k) => frame >= h && frame < hits[k + 1]);
-    const t = (frame - hits[i]) / (hits[i + 1] - hits[i]);
-    x = stamps[i].x + (stamps[i + 1].x - stamps[i].x) * easeInOut(t);
-    y = stamps[i].y + (stamps[i + 1].y - stamps[i].y) * easeInOut(t);
-    lift = Math.sin(Math.PI * Math.min(1, t * 1.08)) * 150 + 10;
-  }
-  return (
-    <g transform={`translate(${x} ${y - lift})`}>
-      <rect x={-26} y={-190} width={52} height={110} rx={22} fill={ACCENT} stroke={INK} strokeWidth={STROKE} />
-      <rect x={-60} y={-90} width={120} height={36} rx={10} fill={PAPER} stroke={INK} strokeWidth={STROKE} />
-      <rect x={-110} y={-56} width={220} height={40} rx={8} fill={PAPER} stroke={INK} strokeWidth={STROKE} />
-    </g>
+    </AbsoluteFill>
   );
 };
 
@@ -208,65 +197,82 @@ const Badge: React.FC<{ frame: number; at: number; x: number; y: number }> = ({ 
 export const S12Events: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
   const c = useMemo(() => eventsCues(slot), [slot]);
-  const cam = shake(frame, c.hits, 7, 0.5);
-  const cam2 = shake(frame, [c.badge, c.countEnd], 18);
-  const wallDim = lin(frame, [c.badge - 3, c.badge + 6], [0, 1], easeOut);
-  const wallScale = 1 - wallDim * 0.12;
-  const toLeft = lin(frame, [c.countStart - 2, c.countStart + 8], [0, 1], easeInOut);
-  const badgeX = 960 - toLeft * 420;
-  const countT = lin(frame, [c.countStart, c.countEnd], [0, 1], (t) => 1 - Math.pow(1 - t, 2.2));
-  const value = Math.round(VIDEO.eventCount * countT);
-  const landed = frame >= c.countEnd;
-  const plus = popIn(frame, c.countEnd, 500, 9);
+  const n = TILES.length;
+  const done = c.hits.filter((h) => frame >= h).length;
+  const wallEnd = c.hits[n - 1];
+  // camera: start tight on the first tiles, pull all the way back as the wall fills
+  const z = lin(frame, [0, wallEnd + 4], [2.3, 1.0], easeOut);
+  const first = TILES[0];
+  const fx = X0 + first.col * (TW + GAP) + TW / 2;
+  const fy = Y0 + first.row * (TH + GAP) + TH / 2;
+  const pull = lin(frame, [0, wallEnd + 4], [0, 1], easeOut);
+  const cx = fx + (960 - fx) * pull;
+  const cy = fy + (540 - fy) * pull;
+  const rot = lin(frame, [0, wallEnd], [-4, 0], easeOut);
+  const kick = shake(frame, [c.slam, c.badge], 18);
+  const dim = lin(frame, [c.slam - 2, c.slam + 6], [0, 1], easeOut);
+  const plus = popIn(frame, c.slam, 500, 9);
   const pulse = beatPulse(frame, 6);
+  const landed = frame >= c.slam;
+  const badgeX = 560;
 
   return (
-    <AbsoluteFill style={{ background: PAPER }}>
-      <AbsoluteFill style={{ transform: `translate(${cam.x + cam2.x}px, ${cam.y + cam2.y}px)` }}>
-        <AbsoluteFill style={{ transform: `scale(${wallScale})` }}>
-          {c.stamps.map((s, i) => (
-            <StampBox key={i} s={s} i={i} frame={frame} hit={c.hits[i]} dim={wallDim} />
+    <AbsoluteFill style={{ background: "#EAF3FB", overflow: "hidden" }}>
+      <AbsoluteFill style={{ transform: `translate(${kick.x}px, ${kick.y}px)` }}>
+        {/* the wall */}
+        <AbsoluteFill
+          style={{
+            transformOrigin: "0 0",
+            transform: `translate(960px, 540px) rotate(${rot}deg) scale(${z * (1 - dim * 0.1)}) translate(${-cx}px, ${-cy}px)`,
+            opacity: 1 - dim * 0.82,
+            filter: dim > 0.02 ? `blur(${dim * 5}px)` : undefined,
+          }}
+        >
+          {TILES.map((t, k) => (
+            <TileBox key={k} t={t} frame={frame} hit={c.hits[k]} />
           ))}
-          <Svg>
-            {c.stamps.map((s, i) => (
-              <Splat key={i} s={s} frame={frame} hit={c.hits[i]} i={i} />
-            ))}
-            <StampTool frame={frame} hits={c.hits} stamps={c.stamps} />
-          </Svg>
         </AbsoluteFill>
-        {frame >= c.badge - 4 && (
+        <Ticker frame={frame} from={c.slam} />
+        {/* running counter while the wall fills */}
+        {frame >= c.hits[0] && !landed && (
+          <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
+            <div style={{ background: "rgba(17,17,17,0.82)", borderRadius: 40, padding: "6px 48px", fontFamily: FONT, fontWeight: 900, fontSize: 190, lineHeight: 1.1, color: PAPER, transform: `scale(${1 + Math.exp(-((frame - c.hits[Math.max(0, done - 1)]) / 2)) * 0.06})` }}>
+              {done}
+            </div>
+          </AbsoluteFill>
+        )}
+        {landed && (
           <Svg>
-            <LightRays frame={frame} x={badgeX} y={500} intensity={0.55 * clamp01((frame - c.badge + 4) / 6)} speed={0.4} />
+            <LightRays frame={frame} x={badgeX} y={520} intensity={0.5 * clamp01((frame - c.badge + 4) / 6)} speed={0.5} />
           </Svg>
         )}
-        <Badge frame={frame} at={c.badge} x={badgeX} y={480} />
-        {frame >= c.countStart && (
+        <Badge frame={frame} at={c.badge} x={badgeX} y={520} />
+        {landed && (
           <div
             style={{
               position: "absolute",
-              left: 1060,
+              left: 1000,
               top: 250,
-              width: 700,
+              width: 760,
               textAlign: "center",
               fontFamily: FONT,
               color: INK,
-              opacity: clamp01((frame - c.countStart) / 4),
-              transform: `scale(${landed ? 1 + (1 - plus) * 0.25 + pulse * 0.03 : 1})`,
+              transform: `scale(${1 + (1 - plus) * 0.6 + pulse * 0.03})`,
             }}
           >
-            <div style={{ fontWeight: 900, fontSize: 300, lineHeight: 1, letterSpacing: -6, WebkitTextStroke: `${STROKE}px ${INK}`, color: PAPER, textShadow: `14px 14px 0 ${ACCENT}` }}>
-              {value}
-              <span style={{ display: "inline-block", transform: `scale(${plus})`, color: ACCENT }}>+</span>
+            <div style={{ fontWeight: 900, fontSize: 320, lineHeight: 1, letterSpacing: -6, WebkitTextStroke: `${STROKE}px ${INK}`, color: PAPER, textShadow: `14px 14px 0 ${ACCENT}` }}>
+              {VIDEO.eventCount}
+              <span style={{ color: ACCENT }}>+</span>
             </div>
-            <div style={{ fontWeight: 900, fontSize: 96, letterSpacing: 10, marginTop: 6 }}>EVENTS</div>
+            <div style={{ fontWeight: 900, fontSize: 104, letterSpacing: 12, marginTop: 6 }}>EVENTS</div>
           </div>
         )}
         {landed && (
           <Svg>
-            {Array.from({ length: 36 }, (_, i) => {
-              const t = frame - c.countEnd;
+            {Array.from({ length: 40 }, (_, i) => {
+              const t = frame - c.slam;
               const x = 960 + (rand(i) - 0.5) * 1900 + Math.sin(t / 6 + i) * 30;
-              const y = -40 + t * (9 + rand(i * 3) * 9) - rand(i * 5) * 200;
+              const y = -40 + t * (11 + rand(i * 3) * 10) - rand(i * 5) * 200;
               return <rect key={i} x={x} y={y} width={18} height={30} rx={4} fill={i % 3 === 0 ? GOLD : ACCENT} stroke={INK} strokeWidth={3} transform={`rotate(${t * 9 + i * 40} ${x + 9} ${y + 15})`} />;
             })}
           </Svg>
@@ -277,8 +283,8 @@ export const S12Events: React.FC<SceneProps> = ({ slot }) => {
         <AbsoluteFill style={{ pointerEvents: "none" }}>
           <AbsoluteFill style={{ boxShadow: `inset 0 0 0 ${Math.max(0, 70 * (1 - frame / 12))}px #15161A`, borderRadius: 30 * (1 - frame / 12) }} />
           <div style={{ position: "absolute", left: 0, right: 0, top: -frame * 8, height: 60, background: "#2D3038", display: "flex", alignItems: "center", gap: 12, paddingLeft: 24, opacity: 1 - frame / 14 }}>
-            {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
-              <span key={c} style={{ width: 18, height: 18, borderRadius: 9, background: c, display: "inline-block" }} />
+            {["#FF5F57", "#FEBC2E", "#28C840"].map((col) => (
+              <span key={col} style={{ width: 18, height: 18, borderRadius: 9, background: col, display: "inline-block" }} />
             ))}
             <span style={{ fontFamily: FONT, fontWeight: 600, fontSize: 24, color: "#9AA3B2", marginLeft: 20 }}>events_wall_final.mp4</span>
           </div>

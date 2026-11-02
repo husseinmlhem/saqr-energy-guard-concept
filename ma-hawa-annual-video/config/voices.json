@@ -41,7 +41,24 @@
     "michael_more": {
       "speaker": "michael",
       "text": "I want MORE creative ideas!",
-      "prompt": "[exasperated] I want MORE... creative ideas!"
+      "prompt": "[exasperated] I want MORE... creative ideas!",
+      "kokoro": {
+        "voice": "am_santa",
+        "speed": 1.0,
+        "pitch": 6
+      },
+      "kokoroText": "I want MORE... creative ideas!"
+    },
+    "hussein_eureka": {
+      "speaker": "hussein",
+      "text": "Eureka!",
+      "prompt": "[excited] Eureka!",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Eureka!"
     },
     "michael_ok": {
       "speaker": "michael",
@@ -51,7 +68,13 @@
     "amr_budget": {
       "speaker": "amr",
       "text": "Saeed… we need a budget.",
-      "prompt": "[confident, polite] Saeed... we need a budget."
+      "prompt": "[confident, polite] Saeed... we need a budget.",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Saeed... we need a budget."
     },
     "saeed_hmm": {
       "speaker": "saeed",
@@ -66,13 +89,25 @@
     },
     "amr_nobudget": {
       "speaker": "amr",
-      "text": "Okay… no budget. We'll make it work!",
-      "prompt": "[resigned sigh, then upbeat] Okay... no budget. We'll make it work!"
+      "text": "Okay… no budget? No problem!",
+      "prompt": "[resigned sigh, then upbeat] Okay... no budget? No problem!",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Okay... no budget? No problem!"
     },
     "amr_lead": {
       "speaker": "amr",
       "text": "Timeline's locked. Let's go, team!",
-      "prompt": "[energetic] Timeline's locked. Let's go, team!"
+      "prompt": "[energetic] Timeline's locked. Let's go, team!",
+      "kokoro": {
+        "voice": "am_fenrir",
+        "speed": 1.0,
+        "pitch": 0
+      },
+      "kokoroText": "Timeline's locked. Let's go, team!"
     },
     "ali_lift": {
       "speaker": "ali",
@@ -82,12 +117,19 @@
     "hussein_done": {
       "speaker": "hussein",
       "text": "And… done!",
-      "prompt": "[tired but proud] And... done!"
+      "prompt": "[tired but proud] And... done!",
+      "kokoro": {
+        "voice": "am_michael",
+        "speed": 0.95,
+        "pitch": 0
+      },
+      "kokoroText": "And... done!"
     },
     "michael_great": {
       "speaker": "michael",
       "text": "Great work, guys!",
       "prompt": "[warmly, proud] Great work, guys!"
     }
-  }
+  },
+  "_engines": "Lines with a 'kokoro' block are voiced locally with Kokoro TTS (scripts/tts_kokoro.py) when no take of their own exists; the others are ElevenLabs takes in assets/voice/raw/."
 }

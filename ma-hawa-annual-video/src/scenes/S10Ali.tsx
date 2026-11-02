@@ -14,6 +14,7 @@ import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { Chapter, Subtitle, camAt } from "./kit";
 import { camTransform } from "../world/Office";
 import { Cues, SceneProps } from "./types";
+import { LogoSvg } from "../brand/Logo";
 
 const G = 1000;
 const AX = 520;
@@ -142,10 +143,8 @@ export const S10Ali: React.FC<SceneProps> = ({ slot }) => {
             <g transform={`translate(${BOOTH.x + BOOTH.w / 2} ${BOOTH.y - 70 - (1 - easeOut(hdrT)) * 400}) rotate(${swing})`}>
               <line x1={-200} x2={-200} y1={-200} y2={-40} stroke="#56627A" strokeWidth={4} />
               <line x1={200} x2={200} y1={-200} y2={-40} stroke="#56627A" strokeWidth={4} />
-              <rect x={-330} y={-50} width={660} height={100} rx={12} fill={on > 0 ? PAPER : "#DCE1E8"} stroke={INK} strokeWidth={STROKE} />
-              <text y={22} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={64} letterSpacing={6} fill={INK}>
-                MA <tspan fill={ACCENT}>HAWA</tspan>
-              </text>
+              <rect x={-330} y={-62} width={660} height={124} rx={12} fill={on > 0 ? PAPER : "#DCE1E8"} stroke={INK} strokeWidth={STROKE} />
+              <LogoSvg x={0} y={0} width={360} anchor="middle" />
             </g>
           )}
           {/* booth glow */}

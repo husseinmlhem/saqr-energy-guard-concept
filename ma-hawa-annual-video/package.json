@@ -2,7 +2,7 @@
   "name": "ma-hawa-annual-video",
   "private": true,
   "version": "1.0.0",
-  "description": "Ma Hawa annual meeting — 60s beat-synced bobblehead animation (Remotion)",
+  "description": "Ma Hawa annual meeting \u2014 60s beat-synced bobblehead animation (Remotion)",
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render MaHawa out/ma-hawa-preview.mp4",
@@ -15,7 +15,8 @@
     "sfx": ".venv/bin/python scripts/make_sfx.py assets/sfx",
     "placeholder": ".venv/bin/python scripts/make_placeholder_track.py assets/audio/placeholder.wav",
     "setup": "npm install && python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt",
-    "voices": ".venv/bin/python scripts/prepare_voices.py"
+    "voices": ".venv/bin/python scripts/prepare_voices.py",
+    "tts": ".venv/bin/python scripts/tts_kokoro.py"
   },
   "dependencies": {
     "@remotion/cli": "4.0.539",

@@ -11,6 +11,7 @@ import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { CAST } from "./S01Play";
 import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
+import { LogoSvg } from "../brand/Logo";
 
 const X = { ali: 190, amr: 420, hussein: 660 } as const;
 const G = 1000;
@@ -49,9 +50,9 @@ const Slide: React.FC<{ kind: string; title: string; i: number; n: number; frame
           <polygon points="-330,40 0,150 330,40 0,-70" fill="#DCE4EE" stroke={INK} strokeWidth={4} />
           <polygon points="-330,40 -330,-190 0,-300 0,-70" fill="#1F3B66" stroke={INK} strokeWidth={4} />
           <polygon points="0,-70 0,-300 330,-190 330,40" fill={ACCENT} stroke={INK} strokeWidth={4} />
-          <text x={-170} y={-150} fontFamily={FONT} fontWeight={900} fontSize={40} fill={PAPER} transform="skewY(18) translate(0 40)">
-            MA HAWA
-          </text>
+          <g transform="skewY(18) translate(-175 -150)">
+            <LogoSvg x={0} y={0} width={150} variant="word" color={PAPER} />
+          </g>
           <polygon points="80,-220 260,-160 260,-60 80,-120" fill="#0E2238" stroke={INK} strokeWidth={4} />
           <polygon points="90,-205 250,-152 250,-70 90,-123" fill={`hsl(${(frame * 4) % 360} 60% 60%)`} opacity={0.7} />
           <polygon points="-120,40 -40,66 -40,6 -120,-20" fill={PAPER} stroke={INK} strokeWidth={4} />

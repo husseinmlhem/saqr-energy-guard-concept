@@ -25,7 +25,8 @@ export const moreCreativeCues = (slot: SceneSlot) => {
     marks: [{ f: look, name: "Michael reads the stack" }, { f: toss, name: "toss! — I WANT…" }, ...at.slice(1).map((f, i) => ({ f, name: `…${words[i + 1]}` })), { f: leave, name: "Michael walks off" }],
     sfx: [{ f: toss, name: "whoosh", volume: 0.8 }, ...at.map((f) => ({ f, name: "tick" as const, volume: 0.35 })), { f: leave, name: "slam" as const, volume: 0.4 }],
   };
-  cues.voice = [{ f: at[0], id: "michael_more" }];
+  // the spoken line is longer than the bar: it starts half a beat in so it ends with the scene
+  cues.voice = [{ f: look + half, id: "michael_more" }];
   return { look, toss, at, words, leave, cues };
 };
 

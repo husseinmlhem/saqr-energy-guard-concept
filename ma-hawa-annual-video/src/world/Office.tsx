@@ -2,8 +2,9 @@
 // Rendered with a simple camera (centre + zoom) and parallax per layer, plus day → night lighting.
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
+import { FONT, INK, PAPER, STROKE } from "../theme";
 import { rand } from "../fx/anim";
+import { LogoSvg } from "../brand/Logo";
 
 export type Cam = { x: number; y: number; zoom: number; rot?: number };
 export const CAM0: Cam = { x: 960, y: 540, zoom: 1 };
@@ -141,15 +142,7 @@ export const Office: React.FC<{ cam?: Cam; night?: number; variant?: OfficeVaria
 const BrandWall: React.FC<{ x: number; y: number; night: number; small?: boolean }> = ({ x, y, night, small }) => (
   <g transform={`translate(${x} ${y})`}>
     <rect x={0} y={0} width={520} height={small ? 300 : 420} rx={10} fill={mix("#FFFFFF", "#2B3550", night)} stroke={INK} strokeWidth={STROKE * 0.6} opacity={0.95} />
-    <text x={260} y={small ? 150 : 200} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={small ? 78 : 96} fill={mix("#1A1F2B", "#E6ECF5", night)} letterSpacing={4}>
-      MA <tspan fill={ACCENT}>HAWA</tspan>
-    </text>
-    <path d={`M 90 ${small ? 190 : 250} C 180 ${small ? 160 : 220}, 260 ${small ? 220 : 280}, 350 ${small ? 185 : 245} S 440 ${small ? 175 : 235}, 450 ${small ? 182 : 242}`} fill="none" stroke={ACCENT} strokeWidth={10} strokeLinecap="round" />
-    {!small && (
-      <text x={260} y={340} textAnchor="middle" fontFamily={FONT} fontWeight={700} fontSize={26} fill={mix("#7A8496", "#9AA6BC", night)} letterSpacing={8}>
-        EVENTS · EXPERIENCES · BRANDS
-      </text>
-    )}
+    <LogoSvg x={260} y={small ? 150 : 210} width={small ? 400 : 450} anchor="middle" markColor={night > 0.5 ? "#C9D2E0" : undefined} />
   </g>
 );
 

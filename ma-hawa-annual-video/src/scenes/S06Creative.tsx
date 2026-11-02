@@ -13,6 +13,7 @@ import { SceneSlot, beatOf } from "../sync/timeline";
 import { FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { Chapter, Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
+import { LogoSvg } from "../brand/Logo";
 
 const HOLO = "#7FE0FF";
 const G = 1000;
@@ -40,6 +41,7 @@ export const creativeCues = (slot: SceneSlot) => {
       { f: eureka, name: "sparkle" as const, volume: 0.9 },
       { f: eureka, name: "slam" as const, volume: 0.4 },
     ],
+    voice: [{ f: eureka, id: "hussein_eureka" }],
   };
   return { steps, eureka, cues };
 };
@@ -99,9 +101,9 @@ const Hologram: React.FC<{ frame: number; s: number[]; gold: number }> = ({ fram
           <line key={k} x1={P(-80 + k * 60, -D0, 60).x} y1={P(-80 + k * 60, -D0, 60).y} x2={P(-40 + k * 60, -D0, 120).x} y2={P(-40 + k * 60, -D0, 120).y} {...L} strokeWidth={2} opacity={0.6} />
         ))}
         <polygon points={poly(P(-110, -D0, H + 4), P(110, -D0, H + 4), P(110, -D0, H + 44), P(-110, -D0, H + 44))} {...F(0.25)} />
-        <text transform={`translate(${P(0, -D0, H + 16).x} ${P(0, -D0, H + 16).y}) skewY(30) `} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={24} letterSpacing={3} fill={col}>
-          MA HAWA
-        </text>
+        <g transform={`translate(${P(0, -D0, H + 24).x} ${P(0, -D0, H + 24).y}) skewY(30)`}>
+          <LogoSvg x={0} y={0} width={150} anchor="middle" color={col} />
+        </g>
       </On>
       {/* stage */}
       <On frame={frame} at={s[4]}>
@@ -210,7 +212,7 @@ export const S06Creative: React.FC<SceneProps> = ({ slot }) => {
         </W>
       </Stage>
       <Chapter frame={frame} title="PLANNING" sub="THE WAR ROOM" dark />
-      <Shout frame={frame} x={960} y={190} size={120} lines={[[{ text: "EUREKA!", at: c.eureka }]]} />
+      <Shout frame={frame} x={960} y={190} size={120} speaker="HUSSEIN" lines={[[{ text: "EUREKA!", at: c.eureka }]]} />
       <AbsoluteFill style={{ background: PAPER, opacity: frame >= c.eureka ? Math.exp(-(frame - c.eureka) / 2.5) * 0.35 : 0, pointerEvents: "none" }} />
     </AbsoluteFill>
   );

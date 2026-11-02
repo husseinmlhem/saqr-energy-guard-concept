@@ -16,6 +16,8 @@ export type Outfit = {
   sleeves: "long" | "short";
   cuff?: string;
   sandals?: boolean;
+  /** team tee: plain Ma Hawa blue with a small white logo on the chest */
+  tee?: boolean;
 };
 
 type CharCfg = {

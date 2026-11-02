@@ -8,6 +8,7 @@ import { BEATS, DURATION_IN_FRAMES, FPS } from "./sync/beats";
 import { PLAN, SceneId, VIDEO } from "./sync/timeline";
 import { PAPER } from "./theme";
 import { voiceFile, voiceFrames } from "./voice";
+import { useBrandLogo } from "./brand/Logo";
 
 export type MaHawaProps = { debug: boolean; sfx?: boolean };
 
@@ -121,6 +122,7 @@ const usePreloadedFaces = () => {
 
 export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
   usePreloadedFaces();
+  useBrandLogo();
   const D = DURATION_IN_FRAMES;
   const a = BEATS.audio;
   const fadeIn = Math.max(1, a.fadeIn * FPS);

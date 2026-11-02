@@ -4,18 +4,19 @@
 // The biggest drop: HERO SHOT — the whole team, low angle, wind, blue light rays, slow motion; Amr in the centre.
 // Then the logo.
 import React, { useMemo } from "react";
-import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Character, headScreenPos } from "../characters/Character";
 import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, lin, popIn, rand } from "../fx/anim";
 import { LightRays, SpeedLines, Sweat, Svg } from "../fx/Fx";
 import { BEAT_FRAMES, beatClock, energyAt, idleMotion } from "../sync/beats";
 import { SceneSlot, VIDEO } from "../sync/timeline";
-import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
+import { ACCENT, INK, PAPER } from "../theme";
 import { Ground } from "./common";
 import { CAST } from "./S01Play";
 import { Shout, Stage, W, breathe, camAt } from "./kit";
 import { Cues, SceneProps } from "./types";
+import { LogoBlock } from "../brand/Logo";
 
 export const finaleCues = (slot: SceneSlot) => {
   const hero = slot.anchors.hero;
@@ -37,38 +38,14 @@ const Logo: React.FC<{ frame: number; at: number }> = ({ frame, at }) => {
   const t = frame - at;
   const wipe = lin(t, [0, 10], [0, 1], easeOut);
   const k = popIn(frame, at + 3, 260, 12);
-  const draw = lin(t, [4, 22], [1, 0], easeInOut);
   return (
     <AbsoluteFill>
       <Svg>
         <circle cx={960} cy={540} r={wipe * 1200} fill={ACCENT} />
         <circle cx={960} cy={540} r={Math.max(0, wipe * 1200 - 60)} fill={PAPER} />
       </Svg>
-      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", transform: `scale(${0.85 + 0.15 * k})`, opacity: clamp01(k * 1.5) }}>
-        {VIDEO.brand.logo ? (
-          <Img src={staticFile(VIDEO.brand.logo)} style={{ maxWidth: 900, maxHeight: 420, objectFit: "contain" }} />
-        ) : (
-          // placeholder wordmark — replace via config/video.json → brand.logo
-          <div style={{ position: "relative", textAlign: "center", fontFamily: FONT, color: INK }}>
-            <div style={{ position: "relative", fontWeight: 900, fontSize: 190, letterSpacing: 6, lineHeight: 1 }}>
-              {VIDEO.brand.name.split(" ")[0]?.toUpperCase()}
-              <span style={{ color: ACCENT }}> {VIDEO.brand.name.split(" ").slice(1).join(" ").toUpperCase()}</span>
-            </div>
-            <svg width={900} height={90} viewBox="0 0 900 90" style={{ display: "block", margin: "18px auto 0", overflow: "visible" }}>
-              <path
-                d="M 30 60 C 200 10, 330 90, 470 45 S 760 0, 870 40"
-                fill="none"
-                stroke={ACCENT}
-                strokeWidth={16}
-                strokeLinecap="round"
-                pathLength={1}
-                strokeDasharray="1"
-                strokeDashoffset={draw}
-              />
-              <path d="M 120 82 C 260 50, 380 100, 520 72" fill="none" stroke={INK} strokeWidth={STROKE} strokeLinecap="round" pathLength={1} strokeDasharray="1" strokeDashoffset={draw} />
-            </svg>
-          </div>
-        )}
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", flexDirection: "column", transform: `scale(${0.85 + 0.15 * k})`, opacity: clamp01(k * 1.5) }}>
+        <LogoBlock width={1150} />
       </AbsoluteFill>
     </AbsoluteFill>
   );

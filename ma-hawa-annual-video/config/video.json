@@ -162,8 +162,8 @@
   },
   "brand": {
     "name": "Ma Hawa",
-    "logo": null,
-    "_logoHelp": "Set to e.g. \"logo/ma-hawa.png\" (inside /assets) to replace the placeholder wordmark.",
+    "logo": "logo/ma-hawa.svg",
+    "_logoHelp": "SVG (preferred: recoloured white on the team tees) or PNG inside /assets. The file is git-ignored (public repo).",
     "accent": "#76ADDE",
     "ink": "#111111",
     "paper": "#FFFFFF",

@@ -1,6 +1,6 @@
 # Ma Hawa — Annual Meeting Video (~86 s, beat-synced, with voices)
 
-A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo) and is set in a Ma Hawa office with depth, camera moves, and day/night lighting. It has spoken dialogue (ElevenLabs), with the music ducking under every line. The team wears Ma Hawa prints (Ali's chest print, Hussein's tee, Amr's pocket logo, Michael's lapel pin). Cuts alternate punch / whip-pan / zoom-through, with a fine film grain on top. Every cut, hit, caption and line comes from the music analysis in `config/beats.json`.
+A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo) and is set in a Ma Hawa office with depth, camera moves, and day/night lighting. It has spoken dialogue (ElevenLabs), with the music ducking under every line. The real Ma Hawa logo (`brand.logo`, drawn as live SVG) is on the title, the office wall, the booth, the hologram and the end card; the team (Ali, Amr, Hussein) wears Ma Hawa-blue tees (#76ADDE) with the logo small in white, Michael a logo pin. Cuts alternate punch / whip-pan / zoom-through, with a fine film grain on top. Every cut, hit, caption and line comes from the music analysis in `config/beats.json`.
 
 ### Storyline (one React component per scene, `src/scenes/S00…S13`)
 
@@ -18,13 +18,13 @@ A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-ph
 | 9 | **AMR · The plan**: client call, the project timeline locks in row by row on the beat. "Timeline's locked. Let's go, team!" | 2 bars |
 | 10 | **ALI · The build**: at the exhibition hall he lifts the LED-wall crate ("Leave the heavy lifting to me!"), the booth walls slam in on the beat, and the lights come on in the quiet bar | 2 bars (2nd = breakdown) |
 | 11 | **HUSSEIN · The night shift**: everyone heads home, he stays. Exports fill on every beat of the build-up. "And… done!", then a dive into his screen | quiet bar + build-up |
-| 12 | **Events**: the wall bursts out of his screen, one stamp per beat, gold badge, 45+ | **the biggest drop** |
+| 12 | **Events**, fast: out of his screen, 45 event tiles blitz onto a full-screen wall at 8 per beat while the camera pulls back and a counter races to 45; "45+ EVENTS" slams on the next downbeat, the gold award lands, event names race past | **the biggest drop** |
 | 13 | **Finale**: they walk back, "GREAT WORK, GUYS!" in the song's second break, then the **hero shot as the beat returns**, then the logo | 6 bars |
 
 It is synced to *7mama — Sheshtawy* (95 BPM), song window **32.9 s → 118.8 s** (a 3-bar intro before the break) (`musicWindow` in `config/video.json`).
 
 ### Voices
-- **Lines and speakers:** `config/voices.json`. Each speaker has a fixed ElevenLabs voice; the `prompt` is what was generated, including v4 tags like `[shouting]`.
+- **Lines and speakers:** `config/voices.json`. Every line is spoken. Michael's lines, Ali's and Saeed's are ElevenLabs takes (the `prompt` is what was generated, including v4 tags like `[shouting]`). Lines with a `kokoro` block (Amr, Hussein, and Michael's "MORE creative ideas") are voiced locally and for free with Kokoro TTS: `npm run tts` (`scripts/tts_kokoro.py`, Apache-2.0 model in `~/.cache/mahawa-models/kokoro`), with an optional pitch shift to sit close to the character's other takes.
 - **Audio files:** `assets/voice/raw/<line>.mp3`. Running `npm run voices` trims silence, runs a voice chain (high-pass, presence lift, gentle compression), levels every line to -14 LUFS with a true-peak limiter, and measures durations into `assets/voice/durations.json`. A line can borrow a slice of another take via `clipFrom` until it has its own.
 - **Missing lines:** a line with no audio file still shows its caption or subtitle, so the video always renders.
 - **Real recordings:** to use real recordings of the actual people, record the line, save it as `assets/voice/raw/<line>.wav`, run `npm run voices` and re-render.

@@ -7,3 +7,4 @@ opencv-python-headless
 pillow
 mediapipe>=0.10.14
 rembg[cpu]
+kokoro-onnx>=0.6        # local TTS for lines without a studio take (npm run tts)

@@ -26,7 +26,7 @@ const SX = 1440;
 export const cfoCues = (slot: SceneSlot) => {
   const b = (n: number) => beatOf(slot, Math.min(n, slot.beats.length - 1));
   const arrive = b(1);
-  const ask = b(1);
+  const ask = b(2); // the word "budget" lands right on the freeze (b4)
   const freeze = b(4); // the laugh stops dead — right on the word "budget"
   const hmm = b(5);
   const away = b(6); // turns away, eyes to the corner, whistling

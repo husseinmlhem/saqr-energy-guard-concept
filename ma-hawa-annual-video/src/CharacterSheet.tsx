@@ -6,6 +6,7 @@ import { CharId } from "./characters/config";
 import { POSES, Pose, walkPose } from "./characters/rig";
 import { idleMotion } from "./sync/beats";
 import { FONT, INK, PAPER } from "./theme";
+import { useBrandLogo } from "./brand/Logo";
 
 const IDS: CharId[] = ["ali", "amr", "hussein", "michael", "saeed"];
 const POSE_FOR: Record<CharId, Pose> = {
@@ -17,6 +18,7 @@ const POSE_FOR: Record<CharId, Pose> = {
 };
 
 export const CharacterSheet: React.FC = () => {
+  useBrandLogo();
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: PAPER, fontFamily: FONT }}>
