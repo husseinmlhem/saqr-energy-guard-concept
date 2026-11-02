@@ -20,3 +20,7 @@ assets/voice/*.wav
 # The company logo stays local too (public repo).
 assets/logo/*
 !assets/logo/.gitkeep
+
+# spare / alternate takes stay local too
+assets/voice/kokoro/
+assets/voice/elevenlabs_unused/
