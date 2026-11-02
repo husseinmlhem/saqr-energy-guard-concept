@@ -241,9 +241,10 @@ export const beatsToFrames = (n: number) => Math.round(n * BEAT_FRAMES);
 // ------------------------------------------------------------------ subtitles + chapter labels
 /** cinematic subtitle for a spoken line: speaker chip + text, bottom centre */
 export const Subtitle: React.FC<{ frame: number; at: number; frames: number; speaker: string; text: string }> = ({ frame, at, frames, speaker, text }) => {
-  if (frame < at - 2 || frame > at + frames + 14) return null;
+  if (frame < at - 2 || frame > at + frames + 7) return null;
   const k = popIn(frame, at - 2, 300, 18);
-  const out = clamp01((frame - at - frames - 6) / 8);
+  // short tail so back-to-back lines never show two subtitles at once
+  const out = clamp01((frame - at - frames - 1) / 6);
   return (
     <div style={{ position: "absolute", left: 0, right: 0, bottom: 64, display: "flex", justifyContent: "center", opacity: clamp01(k * 2) * (1 - out), transform: `translateY(${(1 - k) * 20}px)` }}>
       <div style={{ display: "flex", alignItems: "center", gap: 18, background: "rgba(12,18,32,0.82)", borderRadius: 18, padding: "14px 30px 14px 16px", fontFamily: FONT }}>

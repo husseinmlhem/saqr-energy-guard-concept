@@ -4,16 +4,17 @@
 //                          the camera dives into his screen — and the events wall bursts out of it on the biggest drop.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character } from "../characters/Character";
+import { Character, jointScreenPos } from "../characters/Character";
 import { POSES, Pose, walkPose, withIdle } from "../characters/rig";
-import { clamp01, easeIn, lin, popIn } from "../fx/anim";
-import { beatClock, beatPulse, idleMotion } from "../sync/beats";
+import { clamp01, easeIn, easeOut, lin, popIn } from "../fx/anim";
+import { BEAT_FRAMES, beatClock, beatPulse, idleMotion } from "../sync/beats";
 import { SceneSlot, beatOf } from "../sync/timeline";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
 import { Workstation } from "../world/Screens";
 import { Chapter, Stage, Subtitle, W, camAt } from "./kit";
 import { lineText, voiceFrames } from "../voice";
 import { Cues, SceneProps } from "./types";
+import { CARRY_HANDS, MaHawaBottle, MaHawaCarton } from "../characters/water";
 
 
 export const husseinCues = (slot: SceneSlot) => {
@@ -35,9 +36,10 @@ export const husseinCues = (slot: SceneSlot) => {
       { f: done, name: "And… done! → dive into the screen" },
     ],
     sfx: [...lamps.map((f) => ({ f, name: "tick" as const, volume: 0.5 })), ...exports.map((f) => ({ f, name: "tick" as const, volume: 0.4 })), { f: done, name: "ding" as const, volume: 0.9 }],
-    voice: [{ f: leave[0], id: "ali_night", sub: true }, { f: beatOf(slot, Math.min(n - 3, bar + 1)), id: "hussein_late", sub: true }, { f: done, id: "hussein_done" }],
+    voice: [{ f: leave[0], id: "ali_night", sub: true }, { f: beatOf(slot, 2), id: "wahid_hydrated", sub: true }, { f: beatOf(slot, Math.min(n - 3, bar + 1)), id: "hussein_late", sub: true }, { f: done, id: "hussein_done" }],
   };
-  return { leave, lamps, solo, night, exports, done, cups, bar, split: [] as number[], cues };
+  cues.marks.push({ f: beatOf(slot, 1), name: "Abdulwahid passes with a carton" }, { f: beatOf(slot, 2), name: "a Ma Hawa bottle on Hussein's desk" });
+  return { leave, lamps, solo, night, exports, done, cups, bar, split: [] as number[], cues, wIn: beatOf(slot, 1), wDrop: beatOf(slot, 2) };
 };
 
 const Clock: React.FC<{ x: number; y: number; r: number; t: number }> = ({ x, y, r, t }) => (
@@ -95,6 +97,24 @@ const Evening: React.FC<{ frame: number; c: ReturnType<typeof husseinCues> }> = 
         </W>
         {/* Hussein at his desk, lit by his screens */}
         <Character id="hussein" x={DESK_X.hussein} y={1000} scale={1.35} pose={{ ...POSES.stand, lHand: { x: -60, y: -200 + type(0) }, rHand: { x: 60, y: -200 + type(1) }, head: 2 }} expression="neutral" headTilt={hm.headTilt * 0.5} frame={frame} />
+        {/* Abdulwahid passes with a carton and leaves a bottle on Hussein's desk */}
+        {frame >= c.wIn - 2 && (() => {
+          const stop = DESK_X.hussein - 150;
+          const leaveAt = c.wDrop + Math.round(BEAT_FRAMES * 0.7);
+          const x = frame < c.wDrop ? -220 + (stop + 220) * easeOut(clamp01((frame - c.wIn + 2) / (c.wDrop - c.wIn + 2))) : frame < leaveAt ? stop : stop + (2300 - stop) * easeIn(clamp01((frame - leaveAt) / Math.max(1, c.solo - leaveAt)));
+          const walking = frame < c.wDrop - 2 || frame >= leaveAt;
+          const pose: Pose = walking ? { ...walkPose(POSES.stand, beatClock(frame), 60, 1, 14), lHand: CARRY_HANDS.l, rHand: CARRY_HANDS.r, armsFront: true } : { ...POSES.stand, lHand: CARRY_HANDS.l, rHand: { x: 120, y: -150 }, armsFront: true };
+          const hl = jointScreenPos("abdulwahid", x, 1000, 1.35, pose, "handL");
+          const hr = jointScreenPos("abdulwahid", x, 1000, 1.35, pose, "handR");
+          return (
+            <>
+              <Character id="abdulwahid" x={x} y={1000} scale={1.35} pose={pose} expression="happy" left="none" right="none" frame={frame} />
+              <W>
+                <MaHawaCarton x={(hl.x + hr.x) / 2 - (walking ? 0 : 30)} y={hl.y + 40} w={160} />
+              </W>
+            </>
+          );
+        })()}
         {/* Amr and Ali walking home, waving */}
         {(["ali", "amr"] as const).map((id, i) => {
           const t = walkT(i);
@@ -108,6 +128,7 @@ const Evening: React.FC<{ frame: number; c: ReturnType<typeof husseinCues> }> = 
             <g key={id}>
               <rect x={DESK_X[id] - 250} y={760} width={500} height={24} rx={6} fill="#3A3F4B" stroke={INK} strokeWidth={STROKE * 0.8} />
               <rect x={DESK_X[id] - 230} y={784} width={460} height={230} fill="#2F3440" stroke={INK} strokeWidth={STROKE * 0.8} />
+              {id === "hussein" && frame >= c.wDrop + 2 && <MaHawaBottle x={DESK_X.hussein - 200} y={760 - 44 - (1 - easeOut(clamp01((frame - c.wDrop - 2) / 5))) * 40} h={88} />}
               {/* monitor backs; Hussein's still on (glow on his face) */}
               {[-130, 0, 130].map((dx, k) => (
                 <g key={k}>

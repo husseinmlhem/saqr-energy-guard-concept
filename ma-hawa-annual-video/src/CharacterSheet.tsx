@@ -8,13 +8,14 @@ import { idleMotion } from "./sync/beats";
 import { FONT, INK, PAPER } from "./theme";
 import { useBrandLogo } from "./brand/Logo";
 
-const IDS: CharId[] = ["ali", "amr", "hussein", "michael", "saeed"];
+const IDS: CharId[] = ["ali", "amr", "hussein", "michael", "saeed", "abdulwahid"];
 const POSE_FOR: Record<CharId, Pose> = {
   amr: POSES.clipboard,
   ali: POSES.flex,
   hussein: POSES.relaxed,
   michael: POSES.batReady,
   saeed: POSES.sip,
+  abdulwahid: POSES.carry,
 };
 
 export const CharacterSheet: React.FC = () => {

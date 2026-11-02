@@ -25,6 +25,10 @@
     "hussein": {
       "voiceId": "NeokBGcPJaElDOj380Qt",
       "voiceName": "Bader Eshtaya — Palestine"
+    },
+    "abdulwahid": {
+      "voiceId": "kokoro:am_puck",
+      "voiceName": "Kokoro — am_puck"
     }
   },
   "lines": {
@@ -327,6 +331,39 @@
         "pitch": 0
       },
       "kokoroText": "Okay... next year, we talk budget."
+    },
+    "wahid_coming": {
+      "speaker": "abdulwahid",
+      "text": "Ma Hawa water, coming through!",
+      "prompt": "Ma Hawa water, coming through!",
+      "kokoro": {
+        "voice": "am_puck",
+        "speed": 1.1,
+        "pitch": 0
+      },
+      "kokoroText": "Ma Hawa water, coming through!"
+    },
+    "wahid_hydrated": {
+      "speaker": "abdulwahid",
+      "text": "Stay hydrated, Hussein!",
+      "prompt": "Stay hydrated, Hussein!",
+      "kokoro": {
+        "voice": "am_puck",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Stay hydrated, Hussein!"
+    },
+    "wahid_heroes": {
+      "speaker": "abdulwahid",
+      "text": "Water for the heroes!",
+      "prompt": "Water for the heroes!",
+      "kokoro": {
+        "voice": "am_puck",
+        "speed": 1.05,
+        "pitch": 0
+      },
+      "kokoroText": "Water for the heroes!"
     }
   },
   "_engines": "Michael: ElevenLabs takes. Amr, Ali, Hussein (and Saeed's 'next year' line): Kokoro TTS via scripts/tts_kokoro.py, one fixed voice per character. Saeed's 'Hmm…' is a slice of an ElevenLabs take."

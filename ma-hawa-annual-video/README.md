@@ -16,10 +16,10 @@ A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-ph
 | 7 | **The pitch**: Hussein drives the deck. "EXCELLENT! MAKE IT HAPPEN!" | 2 bars |
 | 8 | **Finance**: Saeed is laughing at his phone. "Saeed… we need a budget." The laugh stops dead (record scratch, snap zoom), "Hmm…", a storm cloud; then he turns away, eyes up to the corner, sips his coffee and whistles. Tumbleweed. "Okay… no budget. We'll make it work!" (NO BUDGET? NO PROBLEM!) — they leave, he goes back to laughing | 3 bars |
 | 9 | **AMR · The plan**: Amr thinks it through while the timeline fills on the beat; Hussein and Ali sprint back and forth around him (in front, behind, out of frame and back) until they collide — BONK, "Ow! Watch it, Ali!" — "Timeline's locked. Let's go, team!", Amr heads off and they race past him | 2 bars |
-| 10 | **ALI · The build**: at the exhibition hall he lifts the LED-wall crate ("Leave the heavy lifting to me!"), the booth walls slam in on the beat, and the lights come on in the quiet bar | 2 bars (2nd = breakdown) |
-| 11 | **HUSSEIN · The night shift**: everyone heads home, he stays. Exports fill on every beat of the build-up. "And… done!", then a dive into his screen | quiet bar + build-up |
+| 10 | **ALI · The build** (with **Abdulwahid**, sales, delivering a Ma Hawa carton to the booth stack: "Ma Hawa water, coming through!"): at the exhibition hall he lifts the LED-wall crate ("Leave the heavy lifting to me!"), the booth walls slam in on the beat, and the lights come on in the quiet bar | 2 bars (2nd = breakdown) |
+| 11 | **HUSSEIN · The night shift**: everyone heads home, he stays (Abdulwahid leaves a Ma Hawa bottle on his desk: "Stay hydrated, Hussein!"). Exports fill on every beat of the build-up. "And… done!", then a dive into his screen | quiet bar + build-up |
 | 12 | **Events**, fast: out of his screen, 45 event tiles blitz onto a full-screen wall at 8 per beat while the camera pulls back and a counter races to 45; "45+ EVENTS" slams on the next downbeat, then a **Guinness World Records · RECORD HOLDER** seal lands (`record` in `config/video.json`; set `record.logo` to the official logo file to show it instead of the drawn seal), event names race past | **the biggest drop** |
-| 13 | **Finale**: they limp back, beaten up (torn shoes with toes poking out, ripped tees, band-aids, scratches with little blood drips, a black eye) — the camera tracks their faces — "GREAT WORK, GUYS!" in the song's second break, then the **hero shot as the beat returns**, then the logo | 6 bars |
+| 13 | **Finale**: they limp back, beaten up (torn shoes with toes poking out, ripped tees, band-aids, scratches with little blood drips, a black eye) — the camera tracks their faces — "GREAT WORK, GUYS!" in the song's second break, Abdulwahid hands out Ma Hawa bottles ("Water for the heroes!"), then the **hero shot as the beat returns**, then the logo | 6 bars |
 
 It is synced to *7mama — Sheshtawy* (95 BPM), song window **32.9 s → 118.8 s** (a 3-bar intro before the break) (`musicWindow` in `config/video.json`).
 
@@ -52,7 +52,7 @@ Remotion downloads its own headless Chrome on first render. To use one you alrea
 ## Swap a face
 
 1. Put the photo(s) in `assets/faces/raw/` named `<id>_<expression>.jpg`.
-   Ids: `amr`, `ali`, `hussein`, `michael`, `saeed`. Expressions: `neutral`, `happy`, `shocked`, `tired`, `away` (looking off to the side — used for Saeed ignoring the budget).
+   Ids: `amr`, `ali`, `hussein`, `michael`, `saeed`, `abdulwahid`. Expressions: `neutral`, `happy`, `shocked`, `tired`, `away` (looking off to the side — used for Saeed ignoring the budget).
    Example: `michael_neutral.jpg`, `michael_happy.jpg`.
 2. Run `npm run faces` (or `npm run faces -- michael` to process only Michael).
    This removes the background, finds the face landmarks, levels the eyes, crops and scales every face to the

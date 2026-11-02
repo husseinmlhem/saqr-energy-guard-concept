@@ -5,7 +5,7 @@
 // Then the logo.
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
-import { Character, headScreenPos } from "../characters/Character";
+import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
 import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeInOut, easeOut, lin, popIn, rand } from "../fx/anim";
 import { LightRays, SpeedLines, Sweat, Svg } from "../fx/Fx";
@@ -19,6 +19,7 @@ import { Cues, SceneProps } from "./types";
 import { LogoBlock } from "../brand/Logo";
 import { Battered } from "../characters/Battered";
 import { hipShakePose } from "./playtime";
+import { CARRY_HANDS, MaHawaBottle, MaHawaCarton } from "../characters/water";
 
 export const finaleCues = (slot: SceneSlot) => {
   const hero = slot.anchors.hero;
@@ -31,7 +32,7 @@ export const finaleCues = (slot: SceneSlot) => {
   const cues: Cues = {
     marks: [{ f: 0, name: "walk back, worn out" }, ...say.map((f, i) => ({ f, name: `"${words[i]}"` })), { f: hero, name: "HERO SHOT — biggest drop" }, { f: logo, name: "logo" }],
     sfx: [{ f: hero, name: "slam" as const, volume: 0.6 }, { f: hero, name: "sparkle" as const, volume: 0.8 }, { f: logo, name: "ding" as const, volume: 0.7 }],
-    voice: [{ f: 0, id: "saeed_next", sub: true }, { f: say[0], id: "michael_great" }],
+    voice: [{ f: 0, id: "saeed_next", sub: true }, { f: say[0], id: "michael_great" }, { f: say[say.length - 1] + Math.round(BEAT_FRAMES * 0.6), id: "wahid_heroes", sub: true }],
   };
   return { hero, logo, say, words, cues };
 };
@@ -96,10 +97,41 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
             <W>
               <Battered id={id} x={x} y={1000} scale={1.35} pose={pose} frame={frame} level={1} seed={i} />
               {!proud && <Sweat frame={frame + i * 7} x={h.x + h.r * 0.7} y={h.y - h.r * 0.5} />}
+              {proud && id !== "ali" && (() => {
+                const hand = jointScreenPos(id, x, 1000, 1.35, pose, "handR");
+                return <MaHawaBottle x={hand.x} y={hand.y - 34} h={84} rot={12} />;
+              })()}
             </W>
           </React.Fragment>
         );
       })}
+      {frame >= c.say[0] - 4 && (() => {
+        const t = clamp01((frame - c.say[0] + 4) / Math.max(1, c.say[c.say.length - 1] - c.say[0] + 4));
+        const x = -260 + (1090 + 260) * easeOut(t);
+        const walking = t < 1;
+        const mw = idleMotion(frame, 0.9, 0.5);
+        const pose: Pose = walking
+          ? { ...walkPose(POSES.stand, clock, 70, 1, 16), lHand: CARRY_HANDS.l, rHand: CARRY_HANDS.r, armsFront: true }
+          : proud
+            ? withIdle({ ...POSES.cheer, lArm: [-20, -40] }, mw)
+            : { ...POSES.stand, lHand: CARRY_HANDS.l, rHand: CARRY_HANDS.r, armsFront: true };
+        const hl = jointScreenPos("abdulwahid", x, 1000, 1.35, pose, "handL");
+        const hr = jointScreenPos("abdulwahid", x, 1000, 1.35, pose, "handR");
+        return (
+          <>
+            {proud && (
+              <W>
+                <MaHawaCarton x={x - 150} y={1000} w={160} />
+              </W>
+            )}
+            <Character id="abdulwahid" x={x} y={1000} scale={1.35} pose={pose} expression="happy" left="none" right="none" frame={frame} />
+            <W>
+              {!proud && <MaHawaCarton x={(hl.x + hr.x) / 2} y={hl.y + 40} w={160} />}
+              {proud && <MaHawaBottle x={hr.x} y={hr.y - 34} h={88} rot={14} />}
+            </W>
+          </>
+        );
+      })()}
       <Character id="michael" x={1380} y={1000} scale={1.35} pose={withIdle(frame >= c.say[0] ? POSES.thumbsUp : POSES.hipsHands, idleMotion(frame, 0.1, 0.5))} expression="happy" flip right="none" frame={frame} />
       <Character id="saeed" x={1640} y={1000} scale={1.35} pose={withIdle(POSES.sip, idleMotion(frame, 0.4, 0.4))} expression="neutral" flip frame={frame} />
     </Stage>
@@ -114,6 +146,7 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
   const back = [
     { id: "michael" as const, x: 690, s: 1.5, y: 880 },
     { id: "saeed" as const, x: 1270, s: 1.5, y: 840 },
+    { id: "abdulwahid" as const, x: 1720, s: 1.5, y: 870 },
   ];
   const front = [
     { id: "ali" as const, x: 430, s: 1.85, pose: POSES.heroFlex },
@@ -136,7 +169,17 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
       <AbsoluteFill style={{ transform: `perspective(1300px) rotateX(14deg) scale(${push})`, transformOrigin: "50% 100%" }}>
         <Ground y={1062} color="#DCE8F5" />
         {back.map(({ id, x, s, y }, i) => (
-          <Character key={id} id={id} x={x} y={y} scale={s} pose={withIdle(id === "michael" ? POSES.cheer : POSES.sip, idleMotion(slow, i, 0.3))} expression={id === "michael" ? "happy" : "neutral"} wind={1} frame={slow} right={id === "michael" ? "none" : undefined} />
+          <React.Fragment key={id}>
+            <Character id={id} x={x} y={y} scale={s} pose={withIdle(id === "saeed" ? POSES.sip : POSES.cheer, idleMotion(slow, i, 0.3))} expression={id === "saeed" ? "neutral" : "happy"} wind={1} frame={slow} right={id === "saeed" ? undefined : "none"} left={id === "abdulwahid" ? "none" : undefined} />
+            {id === "abdulwahid" && (
+              <W>
+                {(() => {
+                  const hand = jointScreenPos(id, x, y, s, withIdle(POSES.cheer, idleMotion(slow, i, 0.3)), "handR");
+                  return <MaHawaBottle x={hand.x} y={hand.y - 36} h={92} rot={10} />;
+                })()}
+              </W>
+            )}
+          </React.Fragment>
         ))}
         {front.map(({ id, x, s, pose: p0 }, i) => {
           const m = idleMotion(slow, i * 0.4, 0.35);

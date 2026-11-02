@@ -52,6 +52,7 @@ export const DIMS: Record<string, BodyDims> = {
   muscle: { thigh: 72, shin: 68, torso: 130, neck: 14, upperArm: 64, forearm: 58, shoulderHalf: 54, hipHalf: 21, w: [36, 29, 36, 29] },
   boss: { thigh: 76, shin: 72, torso: 126, neck: 12, upperArm: 62, forearm: 56, shoulderHalf: 41, hipHalf: 18, w: [26, 23, 32, 26] },
   money: { thigh: 76, shin: 72, torso: 126, neck: 12, upperArm: 62, forearm: 56, shoulderHalf: 37, hipHalf: 17, w: [27, 25, 30, 25] },
+  sales: { thigh: 74, shin: 70, torso: 128, neck: 12, upperArm: 62, forearm: 56, shoulderHalf: 42, hipHalf: 20, w: [28, 25, 33, 27] },
 };
 
 export const P = (lean = 0, overrides: Partial<Pose> = {}): Pose => ({

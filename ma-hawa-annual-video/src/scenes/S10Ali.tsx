@@ -4,10 +4,10 @@
 import React, { useMemo } from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { Character, headScreenPos, jointScreenPos } from "../characters/Character";
-import { POSES, Pose, lerpPose, withIdle } from "../characters/rig";
+import { POSES, Pose, lerpPose, walkPose, withIdle } from "../characters/rig";
 import { clamp01, easeIn, easeInOut, easeOut, shake } from "../fx/anim";
 import { ImpactLines, Sweat } from "../fx/Fx";
-import { beatPhase, idleMotion } from "../sync/beats";
+import { beatClock, beatPhase, idleMotion } from "../sync/beats";
 import { SceneSlot, beatOf } from "../sync/timeline";
 import { lineText, voiceFrames } from "../voice";
 import { ACCENT, FONT, GOLD, INK, PAPER, STROKE } from "../theme";
@@ -16,6 +16,8 @@ import { camTransform } from "../world/Office";
 import { Cues, SceneProps } from "./types";
 import { LogoSvg } from "../brand/Logo";
 import { hipShakePose } from "./playtime";
+import { CARRY_HANDS, MaHawaBottle, MaHawaCarton } from "../characters/water";
+import { NameTag } from "../fx/Fx";
 
 const G = 1000;
 const AX = 520;
@@ -31,9 +33,11 @@ export const aliCues = (slot: SceneSlot) => {
   const cues: Cues = {
     marks: [{ f: lift, name: "LIFT (LED wall crate)" }, ...walls.map((f, i) => ({ f, name: `booth wall ${i + 1} slams in` })), { f: header, name: "MA HAWA header" }, { f: wipe, name: "wipes forehead" }, { f: lights, name: "LIGHTS ON" }, { f: proud, name: "proud flex" }],
     sfx: [{ f: lift, name: "slam", volume: 0.6 }, ...walls.map((f) => ({ f, name: "stamp" as const, volume: 0.8 })), { f: header, name: "whoosh", volume: 0.5 }, { f: lights, name: "sparkle", volume: 0.9 }, { f: lights, name: "ding", volume: 0.5 }],
-    voice: [{ f: lift, id: "ali_lift" }, { f: lights, id: "ali_lights", sub: true }],
+    voice: [{ f: lift, id: "ali_lift" }, { f: beatOf(slot, 3), id: "wahid_coming", sub: true }, { f: lights, id: "ali_lights", sub: true }],
   };
-  return { lift, walls, header, wipe, lights, proud, cues };
+  cues.marks.push({ f: beatOf(slot, 2), name: "Abdulwahid walks in with a Ma Hawa carton" }, { f: header, name: "carton onto the stack" });
+  cues.sfx.push({ f: header + 4, name: "stamp", volume: 0.5 });
+  return { lift, walls, header, wipe, lights, proud, cues, wIn: beatOf(slot, 2) };
 };
 
 const Hall: React.FC<{ frame: number; on: number }> = ({ frame, on }) => (
@@ -77,6 +81,46 @@ const Hall: React.FC<{ frame: number; on: number }> = ({ frame, on }) => (
     ))}
   </svg>
 );
+
+/** Abdulwahid (sales) walks in with a carton of Ma Hawa water, drops it on the stack by the booth, raises a bottle when the lights come on */
+const WX0 = 2250;
+const WX1 = 1560;
+const STACK_X = 1800;
+const WahidDelivery: React.FC<{ frame: number; c: ReturnType<typeof aliCues> }> = ({ frame, c }) => {
+  const s = 1.4;
+  const walkT = clamp01((frame - c.wIn) / Math.max(1, c.header - c.wIn));
+  const x = WX0 + (WX1 - WX0) * easeOut(walkT);
+  const walking = frame < c.header && frame >= c.wIn;
+  const drop = clamp01((frame - c.header) / 6);
+  const cheering = frame >= c.lights - 2;
+  const m = idleMotion(frame, 0.7, 0.5);
+  let pose: Pose = walking
+    ? { ...walkPose(POSES.stand, beatClock(frame), 60, -1, 16), lHand: CARRY_HANDS.l, rHand: CARRY_HANDS.r, armsFront: true }
+    : frame < c.header + 6
+      ? { ...POSES.stand, lHand: CARRY_HANDS.l, rHand: CARRY_HANDS.r, armsFront: true, hipY: 10 * drop }
+      : withIdle(POSES.hipsHands, m);
+  if (cheering) pose = lerpPose(pose, withIdle({ ...POSES.cheer, lArm: [-14, -8] }, m), easeInOut(clamp01((frame - c.lights + 2) / 6)));
+  const hl = jointScreenPos("abdulwahid", x, G, s, pose, "handL", walking);
+  const hr = jointScreenPos("abdulwahid", x, G, s, pose, "handR", walking);
+  const cw = 170;
+  const held = { x: (hl.x + hr.x) / 2, y: (hl.y + hr.y) / 2 + cw * 0.22 };
+  const top = { x: STACK_X, y: G - 2 * cw * 0.7 };
+  const carton = frame < c.header ? held : { x: held.x + (top.x - held.x) * easeInOut(drop), y: held.y + (top.y - held.y) * easeInOut(drop) - Math.sin(drop * Math.PI) * 60 };
+  if (frame < c.wIn - 2) return null;
+  return (
+    <>
+      <svg width={1920} height={1080} style={{ position: "absolute", overflow: "visible" }}>
+        <MaHawaCarton x={STACK_X} y={G} w={cw} open={false} />
+        <MaHawaCarton x={STACK_X + 4} y={G - cw * 0.7} w={cw} open={false} rot={-1.5} />
+      </svg>
+      <Character id="abdulwahid" x={x} y={G} scale={s} pose={pose} flip={walking} expression={walking ? "tired" : "happy"} left="none" right="none" frame={frame} />
+      <svg width={1920} height={1080} style={{ position: "absolute", overflow: "visible" }}>
+        <MaHawaCarton x={carton.x} y={carton.y} w={cw} />
+        {cheering && <MaHawaBottle x={hr.x} y={hr.y - 30} h={90} rot={-10} />}
+      </svg>
+    </>
+  );
+};
 
 export const S10Ali: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
@@ -176,12 +220,14 @@ export const S10Ali: React.FC<SceneProps> = ({ slot }) => {
             <Sweat frame={frame} x={AX + 70} y={420} n={3} />
           </svg>
         )}
+        <WahidDelivery frame={frame} c={c} />
       </AbsoluteFill>
       {/* lights-on bloom */}
       <AbsoluteFill style={{ background: "radial-gradient(ellipse 60% 50% at 65% 55%, rgba(255,243,196,0.35), rgba(255,243,196,0) 70%)", opacity: on, pointerEvents: "none" }} />
       <AbsoluteFill style={{ background: "#FFFFFF", opacity: frame >= c.lights ? Math.exp(-(frame - c.lights) / 3) * 0.5 : 0, pointerEvents: "none" }} />
       <Chapter frame={frame} title="ALI" sub="THE BUILD" dark />
       <Subtitle frame={frame} at={c.lift} frames={voiceFrames("ali_lift")} speaker="Ali" text={lineText("ali_lift")} />
+      <NameTag frame={frame} at={c.wIn + 10} x={1560} y={150} text="Abdulwahid — Sales" />
     </AbsoluteFill>
   );
 };

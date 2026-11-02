@@ -2,9 +2,9 @@
 import { getStaticFiles } from "remotion";
 import charactersJson from "../../config/characters.json";
 
-export type CharId = "amr" | "ali" | "hussein" | "michael" | "saeed";
+export type CharId = "amr" | "ali" | "hussein" | "michael" | "saeed" | "abdulwahid";
 export type Expression = "neutral" | "happy" | "shocked" | "tired" | "away";
-export type BodyType = "leader" | "muscle" | "genius" | "boss" | "money";
+export type BodyType = "leader" | "muscle" | "genius" | "boss" | "money" | "sales";
 
 export type Outfit = {
   id: CharId;

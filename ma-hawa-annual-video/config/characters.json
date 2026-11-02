@@ -142,6 +142,28 @@
         "sleeves": "long",
         "sandals": true
       }
+    },
+    "abdulwahid": {
+      "name": "Abdulwahid",
+      "tag": "Abdulwahid — Sales",
+      "body": "sales",
+      "faces": {
+        "neutral": "faces/abdulwahid_neutral.png",
+        "happy": "faces/abdulwahid_happy.png",
+        "tired": "faces/abdulwahid_tired.png"
+      },
+      "placeholder": {
+        "initials": "AW",
+        "hair": "none"
+      },
+      "outfit": {
+        "top": "#1F3B66",
+        "bottom": "#6E6355",
+        "shoes": "#2B2B2B",
+        "skin": "#A97B62",
+        "sleeves": "short",
+        "tee": true
+      }
     }
   }
 }
