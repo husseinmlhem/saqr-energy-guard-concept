@@ -1,0 +1,57 @@
+{
+  "_help": [
+    "Scene order is fixed. 'target' = rough length in seconds; the solver in src/sync/timeline.ts snaps every cut to a downbeat in config/beats.json.",
+    "'minSeconds' protects a scene from being squeezed; Events also gets enough beats for one stamp per beat.",
+    "anchors: the CEO door lands on a quiet part / hard break near 'ceoTarget'; the hero shot lands on the biggest drop."
+  ],
+  "scenes": [
+    { "id": "playtime", "title": "Playtime", "target": 8, "minSeconds": 4 },
+    { "id": "ceo", "title": "CEO enters", "target": 7, "minSeconds": 5 },
+    { "id": "huddle", "title": "The huddle", "target": 6, "minSeconds": 3.5 },
+    { "id": "cfo", "title": "The CFO", "target": 6, "minSeconds": 4 },
+    { "id": "hardwork", "title": "Hard work", "target": 8, "minSeconds": 5 },
+    { "id": "events", "title": "Events", "target": 14, "minSeconds": 9 },
+    { "id": "finale", "title": "Finale", "target": 11, "minSeconds": 7 }
+  ],
+  "anchors": {
+    "ceoTarget": 8,
+    "ceoWindow": [3.5, 16],
+    "heroWindowFraction": [0.55, 0.95],
+    "finaleLeadIn": 5,
+    "logoSeconds": 4
+  },
+  "events": [
+    { "name": "Gulfood", "years": ["2024", "2025", "2026"] },
+    { "name": "GITEX Global" },
+    { "name": "WETEX" },
+    { "name": "Abu Dhabi International Hunting & Equestrian Exhibition" },
+    { "name": "Liwa International Festival" },
+    { "name": "Abu Dhabi International Book Fair" },
+    { "name": "Dubai World Cup 2025" },
+    { "name": "Kayan Wellness Festival" },
+    { "name": "ExpoCulinaire" },
+    { "name": "Arab Water Forum 2024" },
+    { "name": "The Music Run Dubai 2025" }
+  ],
+  "award": "ADNOC Onshore HSE — Best Exhibit Winner",
+  "eventCount": 45,
+  "lines": {
+    "ceo": "We need creative ideas!",
+    "budgetSign": "BUDGET?",
+    "finale": "Great work, guys!"
+  },
+  "brand": {
+    "name": "Ma Hawa",
+    "logo": null,
+    "_logoHelp": "Set to e.g. \"logo/ma-hawa.png\" (inside /assets) to replace the placeholder wordmark.",
+    "accent": "#76ADDE",
+    "ink": "#111111",
+    "paper": "#FFFFFF",
+    "gold": "#D4A62A"
+  },
+  "audio": {
+    "musicVolume": 1.0,
+    "sfx": true,
+    "sfxVolume": 0.55
+  }
+}

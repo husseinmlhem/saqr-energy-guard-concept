@@ -1,0 +1,9 @@
+# Python tools: beat analysis, face processing, SFX + placeholder music
+librosa>=0.11
+soundfile
+numpy
+scipy
+opencv-python-headless
+pillow
+mediapipe>=0.10.14
+rembg[cpu]

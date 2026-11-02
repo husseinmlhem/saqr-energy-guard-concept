@@ -1,0 +1,34 @@
+{
+  "name": "ma-hawa-annual-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ma Hawa annual meeting — 60s beat-synced bobblehead animation (Remotion)",
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render MaHawa out/ma-hawa-preview.mp4",
+    "render:debug": "remotion render MaHawaDebug out/ma-hawa-debug.mp4",
+    "still": "remotion still MaHawa out/still.png",
+    "typecheck": "tsc --noEmit",
+    "plan": "tsx scripts/print-plan.ts",
+    "sync": "bash scripts/sync.sh",
+    "faces": ".venv/bin/python scripts/process_faces.py",
+    "sfx": ".venv/bin/python scripts/make_sfx.py assets/sfx",
+    "placeholder": ".venv/bin/python scripts/make_placeholder_track.py assets/audio/placeholder.wav",
+    "setup": "npm install && python3 -m venv .venv && .venv/bin/pip install -r scripts/requirements.txt"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.539",
+    "@remotion/fonts": "4.0.539",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "remotion": "4.0.539"
+  },
+  "devDependencies": {
+    "@fontsource/poppins": "5.2.7",
+    "@remotion/bundler": "4.0.539",
+    "@remotion/renderer": "4.0.539",
+    "@types/react": "19.2.2",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3"
+  }
+}

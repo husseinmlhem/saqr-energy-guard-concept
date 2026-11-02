@@ -1,0 +1,69 @@
+{
+  "_help": [
+    "Swap a face: drop photos in assets/faces/raw/<id>_<expression>.jpg, run `npm run faces`, then point 'faces' below at the new PNGs.",
+    "Expressions: neutral, happy, shocked, tired. Missing ones fall back via 'expressionFallbacks'.",
+    "A character with no faces (or whose files are missing) is drawn as a line-art placeholder with its initials.",
+    "Paths are relative to /assets. 'tag' is shown once, for 1.5 s, on the character's first appearance (null = never)."
+  ],
+  "headScale": 1.6,
+  "expressionFallbacks": {
+    "neutral": ["happy"],
+    "happy": ["neutral"],
+    "shocked": ["tired", "neutral"],
+    "tired": ["shocked", "neutral"]
+  },
+  "faceGeometry": {
+    "_help": "Where the eyes sit inside every processed face PNG (0-1). process_faces.py aligns all photos to this.",
+    "leftEye": [0.407, 0.47],
+    "rightEye": [0.593, 0.47]
+  },
+  "characters": {
+    "amr": {
+      "name": "Amr",
+      "tag": null,
+      "body": "leader",
+      "faces": {
+        "neutral": "faces/amr_neutral.png",
+        "happy": "faces/amr_happy.png",
+        "shocked": "faces/amr_shocked.png"
+      },
+      "placeholder": { "initials": "A" }
+    },
+    "ali": {
+      "name": "Ali",
+      "tag": null,
+      "body": "muscle",
+      "faces": {
+        "neutral": "faces/ali_neutral.png",
+        "happy": "faces/ali_happy.png",
+        "shocked": "faces/ali_shocked.png"
+      },
+      "placeholder": { "initials": "AL" }
+    },
+    "hussein": {
+      "name": "Hussein",
+      "tag": null,
+      "body": "genius",
+      "faces": {
+        "neutral": "faces/hussein_neutral.png",
+        "happy": "faces/hussein_happy.png",
+        "tired": "faces/hussein_tired.png"
+      },
+      "placeholder": { "initials": "H" }
+    },
+    "michael": {
+      "name": "Michael",
+      "tag": "Michael — CEO",
+      "body": "boss",
+      "faces": {},
+      "placeholder": { "initials": "M", "hair": "side-part" }
+    },
+    "saeed": {
+      "name": "Saeed",
+      "tag": "Saeed — CFO",
+      "body": "money",
+      "faces": {},
+      "placeholder": { "initials": "S", "hair": "none" }
+    }
+  }
+}
