@@ -164,7 +164,8 @@ export const S13Finale: React.FC<SceneProps> = ({ slot }) => {
     <AbsoluteFill style={{ background: PAPER }}>
       {!inHero && partA}
       {!inHero && (
-        <Shout frame={frame} x={1180} y={250} size={130} speaker="MICHAEL" lines={[c.words.slice(0, 2).map((w, i) => ({ text: w, at: c.say[i] })), c.words.slice(2).map((w, i) => ({ text: w, at: c.say[i + 2] }))]} />
+        // one word per line, over the right-hand window — clear of the logo wall, right above Michael
+        <Shout frame={frame} x={1600} y={182} size={108} speaker="MICHAEL" lines={c.words.map((w, i) => [{ text: w, at: c.say[i] }])} />
       )}
       {inHero && partB}
       {inLogo && <Logo frame={frame} at={c.logo} />}

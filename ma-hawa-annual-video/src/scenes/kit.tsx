@@ -1,7 +1,7 @@
 // Shared scene kit: kinetic captions, floor pump, sticky notes, stage (set + camera + light).
 import React from "react";
 import { AbsoluteFill, Easing, interpolate } from "remotion";
-import { clamp01, popIn, rand } from "../fx/anim";
+import { clamp01, easeInOut, popIn, rand } from "../fx/anim";
 import { ACCENT, FONT, INK, PAPER, STROKE } from "../theme";
 import { BEAT_FRAMES, beatPhase } from "../sync/beats";
 import { Cam, CAM0, Lighting, Office, OfficeVariant, camTransform } from "../world/Office";
@@ -56,10 +56,15 @@ export const W: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 
 // ------------------------------------------------------------------ kinetic caption
 export type ShoutWord = { text: string; at: number };
-/**
- * Big kinetic words that slam in on their beats. `lines` = rows of words.
- * Last word of the last line is highlighted in the brand blue.
- */
+/** advance widths of Poppins Black (em units, measured from the font file), so kinetic words sit snugly and never collide */
+const CAP_W: Record<string, number> = {
+  A: 0.773, B: 0.684, C: 0.753, D: 0.743, E: 0.556, F: 0.575, G: 0.752, H: 0.755, I: 0.322, J: 0.59, K: 0.755, L: 0.506, M: 0.951,
+  N: 0.779, O: 0.788, P: 0.649, Q: 0.788, R: 0.67, S: 0.625, T: 0.616, U: 0.719, V: 0.763, W: 1.1, X: 0.764, Y: 0.73, Z: 0.63,
+  "!": 0.455, ",": 0.342, ".": 0.319, "?": 0.538, "'": 0.265, "…": 0.869, " ": 0.17,
+};
+const wordWidth = (t: string, size: number) => [...t].reduce((a, ch) => a + size * (CAP_W[ch] ?? (/[0-9]/.test(ch) ? 0.662 : 0.617)), 0);
+const WORD_GAP = 0.24;
+
 export const Shout: React.FC<{
   frame: number;
   x: number;
@@ -74,7 +79,6 @@ export const Shout: React.FC<{
   if (frame < first - 1) return null;
   const out = frame > hideAt ? clamp01((frame - hideAt) / 6) : 0;
   if (out >= 1) return null;
-  const cw = size * 0.66;
   const lh = size * 1.02;
   return (
     <svg width={1920} height={1080} style={{ position: "absolute", left: 0, top: 0, overflow: "visible", opacity: 1 - out }}>
@@ -88,13 +92,13 @@ export const Shout: React.FC<{
           </g>
         )}
         {lines.map((line, li) => {
-          const widths = line.map((w) => w.text.length * cw);
-          const total = widths.reduce((a, b) => a + b, 0) + (line.length - 1) * size * 0.28;
+          const widths = line.map((w) => wordWidth(w.text, size));
+          const total = widths.reduce((a, b) => a + b, 0) + (line.length - 1) * size * WORD_GAP;
           let cx = -total / 2;
           return line.map((w, wi) => {
             const ww = widths[wi];
             const mid = cx + ww / 2;
-            cx += ww + size * 0.28;
+            cx += ww + size * WORD_GAP;
             if (frame < w.at - 1) return null;
             const k = popIn(frame, w.at - 1, 520, 13);
             const s = 1 + (1 - k) * 0.9;
@@ -102,6 +106,10 @@ export const Shout: React.FC<{
             const jitter = frame - w.at < 6 ? (rand(frame + wi) - 0.5) * 6 : 0;
             return (
               <g key={`${li}-${wi}`} transform={`translate(${mid + jitter} ${li * lh}) scale(${s}) rotate(${(rand(wi + li * 7) - 0.5) * 6})`} opacity={clamp01(k * 3)}>
+                {/* sticker outline: keeps the words legible over any background */}
+                <text textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={size} fill={PAPER} stroke={PAPER} strokeWidth={size * 0.24} strokeLinejoin="round">
+                  {w.text}
+                </text>
                 <text x={10} y={10} textAnchor="middle" fontFamily={FONT} fontWeight={900} fontSize={size} fill={ACCENT} opacity={0.9}>
                   {w.text}
                 </text>
@@ -244,10 +252,13 @@ export const Subtitle: React.FC<{ frame: number; at: number; frames: number; spe
 };
 
 /** small chapter label, top-left (who / where) */
-export const Chapter: React.FC<{ frame: number; title: string; sub?: string; dark?: boolean }> = ({ frame, title, sub, dark }) => {
+/** scene label, top-left; slides in, then steps aside after ~3 s so it never fights the action */
+export const Chapter: React.FC<{ frame: number; title: string; sub?: string; dark?: boolean; hold?: number }> = ({ frame, title, sub, dark, hold = 84 }) => {
   const k = popIn(frame, 1, 220, 18);
+  const out = easeInOut(clamp01((frame - hold) / 12));
+  if (out >= 1) return null;
   return (
-    <div style={{ position: "absolute", left: 56, top: 48, fontFamily: FONT, opacity: clamp01(k * 2), transform: `translateX(${(1 - k) * -60}px)` }}>
+    <div style={{ position: "absolute", left: 56, top: 48, fontFamily: FONT, opacity: clamp01(k * 2) * (1 - out), transform: `translateX(${(1 - k) * -60 - out * 40}px)` }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <span style={{ width: 14, height: 54, background: ACCENT, borderRadius: 4 }} />
         <span style={{ fontWeight: 900, fontSize: 52, letterSpacing: 6, color: dark ? PAPER : INK }}>{title}</span>

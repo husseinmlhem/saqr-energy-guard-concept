@@ -123,8 +123,9 @@ export const S03Bonk: React.FC<SceneProps> = ({ slot }) => {
       <Shout
         frame={frame}
         x={900}
-        y={230}
+        y={288}
         size={150}
+        rotate={-1.5}
         speaker="MICHAEL"
         lines={[[{ text: VIDEO.lines.bonk.split(" ").slice(0, 2).join(" "), at: c.words[0] }, { text: VIDEO.lines.bonk.split(" ").slice(2).join(" "), at: c.words[1] }]]}
       />

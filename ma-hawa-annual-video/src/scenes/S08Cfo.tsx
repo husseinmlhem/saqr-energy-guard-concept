@@ -61,7 +61,7 @@ const RequestCard: React.FC<{ frame: number; c: ReturnType<typeof cfoCues> }> = 
   const stamp = frame >= c.approve ? popIn(frame, c.approve - 1, 500, 12) : 0;
   const away = easeInOut(clamp01((frame - c.approve - BEAT_FRAMES * 1.5) / 10));
   return (
-    <div style={{ position: "absolute", left: 90, top: 140, width: 560, transform: `translate(${-away * 700}px, ${(1 - k) * 60}px) rotate(${-2 + (1 - k) * 4}deg)`, opacity: clamp01(k * 2), fontFamily: FONT }}>
+    <div style={{ position: "absolute", right: 90, top: 170, width: 560, transform: `translate(${away * 760}px, ${(1 - k) * 60}px) rotate(${2 - (1 - k) * 4}deg)`, opacity: clamp01(k * 2), fontFamily: FONT }}>
       <div style={{ background: PAPER, border: `${STROKE}px solid ${INK}`, borderRadius: 16, padding: "30px 34px", boxShadow: `14px 14px 0 rgba(118,173,222,0.55)` }}>
         <div style={{ fontWeight: 900, fontSize: 34, letterSpacing: 3, color: INK }}>BUDGET REQUEST</div>
         <div style={{ fontWeight: 700, fontSize: 20, color: "#7A8496", marginTop: 4, letterSpacing: 3 }}>MA HAWA · EVENTS SEASON</div>
@@ -83,7 +83,7 @@ const RequestCard: React.FC<{ frame: number; c: ReturnType<typeof cfoCues> }> = 
         </div>
       </div>
       {stamp > 0 && (
-        <div style={{ position: "absolute", left: 120, top: 150, transform: `rotate(-14deg) scale(${1 + (1 - stamp) * 1.4})`, opacity: clamp01(stamp * 3), border: "10px solid #2E9E5B", color: "#2E9E5B", borderRadius: 16, padding: "8px 28px", fontWeight: 900, fontSize: 84, letterSpacing: 8, background: "rgba(255,255,255,0.75)" }}>
+        <div style={{ position: "absolute", left: 0, top: 160, transform: `rotate(-12deg) scale(${1 + (1 - stamp) * 1.4})`, opacity: clamp01(stamp * 3), border: "10px solid #2E9E5B", color: "#2E9E5B", borderRadius: 16, padding: "6px 24px", fontWeight: 900, fontSize: 70, letterSpacing: 7, background: "rgba(255,255,255,0.75)" }}>
           APPROVED
         </div>
       )}
@@ -100,8 +100,8 @@ export const S08Cfo: React.FC<SceneProps> = ({ slot }) => {
   const cam = camAt(frame, [
     [0, { x: 900, y: 540, zoom: 1.0 }],
     [c.folder, { x: 980, y: 540, zoom: 1.02 }],
-    [c.review + 4, { x: 1300, y: 500, zoom: 1.25 }],
-    [c.approve + 6, { x: 1280, y: 505, zoom: 1.22 }],
+    [c.review + 4, { x: 1780, y: 500, zoom: 1.3 }],
+    [c.approve + 6, { x: 1800, y: 505, zoom: 1.27 }],
     [Math.round(c.approve + BEAT_FRAMES * 1.6), { x: 960, y: 540, zoom: 1.0 }],
   ]);
   // Saeed: relaxed, a light chuckle at his phone (small shoulder bounce) → focused, reading → calm nod

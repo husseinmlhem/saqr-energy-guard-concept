@@ -19,7 +19,7 @@ const ROWS = [
   { name: "Content", start: 0.35, len: 0.4, color: "#7B61C4" },
   { name: "Event day", start: 0.78, len: 0.16, color: GOLD },
 ];
-const BOARD = { x: 110, y: 110, w: 1060, h: 560 };
+const BOARD = { x: 200, y: 170, w: 980, h: 500 };
 const AX = 1440;
 const G = 1010;
 
@@ -54,11 +54,11 @@ const Gantt: React.FC<{ frame: number; c: ReturnType<typeof amrCues> }> = ({ fra
           <text x={lx + (i + 0.5) * (cw / 6)} y={y + 120} textAnchor="middle" fontFamily={FONT} fontWeight={700} fontSize={22} fill="#7A8496">
             {wk}
           </text>
-          <line x1={lx + i * (cw / 6)} x2={lx + i * (cw / 6)} y1={y + 136} y2={y + h - 30} stroke="#E3E8EF" strokeWidth={3} />
+          <line x1={lx + i * (cw / 6)} x2={lx + i * (cw / 6)} y1={y + 136} y2={y + h - 24} stroke="#E3E8EF" strokeWidth={3} />
         </g>
       ))}
       {ROWS.map((r, i) => {
-        const ry = y + 170 + i * 92;
+        const ry = y + 150 + i * 80;
         const k = easeOut(clamp01((frame - c.rows[i] + 2) / 8));
         return (
           <g key={r.name}>
@@ -114,7 +114,7 @@ export const S09Amr: React.FC<SceneProps> = ({ slot }) => {
           <Gantt frame={frame} c={c} />
           {/* client call card */}
           {frame >= c.call && onPhone && (
-            <g transform={`translate(1180 230) scale(${popIn(frame, c.call, 300, 16)})`}>
+            <g transform={`translate(1215 250) scale(${popIn(frame, c.call, 300, 16)})`}>
               <rect x={-10} y={-50} width={270} height={100} rx={22} fill={INK} />
               <circle cx={44} cy={0} r={28} fill="#3FBF6F" />
               <path d="M 32 -10 q 0 24 24 24 l 6 -8 l -8 -6 l -5 4 q -8 -4 -11 -11 l 4 -5 l -6 -8 Z" fill={PAPER} />

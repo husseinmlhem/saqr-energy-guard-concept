@@ -125,7 +125,7 @@ export const S02Stop: React.FC<SceneProps> = ({ slot }) => {
           </W>
         )}
       </Stage>
-      <Shout frame={frame} x={760} y={250} size={150} speaker="MICHAEL" lines={[[{ text: VIDEO.lines.stop.split(" ")[0], at: c.words[0] }, { text: VIDEO.lines.stop.split(" ").slice(1).join(" "), at: c.words[1] }]]} hideAt={c.squint} />
+      <Shout frame={frame} x={760} y={292} size={150} rotate={-1.5} speaker="MICHAEL" lines={[[{ text: VIDEO.lines.stop.split(" ")[0], at: c.words[0] }, { text: VIDEO.lines.stop.split(" ").slice(1).join(" "), at: c.words[1] }]]} hideAt={c.squint} />
       <NameTag frame={frame} at={c.enter + 2} x={1560} y={140} text={charCfg("michael").tag ?? "Michael"} />
       <AbsoluteFill style={{ background: "rgba(10,20,40,0.12)", opacity: frame < c.leave ? lin(frame, [0, 4], [0, 1]) : 1 - lin(frame, [c.leave, c.leave + 6], [0, 1]), pointerEvents: "none" }} />
     </AbsoluteFill>
