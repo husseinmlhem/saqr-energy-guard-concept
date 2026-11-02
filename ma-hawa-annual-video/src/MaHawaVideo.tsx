@@ -1,6 +1,6 @@
 // The 60-second video: scenes on downbeat-snapped slots, music, beat-locked SFX, optional debug overlay.
 import React, { useEffect, useMemo, useState } from "react";
-import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, prefetch, staticFile } from "remotion";
+import { AbsoluteFill, Audio, Sequence, continueRender, delayRender, prefetch, staticFile, useCurrentFrame } from "remotion";
 import { allFacePaths } from "./characters/config";
 import { BeatDebug } from "./debug/BeatDebug";
 import { SCENES } from "./scenes";
@@ -9,6 +9,18 @@ import { PLAN, VIDEO } from "./sync/timeline";
 import { PAPER } from "./theme";
 
 export type MaHawaProps = { debug: boolean; sfx?: boolean };
+
+/** every cut lands on a downbeat: give it a little zoom-punch and a flash so it hits like the music */
+const CutPunch: React.FC<{ children: React.ReactNode; enabled: boolean }> = ({ children, enabled }) => {
+  const f = useCurrentFrame();
+  const k = enabled ? Math.exp(-f / 4) : 0;
+  return (
+    <AbsoluteFill>
+      <AbsoluteFill style={{ transform: `scale(${1 + 0.035 * k})` }}>{children}</AbsoluteFill>
+      {enabled && f < 8 && <AbsoluteFill style={{ background: "#FFFFFF", opacity: 0.35 * Math.exp(-f / 2), pointerEvents: "none" }} />}
+    </AbsoluteFill>
+  );
+};
 
 /** decode every face before the first frame so heads never pop in blank */
 const usePreloadedFaces = () => {
@@ -41,7 +53,9 @@ export const MaHawaVideo: React.FC<MaHawaProps> = ({ debug, sfx }) => {
         const { Component } = SCENES[slot.id];
         return (
           <Sequence key={slot.id} from={slot.from} durationInFrames={slot.durationInFrames} name={`${slot.title}`}>
-            <Component slot={slot} />
+            <CutPunch enabled={slot.from > 0 && slot.id !== "events"}>
+              <Component slot={slot} />
+            </CutPunch>
           </Sequence>
         );
       })}

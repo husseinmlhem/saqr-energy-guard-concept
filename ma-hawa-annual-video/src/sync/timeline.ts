@@ -1,22 +1,26 @@
 // Timeline solver: turns config/beats.json + config/video.json into scene slots.
 //
-// Rules (from the brief):
+// Rules:
 //  * every scene cut lands on a downbeat
-//  * the CEO's entrance lands on a quiet part / hard break
-//  * the hero shot lands on the biggest drop (late in the video)
-//  * order is fixed; target lengths are only a guide
+//  * Michael's "STOP PLAYING!" scene starts on a hard break / quiet part
+//  * the hero shot (in the finale) lands on the biggest drop
+//  * order is fixed; target lengths are a guide — the rest is fitted by dynamic programming
 import videoJson from "../../config/video.json";
-import {
-  BEATS,
-  BEAT_FRAMES,
-  BEAT_FRAMES_INT,
-  DOWNBEAT_FRAMES,
-  DURATION_IN_FRAMES,
-  FPS,
-  energyAt,
-} from "./beats";
+import { BEATS, BEAT_FRAMES, BEAT_FRAMES_INT, DOWNBEAT_FRAMES, DURATION_IN_FRAMES, FPS, energyAt } from "./beats";
 
-export type SceneId = "playtime" | "ceo" | "huddle" | "cfo" | "hardwork" | "events" | "finale";
+export type SceneId =
+  | "title"
+  | "pump"
+  | "stop"
+  | "bonk"
+  | "brainstorm"
+  | "moreCreative"
+  | "creative"
+  | "pitch"
+  | "cfo"
+  | "execute"
+  | "events"
+  | "finale";
 
 export type SceneSlot = {
   id: SceneId;
@@ -28,22 +32,22 @@ export type SceneSlot = {
   beats: number[];
   /** downbeat frames relative to the scene start */
   downbeats: number[];
-  /** named anchor frames relative to the scene start (e.g. hero, logo, door) */
+  /** named anchor frames relative to the scene start (e.g. hero, logo) */
   anchors: Record<string, number>;
 };
 
 export type Plan = {
   scenes: SceneSlot[];
-  anchors: { ceoEnter: number; heroDrop: number; logo: number; finaleStart: number };
+  anchors: { stop: number; heroDrop: number; logo: number; finaleStart: number };
   reasons: string[];
 };
 
-type SceneCfg = { id: SceneId; title: string; target: number; minSeconds: number };
+type SceneCfg = { id: SceneId; title: string; target: number; minSeconds: number; anchor?: "break" };
 export const VIDEO = videoJson as unknown as {
   scenes: SceneCfg[];
   anchors: {
-    ceoTarget: number;
-    ceoWindow: [number, number];
+    breakTarget: number;
+    breakWindow: [number, number];
     heroWindowFraction: [number, number];
     finaleLeadIn: number;
     logoSeconds: number;
@@ -51,7 +55,10 @@ export const VIDEO = videoJson as unknown as {
   events: { name: string; years?: string[] }[];
   award: string;
   eventCount: number;
-  lines: { ceo: string; budgetSign: string; finale: string };
+  lines: { stop: string; bonk: string; moreCreative: string; pitchOk: string; budget: string; finale: string };
+  ideas: string[];
+  pitchSlides: { title: string; kind: string }[];
+  title: { main: string; sub: string };
   brand: { name: string; logo: string | null; accent: string; ink: string; paper: string; gold: string };
   audio: { musicVolume: number; sfx: boolean; sfxVolume: number };
 };
@@ -61,11 +68,9 @@ const BAR = BEAT_FRAMES * 4;
 const sec = (s: number) => Math.round(s * FPS);
 
 /** number of stamp hits the Events scene needs (one per beat) */
-export const eventStampCount = () =>
-  VIDEO.events.reduce((n, e) => n + (e.years?.length ?? 1), 0);
-
-/** beats the Events scene needs: one stamp per beat, badge on the next beat, counter lands on the next downbeat, short hold */
-const eventsBeatsNeeded = () => Math.ceil((eventStampCount() + 3) / 4) * 4 + 2;
+export const eventStampCount = () => VIDEO.events.reduce((n, e) => n + (e.years?.length ?? 1), 0);
+/** stamps, badge on the next beat, counter over the next two beats, a beat of hold */
+const eventsBeatsNeeded = () => eventStampCount() + 3;
 
 const nearest = (arr: number[], target: number, lo = -Infinity, hi = Infinity) => {
   let best: number | null = null;
@@ -76,23 +81,71 @@ const nearest = (arr: number[], target: number, lo = -Infinity, hi = Infinity) =
   return best;
 };
 
+/**
+ * Place `scenes` back to back between `start` and `end`, every cut on a downbeat,
+ * as close as possible to their (proportionally scaled) targets. Classic DP over downbeats.
+ */
+const fitSegment = (scenes: SceneCfg[], start: number, end: number, downs: number[], reasons: string[]): number[] => {
+  const k = scenes.length;
+  if (k === 1) return [start, end];
+  const avail = end - start;
+  const tgtSum = scenes.reduce((a, s) => a + s.target, 0);
+  const tgt = scenes.map((s) => (s.target / tgtSum) * avail);
+  const mins = scenes.map((s) => (s.id === "events" ? Math.max(sec(s.minSeconds), Math.round(eventsBeatsNeeded() * BEAT_FRAMES)) : sec(s.minSeconds)));
+  const pts = [start, ...downs.filter((f) => f > start + 2 && f < end - 2), end];
+  const n = pts.length;
+  const cost = (i: number, a: number, b: number) => {
+    const dur = pts[b] - pts[a];
+    let c = ((dur - tgt[i]) / FPS) ** 2 / scenes[i].target;
+    if (dur < mins[i] - BAR * 0.5) c += 1000 + (mins[i] - dur);
+    return c;
+  };
+  // dp[i][j]: best cost with the first i scenes ending at pts[j]
+  const dp = Array.from({ length: k + 1 }, () => new Array(n).fill(Infinity));
+  const prev = Array.from({ length: k + 1 }, () => new Array(n).fill(-1));
+  dp[0][0] = 0;
+  for (let i = 1; i <= k; i++)
+    for (let j = 1; j < n; j++) {
+      if (i === k && j !== n - 1) continue;
+      for (let a = 0; a < j; a++) {
+        if (dp[i - 1][a] === Infinity) continue;
+        const c = dp[i - 1][a] + cost(i - 1, a, j);
+        if (c < dp[i][j]) {
+          dp[i][j] = c;
+          prev[i][j] = a;
+        }
+      }
+    }
+  if (dp[k][n - 1] === Infinity) {
+    reasons.push("warning: not enough downbeats — scenes split evenly");
+    return Array.from({ length: k + 1 }, (_, i) => Math.round(start + (avail * i) / k));
+  }
+  if (dp[k][n - 1] >= 1000) reasons.push(`warning: ${scenes.map((s) => s.id).join("/")} squeezed below their minimums`);
+  const cuts: number[] = [];
+  let j = n - 1;
+  for (let i = k; i > 0; i--) {
+    cuts.unshift(pts[j]);
+    j = prev[i][j];
+  }
+  return [start, ...cuts];
+};
+
 export const solvePlan = (): Plan => {
   const reasons: string[] = [];
   const downs = DOWNBEAT_FRAMES.filter((f) => f > 0 && f < D);
   const cfg = VIDEO.anchors;
 
-  // ---- 1. hero shot = biggest drop late in the video -------------------------
+  // ---- 1. hero shot = biggest drop late in the video
   const [h0, h1] = cfg.heroWindowFraction;
   const heroLo = D * h0;
-  const heroHi = Math.min(D * h1, D - sec(2.5));
+  const heroHi = Math.min(D * h1, D - sec(3));
   const dropCands = BEATS.drops.filter((d) => d.f >= heroLo && d.f <= heroHi);
   let hero: number;
   if (dropCands.length) {
     const best = dropCands.reduce((a, b) => (b.strength > a.strength ? b : a));
     hero = nearest(downs, best.f) ?? best.f;
-    reasons.push(`hero shot on biggest drop @ ${(best.t).toFixed(2)}s (strength ${best.strength})`);
+    reasons.push(`hero shot on the biggest drop @ ${best.t.toFixed(2)}s (strength ${best.strength})`);
   } else {
-    // fallback: downbeat with the largest energy rise in the window
     let bestF = nearest(downs, D * 0.85) ?? Math.round(D * 0.85);
     let bestRise = -Infinity;
     for (const f of downs) {
@@ -104,100 +157,49 @@ export const solvePlan = (): Plan => {
       }
     }
     hero = bestF;
-    reasons.push(`no drop found late in the track — hero on biggest energy rise @ ${(hero / FPS).toFixed(2)}s`);
+    reasons.push(`no drop late in the track — hero on the biggest energy rise @ ${(hero / FPS).toFixed(2)}s`);
   }
 
-  // ---- 2. logo near the end ----------------------------------------------------
-  const logo =
-    nearest(downs, D - sec(cfg.logoSeconds), hero + sec(2.5), D - sec(2.2)) ??
-    Math.min(D - sec(2.5), Math.max(hero + sec(2), D - sec(cfg.logoSeconds)));
+  // ---- 2. logo near the end, finale lead-in before the drop
+  const logo = nearest(downs, D - sec(cfg.logoSeconds), hero + sec(2.5), D - sec(2.2)) ?? Math.min(D - sec(2.5), hero + sec(4));
+  const finaleStart = nearest(downs, hero - sec(cfg.finaleLeadIn), hero - sec(6), hero - sec(1.5)) ?? Math.max(0, hero - sec(2.5));
 
-  // ---- 3. finale starts a few bars before the hero drop ----------------------
-  const finaleStart =
-    nearest(downs, hero - sec(cfg.finaleLeadIn), hero - sec(9), hero - sec(3)) ??
-    Math.max(0, hero - sec(4));
-
-  // ---- 4. CEO entrance on a hard break / quiet part --------------------------
-  const [c0, c1] = cfg.ceoWindow;
+  // ---- 3. "STOP PLAYING!" on a hard break / quiet part
+  const [b0, b1] = cfg.breakWindow;
   const gauss = (x: number, mu: number, s: number) => Math.exp(-((x - mu) ** 2) / (2 * s * s));
-  type Cand = { f: number; score: number; why: string };
-  const cands: Cand[] = [];
-  for (const b of BEATS.breaks)
-    if (b.t >= c0 && b.t <= c1) cands.push({ f: b.f, score: Math.min(1, b.strength * 2) * gauss(b.t, cfg.ceoTarget, 4), why: "hard break" });
-  for (const q of BEATS.quiet)
-    if (q.start >= c0 && q.start <= c1) cands.push({ f: q.f, score: 0.6 * gauss(q.start, cfg.ceoTarget, 4), why: "quiet part" });
-  let ceo: number;
-  const latestCeo = finaleStart - sec(25);
-  const okCands = cands.filter((c) => c.f < latestCeo);
-  if (okCands.length) {
-    const best = okCands.reduce((a, b) => (b.score > a.score ? b : a));
-    ceo = nearest(downs, best.f) ?? best.f;
-    reasons.push(`CEO enters on ${best.why} @ ${(ceo / FPS).toFixed(2)}s`);
+  const cands: { f: number; score: number; why: string }[] = [];
+  for (const b of BEATS.breaks) if (b.t >= b0 && b.t <= b1) cands.push({ f: b.f, score: Math.min(1, b.strength * 2) * gauss(b.t, cfg.breakTarget, 5), why: "hard break" });
+  for (const q of BEATS.quiet) if (q.start >= b0 && q.start <= b1) cands.push({ f: q.f, score: 0.6 * gauss(q.start, cfg.breakTarget, 5), why: "quiet part" });
+  let stop: number;
+  if (cands.length) {
+    const best = cands.reduce((a, b) => (b.score > a.score ? b : a));
+    stop = nearest(downs, best.f) ?? best.f;
+    reasons.push(`"STOP PLAYING!" on a ${best.why} @ ${(stop / FPS).toFixed(2)}s`);
   } else {
-    ceo = nearest(downs, sec(cfg.ceoTarget), sec(3), latestCeo) ?? sec(cfg.ceoTarget);
-    reasons.push(`no break/quiet part early in the track — CEO on downbeat @ ${(ceo / FPS).toFixed(2)}s`);
+    stop = nearest(downs, sec(cfg.breakTarget)) ?? sec(cfg.breakTarget);
+    reasons.push(`no break near ${cfg.breakTarget}s — "STOP PLAYING!" on a downbeat @ ${(stop / FPS).toFixed(2)}s`);
   }
 
-  // ---- 5. middle scenes: brute-force the downbeats that best fit the targets --
-  const mid = VIDEO.scenes.filter((s) => ["ceo", "huddle", "cfo", "hardwork", "events"].includes(s.id));
-  const mins = mid.map((s) => sec(s.minSeconds));
-  const evIdx = mid.findIndex((s) => s.id === "events");
-  mins[evIdx] = Math.max(mins[evIdx], Math.round(eventsBeatsNeeded() * BEAT_FRAMES));
-  const avail = finaleStart - ceo;
-  const tgtSum = mid.reduce((a, s) => a + s.target, 0);
-  const tgts = mid.map((s) => (s.target / tgtSum) * avail);
-  const M = downs.filter((f) => f > ceo && f < finaleStart);
-  let best: { cost: number; cuts: number[] } | null = null;
-  const n = M.length;
-  for (let a = 0; a < n; a++)
-    for (let b = a + 1; b < n; b++)
-      for (let c = b + 1; c < n; c++)
-        for (let d = c + 1; d < n; d++) {
-          const cuts = [ceo, M[a], M[b], M[c], M[d], finaleStart];
-          let cost = 0;
-          for (let i = 0; i < 5; i++) {
-            const dur = cuts[i + 1] - cuts[i];
-            cost += ((dur - tgts[i]) / FPS) ** 2 / mid[i].target;
-            // minimums are soft by half a bar: cuts can only move in whole bars
-            if (dur < mins[i] - BAR * 0.5) cost += 1000 + (mins[i] - dur);
-          }
-          if (!best || cost < best.cost) best = { cost, cuts };
-        }
-  let cuts: number[];
-  if (best) {
-    cuts = best.cuts;
-    if (best.cost >= 1000) reasons.push("warning: track too short for every scene's minimum — some scenes are squeezed");
-  } else {
-    // not enough downbeats (very slow song): split evenly on beats
-    cuts = [ceo];
-    for (let i = 1; i < 5; i++) cuts.push(ceo + Math.round((avail * mid.slice(0, i).reduce((x, s) => x + s.target, 0)) / tgtSum));
-    cuts.push(finaleStart);
-    reasons.push("warning: not enough downbeats — middle cuts placed on nearest beats");
-  }
+  // ---- 4. fit the rest onto downbeats
+  const sc = VIDEO.scenes;
+  const iStop = sc.findIndex((s) => s.anchor === "break");
+  const iFinale = sc.findIndex((s) => s.id === "finale");
+  const before = fitSegment(sc.slice(0, iStop), 0, stop, downs, reasons);
+  const middle = fitSegment(sc.slice(iStop, iFinale), stop, finaleStart, downs, reasons);
+  const bounds = [...before.slice(0, -1), ...middle, D];
 
-  const bounds = [0, ...cuts, D];
-  const order: SceneId[] = ["playtime", "ceo", "huddle", "cfo", "hardwork", "events", "finale"];
-  const scenes: SceneSlot[] = order.map((id, i) => {
+  const scenes: SceneSlot[] = sc.map((s, i) => {
     const from = bounds[i];
     const to = bounds[i + 1];
-    const cfgS = VIDEO.scenes.find((s) => s.id === id)!;
     const rel = (arr: number[]) => arr.filter((f) => f >= from && f < to).map((f) => f - from);
     const anchors: Record<string, number> = {};
-    if (id === "finale") {
+    if (s.id === "finale") {
       anchors.hero = hero - from;
       anchors.logo = logo - from;
     }
-    return {
-      id,
-      title: cfgS.title,
-      from,
-      durationInFrames: to - from,
-      beats: rel(BEAT_FRAMES_INT),
-      downbeats: rel(DOWNBEAT_FRAMES),
-      anchors,
-    };
+    return { id: s.id, title: s.title, from, durationInFrames: to - from, beats: rel(BEAT_FRAMES_INT), downbeats: rel(DOWNBEAT_FRAMES), anchors };
   });
-  return { scenes, anchors: { ceoEnter: ceo, heroDrop: hero, logo, finaleStart }, reasons };
+  return { scenes, anchors: { stop, heroDrop: hero, logo, finaleStart }, reasons };
 };
 
 export const PLAN = solvePlan();
@@ -209,7 +211,6 @@ export const beatOf = (slot: SceneSlot, n: number): number => {
   if (!b.length) return 0;
   if (n < 0) return b[Math.max(0, b.length + n)];
   if (n < b.length) return b[n];
-  // past the end: extrapolate on the grid
   return Math.round(b[b.length - 1] + (n - b.length + 1) * BEAT_FRAMES);
 };
 
@@ -219,18 +220,12 @@ export const beatAtFraction = (slot: SceneSlot, frac: number): number => {
   return slot.beats.reduce((a, b) => (Math.abs(b - target) < Math.abs(a - target) ? b : a), slot.beats[0] ?? 0);
 };
 
-/** index of the beat closest to a fraction of the scene */
-export const beatIndexAtFraction = (slot: SceneSlot, frac: number): number => {
-  const f = beatAtFraction(slot, frac);
-  return Math.max(0, slot.beats.indexOf(f));
-};
+export const beatIndexAtFraction = (slot: SceneSlot, frac: number): number => Math.max(0, slot.beats.indexOf(beatAtFraction(slot, frac)));
 
 /** first beat at or after a relative frame */
-export const beatAtOrAfter = (slot: SceneSlot, frame: number): number =>
-  slot.beats.find((b) => b >= frame - 0.5) ?? Math.round(frame);
+export const beatAtOrAfter = (slot: SceneSlot, frame: number): number => slot.beats.find((b) => b >= frame - 0.5) ?? Math.round(frame);
 
 /** first downbeat at or after a relative frame */
-export const downbeatAtOrAfter = (slot: SceneSlot, frame: number): number =>
-  slot.downbeats.find((b) => b >= frame - 0.5) ?? beatAtOrAfter(slot, frame);
+export const downbeatAtOrAfter = (slot: SceneSlot, frame: number): number => slot.downbeats.find((b) => b >= frame - 0.5) ?? beatAtOrAfter(slot, frame);
 
 export const BAR_FRAMES = BAR;

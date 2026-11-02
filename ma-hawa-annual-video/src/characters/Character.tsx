@@ -104,6 +104,7 @@ export const Character: React.FC<CharacterProps> = (p) => {
   const wind = p.wind ?? 0;
   const o = outfitOf(p.id);
   const armsFront = !!p.pose.armsFront;
+  const armsBack = !!p.pose.armsBack;
 
   const transform = [
     `translate(${p.x}px, ${p.y}px)`,
@@ -136,30 +137,32 @@ export const Character: React.FC<CharacterProps> = (p) => {
           </pattern>
         </defs>
         {(p.shadow ?? rot === 0) && <ellipse cx={(sk.footL.x + sk.footR.x) / 2} cy={4} rx={Math.abs(sk.footR.x - sk.footL.x) / 2 + 52} ry={10} fill="rgba(20,30,50,0.10)" />}
+        {armsBack && props}
+        {armsBack && arms}
         <Legs sk={sk} d={d} o={o} sw={sw} body={body} />
         <Neck sk={sk} o={o} sw={sw} w={body === "muscle" ? 40 : 28} />
         <Torso sk={sk} d={d} o={o} sw={sw} body={body} id={p.id} wind={wind} frame={frame} />
         {body === "money" && !p.back && <GhutraDrape hc={hc} r={r} sw={sw} wind={wind} frame={frame} sk={sk} />}
-        {!armsFront && arms}
-        {!face && <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} />}
-        {!armsFront && props}
+        {!armsFront && !armsBack && arms}
+        {!face && !p.back && <circle cx={hc.x} cy={hc.y} r={r} fill={PAPER} />}
+        {!armsFront && !armsBack && props}
       </svg>
       {face && <PhotoHead src={face} hc={hc} r={r} tilt={tilt} flip={flip} sw={sw} />}
       <svg width={1} height={1} style={svgStyle}>
         <g transform={`rotate(${tilt} ${pivot.x} ${pivot.y})`}>
           {p.back ? (
-            <BackOfHead hc={hc} r={r} sw={sw} body={body} />
+            <BackOfHead hc={hc} r={r} sw={sw} body={body} skin={o.skin} />
           ) : face ? null : (
             <PlaceholderHead id={p.id} hc={hc} r={r} sw={sw} expression={expression} flip={flip} />
           )}
           {body === "money" && !p.back && !face && <GhutraFront hc={hc} r={r} sw={sw} />}
-          {body === "genius" && (p.goggles ?? "forehead") !== "none" && (
+          {body === "genius" && (p.goggles ?? "none") !== "none" && (
             <g transform={`translate(${hc.x} ${hc.y})`}>
               <Goggles
                 r={r}
                 sw={sw}
                 eyes={[CHARS.faceGeometry.leftEye, CHARS.faceGeometry.rightEye]}
-                mode={(p.goggles ?? "forehead") as "eyes" | "forehead"}
+                mode={(p.goggles ?? "none") as "eyes" | "forehead"}
                 glow={p.gogglesGlow}
               />
             </g>
@@ -461,7 +464,7 @@ const GhutraFront: React.FC<{ hc: Pt; r: number; sw: number }> = ({ hc, r, sw })
   </g>
 );
 
-const BackOfHead: React.FC<{ hc: Pt; r: number; sw: number; body: string }> = ({ hc, r, sw, body }) =>
+const BackOfHead: React.FC<{ hc: Pt; r: number; sw: number; body: string; skin: string }> = ({ hc, r, sw, body, skin }) =>
   body === "money" ? (
     <g>
       <path
@@ -478,7 +481,20 @@ const BackOfHead: React.FC<{ hc: Pt; r: number; sw: number; body: string }> = ({
     </g>
   ) : (
     <g>
-      <ellipse cx={hc.x} cy={hc.y} rx={r * 0.72} ry={r * 0.85} fill="#2A2420" stroke={INK} strokeWidth={sw} />
+      {/* ears */}
+      <ellipse cx={hc.x - r * 0.7} cy={hc.y + r * 0.05} rx={r * 0.12} ry={r * 0.2} fill={skin} stroke={INK} strokeWidth={sw * 0.8} />
+      <ellipse cx={hc.x + r * 0.7} cy={hc.y + r * 0.05} rx={r * 0.12} ry={r * 0.2} fill={skin} stroke={INK} strokeWidth={sw * 0.8} />
+      {/* head + nape */}
+      <ellipse cx={hc.x} cy={hc.y} rx={r * 0.68} ry={r * 0.82} fill={skin} stroke={INK} strokeWidth={sw} />
+      {/* hair: covers the crown and the back, short at the nape */}
+      <path
+        d={`M ${hc.x - r * 0.69} ${hc.y + r * 0.1} Q ${hc.x - r * 0.75} ${hc.y - r * 0.85} ${hc.x} ${hc.y - r * 0.86} Q ${hc.x + r * 0.75} ${hc.y - r * 0.85} ${hc.x + r * 0.69} ${hc.y + r * 0.1} Q ${hc.x + r * 0.5} ${hc.y + r * 0.62} ${hc.x} ${hc.y + r * 0.6} Q ${hc.x - r * 0.5} ${hc.y + r * 0.62} ${hc.x - r * 0.69} ${hc.y + r * 0.1} Z`}
+        fill="#24201D"
+        stroke={INK}
+        strokeWidth={sw}
+        strokeLinejoin="round"
+      />
+      <path d={`M ${hc.x - r * 0.3} ${hc.y - r * 0.55} Q ${hc.x} ${hc.y - r * 0.68} ${hc.x + r * 0.3} ${hc.y - r * 0.55}`} fill="none" stroke="#4A433D" strokeWidth={sw * 0.8} strokeLinecap="round" />
     </g>
   );
 

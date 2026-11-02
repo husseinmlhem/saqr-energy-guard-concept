@@ -38,7 +38,7 @@ export const eventsCues = (slot: SceneSlot) => {
   const S = stamps.length;
   const badge = beatOf(slot, S);
   const countStart = beatOf(slot, S + 1);
-  const countEnd = slot.downbeats.find((d) => d >= beatOf(slot, S + 3) - 0.5) ?? beatOf(slot, S + 3);
+  const countEnd = beatOf(slot, Math.min(S + 2, slot.beats.length - 1));
   const countBeats = slot.beats.filter((b) => b > countStart && b < countEnd);
   const cues: Cues = {
     marks: [
@@ -205,7 +205,7 @@ const Badge: React.FC<{ frame: number; at: number; x: number; y: number }> = ({ 
   );
 };
 
-export const S6Events: React.FC<SceneProps> = ({ slot }) => {
+export const S10Events: React.FC<SceneProps> = ({ slot }) => {
   const frame = useCurrentFrame();
   const c = useMemo(() => eventsCues(slot), [slot]);
   const cam = shake(frame, c.hits, 7, 0.5);
@@ -272,6 +272,18 @@ export const S6Events: React.FC<SceneProps> = ({ slot }) => {
           </Svg>
         )}
       </AbsoluteFill>
+      {/* we come out of Hussein's monitor: the screen bezel opens up and the app chrome slides away */}
+      {frame < 14 && (
+        <AbsoluteFill style={{ pointerEvents: "none" }}>
+          <AbsoluteFill style={{ boxShadow: `inset 0 0 0 ${Math.max(0, 70 * (1 - frame / 12))}px #15161A`, borderRadius: 30 * (1 - frame / 12) }} />
+          <div style={{ position: "absolute", left: 0, right: 0, top: -frame * 8, height: 60, background: "#2D3038", display: "flex", alignItems: "center", gap: 12, paddingLeft: 24, opacity: 1 - frame / 14 }}>
+            {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
+              <span key={c} style={{ width: 18, height: 18, borderRadius: 9, background: c, display: "inline-block" }} />
+            ))}
+            <span style={{ fontFamily: FONT, fontWeight: 600, fontSize: 24, color: "#9AA3B2", marginLeft: 20 }}>events_wall_final.mp4</span>
+          </div>
+        </AbsoluteFill>
+      )}
     </AbsoluteFill>
   );
 };

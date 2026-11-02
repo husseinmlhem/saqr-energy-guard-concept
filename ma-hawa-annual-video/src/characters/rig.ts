@@ -29,6 +29,8 @@ export type Pose = {
   plant?: boolean;
   /** draw arms in front of the head (blowing a balloon, hands at the face) */
   armsFront?: boolean;
+  /** draw arms behind the torso (hiding something behind the back) */
+  armsBack?: boolean;
 };
 
 export type BodyDims = {
@@ -96,6 +98,14 @@ export const POSES = {
   lying: P(0, { lArm: [-30, -20], rArm: [30, 20], lLeg: [-10, 10], rLeg: [10, -10], plant: false }),
   sitDazed: P(0, { hipY: 70, lArm: [-40, -20], rArm: [40, 20], lFoot: { x: -60, y: 0 }, rFoot: { x: 60, y: 0 } }),
   thumbsUp: P(0, { rArm: [62, 108], lArm: [-10, -8] }),
+  hideBehind: P(0, { lArm: [-16, 46], rArm: [16, -46], armsBack: true, head: -3 }),
+  think: P(0, { rArm: [40, 128], lArm: [-30, 85] }),
+  armsCrossed: P(0, { lArm: [-28, 105], rArm: [28, -105] }),
+  presentPoint: P(-4, { lArm: [-118, -10], rArm: [24, 60] }),
+  laugh: P(-8, { lArm: [-30, 110], rArm: [30, 125], head: -12 }),
+  phoneTalk: P(0, { rArm: [30, 140], lArm: [-24, 96] }),
+  hammerUp: P(0, { rArm: [140, 30], lArm: [-30, 60] }),
+  hammerDown: P(6, { rArm: [70, 20], lArm: [-30, 60], hipY: 10 }),
 } satisfies Record<string, Pose>;
 
 /** layer the beat-locked idle groove (see idleMotion) on top of any pose */
@@ -129,6 +139,7 @@ export const lerpPose = (a: Pose, b: Pose, t: number): Pose => ({
   rFoot: lerpPt(a.rFoot ?? FOOT_R, b.rFoot ?? FOOT_R, t),
   plant: t < 0.5 ? a.plant : b.plant,
   armsFront: t < 0.5 ? a.armsFront : b.armsFront,
+  armsBack: t < 0.5 ? a.armsBack : b.armsBack,
 });
 
 const FOOT_L = { x: -20, y: 0 };

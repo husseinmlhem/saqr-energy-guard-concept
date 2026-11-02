@@ -1,21 +1,25 @@
-# Ma Hawa — Annual Meeting Video (60 s, beat-synced)
+# Ma Hawa — Annual Meeting Video (~73 s, beat-synced)
 
-A 1920×1080, 30 fps animation built in **Remotion (React)**. It uses real-photo heads on clothed, outlined bodies, with outfit colours taken from each person's photo. White background, Ma Hawa blue accents.
-Every scene is a React component, and every cut, hit and bounce comes from the music analysis in `config/beats.json`.
+A 1920×1080, 30 fps animated film built in **Remotion (React)**. It has real-photo heads on clothed bodies (outfit colours taken from each photo), set in a Ma Hawa office with depth, camera moves, and day/night lighting. Every cut, hit, caption and bounce comes from the music analysis in `config/beats.json`.
 
-```
-Playtime → CEO enters → The huddle → The CFO → Hard work → Events → Finale (hero shot + logo)
-```
+### Storyline (one React component per scene, `src/scenes/S00…S11`)
 
-**Current version** is synced to *7mama — Sheshtawy* (95 BPM). The best 60 s window is **40.5 s → 100.5 s** of the song:
-- It opens on the song's soft break bar, where the three start blowing up balloons.
-- The breakdown and build-up (song 80.9–91 s) carry the tired walk-back and "Great work, guys!".
-- The biggest drop (song 91.0 s) is the hero shot at 50.5 s.
-- It ends in the full groove with a 2.5 s fade.
+| # | Scene | Music moment |
+|---|---|---|
+| 0 | **Title**: the camera glides across the office, MA HAWA slams in on the beats | 1 bar |
+| 1 | **Pump party**: Ali, Amr (centre) and Hussein inflate balloons with floor pumps. The handle goes down on every beat and up on the off-beat. Then they dance with the balloons | 4 bars |
+| 2 | **"STOP PLAYING!"**: Michael leans in from the edge of the screen. Balloons go behind backs, innocent whistling. He leaves and the party resumes | **the song's hard break** (bass drops out) |
+| 3 | **BONK**: a bat swings in from the screen edge, the three tumble down. "I WANT IDEAS!" | 1 bar |
+| 4 | **Lots of ideas**: a sticky note flies onto the board on every beat. Amr hands the stack to Michael | 2 bars |
+| 5 | **"I WANT MORE CREATIVE IDEAS!"**: the stack goes in the air and he walks off | 1 bar |
+| 6 | **Creative huddle** (top-down): sketches orbit and bulbs light (Hussein's is the big one). EUREKA | 2 bars |
+| 7 | **The pitch** (over Michael's shoulder): Hussein drives the deck, one slide per beat. "EXCELLENT! MAKE IT HAPPEN!" | starts on the song's accent bar |
+| 8 | **The CFO**: Saeed is laughing at his phone. "WE NEED A BUDGET…" and he stops laughing instantly (record scratch, snap zoom) | 2 bars |
+| 9 | **Making it happen**: a three-way split, then over Hussein's shoulder on realistic screens (3D booth, edit timeline, key visual). Day turns to night. Exports fill on the beat, EXPORT COMPLETE, and the camera dives into his screen | 3 bars |
+| 10 | **Events**: the wall comes out of that screen, one stamp per beat, gold badge, 45+ | 4 bars |
+| 11 | **Finale**: they walk back worn out. "GREAT WORK, GUYS!" on the beats, then the **hero shot on the biggest drop** (whole team, low angle, rays, slow-mo), then the logo | 5 bars |
 
-The song's only hard breaks (40.5 s, 80.9 s, 106 s) can't sit near 10 s in any 60 s window that also contains that drop. So the CEO bursts in on the bar-5 downbeat (10.1 s), right after the groove's bass stop. To put the CEO on a real break instead, use `npm run sync -- song.mp3 --start 30.39`, but the video then ends before the big drop.
-
----
+It is synced to *7mama — Sheshtawy* (95 BPM), song window **27.9 s → 101.1 s**. "STOP PLAYING!" lands on the song's bass break (40.5 s in the song), and the hero shot on the biggest drop (91.0 s in the song).
 
 ## Quick start
 
@@ -65,7 +69,7 @@ Already-cut transparent PNGs can skip step 2. Make them 640×640 with the eyes a
 
 ```bash
 npm run sync -- ~/Music/song.mp3            # copies it into assets/audio/, analyses it, prints the new plan
-npm run sync -- song.mp3 --start 42.5       # force where the 60 s window starts (snapped to a downbeat)
+npm run sync -- song.mp3 --start 42.5       # force where the window starts (snapped to a downbeat)
 npm run sync -- song.mp3 --bpm 128          # tempo hint if it locks to half/double time
 npm run render && npm run render:debug
 ```
@@ -80,14 +84,14 @@ npm run render && npm run render:debug
 | `peaks[]` | energy peaks |
 | `drops[]`, `biggestDrop` | big jumps in loudness and bass on a downbeat into the loudest part of the song |
 | `breaks[]`, `quiet[]` | hard breaks (energy falls off a cliff) and quiet sections |
-| `audio.segmentStart/End` | if the song is longer than 60 s, the best window (build-up → drop near the end → strong ending), with `fadeOut` |
+| `audio.segmentStart/End` | if the song is longer than `musicWindow.duration`, the best window (break early → build-up → biggest drop near the end), with `fadeOut` |
 
 How the video locks to it (`src/sync/timeline.ts`):
 
-- **Scene cuts** land on downbeats. A brute-force search picks the downbeats closest to the target lengths in `config/video.json`.
-- **CEO entrance** lands on a hard break or quiet part near 8 s.
-- **Hero shot** lands on the biggest drop, in the last 45% of the video. The finale starts a few bars before it; the logo comes on a downbeat about 4 s before the end.
-- **Action hits** are on beats. Each scene builds a cue sheet from its own beats: balloon taps and pop, door slam, bat hit, light bulbs, sign, sip, stamps (one per beat), badge, counter, and the hero pose.
+- **Scene cuts** land on downbeats. Dynamic programming over the downbeats picks the cuts closest to the target lengths in `config/video.json`.
+- **"STOP PLAYING!"** lands on a hard break (also a bass drop-out) or a quiet part, near `anchors.breakTarget`.
+- **Hero shot** lands on the biggest drop, late in the video. The finale starts about a bar before it, and the logo comes on a downbeat about 5 s before the end.
+- **Action hits** are on beats. Each scene builds a cue sheet from its own beats: pump strokes, the STOP/PLAYING words, the bat hit, sticky notes, bulbs, slides, the HA!s and the scratch, hammer/ticks/exports, stamps (one per beat), badge, counter, and the hero pose.
 - **Idle motion** follows the beat grid: characters dip and squash on every beat, and heads bobble once every two beats.
 - **SFX** (pop, whoosh, bonk, stamp, ding, slam, sparkle, tick, boing, sip) play at those same cue frames, under the music.
 
@@ -110,6 +114,7 @@ If any cue is off-beat, the panel flags it.
   - Walk cycle: the stance foot stays put, the swing foot lifts, and the hips bob.
   - Pose changes ease naturally, and the arms lag a few frames behind the body (follow-through).
 - **Idle groove** (`idleMotion`): the knees dip exactly on every beat, weight shifts once per bar, and the head sways every two beats. Each person is slightly offset so the group never moves like one robot.
+- **No drawn goggles:** Hussein's own glasses are in his photo.
 - **Amr is always in the centre:** Ali | Amr | Hussein in every group shot. He's at the head of the huddle, in the middle panel of the split screen, and front and centre (larger) in the hero shot.
 
 ## Edit the content
@@ -118,11 +123,15 @@ If any cue is off-beat, the panel flags it.
 |---|---|
 | Scene lengths, CEO/hero anchors | `config/video.json` → `scenes`, `anchors` |
 | Event names, award, "45+" count | `config/video.json` → `events`, `award`, `eventCount` |
-| Speech lines ("We need creative ideas!", "BUDGET?", "Great work, guys!") | `config/video.json` → `lines` |
+| Spoken lines (STOP PLAYING!, I WANT IDEAS!, …) | `config/video.json` → `lines` |
+| Sticky-note ideas, pitch slides, title | `config/video.json` → `ideas`, `pitchSlides`, `title` |
+| Video length + where the break/drop should sit when re-syncing | `config/video.json` → `musicWindow` |
+| Office set (walls, windows, brand wall, CFO office) | `src/world/Office.tsx` |
+| Realistic screens (3D, edit, code, dashboard, export) | `src/world/Screens.tsx` |
 | Logo | put the file in `assets/logo/` and set `brand.logo` (e.g. `"logo/ma-hawa.png"`) — until then a wordmark placeholder is shown |
 | Colours | `config/video.json` → `brand` (accent `#76ADDE`) |
 | Music / SFX volume, SFX on/off | `config/video.json` → `audio` |
-| A scene's animation | `src/scenes/S1Playtime.tsx` … `S7Finale.tsx` (one component per scene) |
+| A scene's animation | `src/scenes/S00Title.tsx` … `S11Finale.tsx` (one component per scene; shared pieces in `kit.tsx`) |
 | Poses | `src/characters/rig.ts` → `POSES` (angles, or IK targets `lHand`/`rHand`/`lFoot`/`rFoot`) |
 | Outfit colours, head size | `config/characters.json` → `outfit`, `headScale` |
 | Bodies / outfits / props | `src/characters/Character.tsx`, `src/characters/props.tsx` |

@@ -125,10 +125,25 @@ def puff():
     return norm(n * env + rub, 0.5)
 
 
+def scratch():
+    # record scratch: a fast pitch dive on filtered noise + a squeaky tone
+    t = t_arr(0.45)
+    n = rng.standard_normal(len(t))
+    out = np.zeros_like(t)
+    step = 512
+    for i in range(0, len(t), step):
+        p = i / len(t)
+        f = 3500 * (1 - p) ** 2 + 300
+        out[i:i + step] = sosfilt(butter(2, [f * 0.7, min(f * 1.3, 20000)], "band", fs=SR, output="sos"), n[i:i + step])
+    tone = np.sin(2 * np.pi * np.cumsum(1400 * (1 - t / 0.45) ** 1.5 + 200) / SR) * 0.4
+    env = np.minimum(1, t / 0.005) * np.exp(-t * 6)
+    return norm((out + tone) * env, 0.8)
+
+
 def write_all(dest: Path):
     dest.mkdir(parents=True, exist_ok=True)
     for name, fn in [("pop", pop), ("whoosh", whoosh), ("bonk", bonk), ("stamp", stamp), ("ding", ding),
-                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip), ("puff", puff)]:
+                     ("slam", slam), ("sparkle", sparkle), ("tick", tick), ("boing", boing), ("sip", sip), ("puff", puff), ("scratch", scratch)]:
         x = fn()
         fade = int(0.01 * SR)
         x[-fade:] *= np.linspace(1, 0, fade)

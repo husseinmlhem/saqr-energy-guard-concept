@@ -2,7 +2,7 @@
 import React from "react";
 import { ACCENT, ACCENT_SOFT, GOLD, INK, PAPER } from "../theme";
 
-export type PropName = "clipboard" | "bat" | "coffee" | "box" | "marker" | "gadget" | "stamp" | "none";
+export type PropName = "clipboard" | "bat" | "coffee" | "box" | "marker" | "gadget" | "stamp" | "laptop" | "phone" | "hammer" | "clicker" | "none";
 
 type PropProps = { sw: number; angle: number; frame?: number; glow?: number };
 
@@ -10,7 +10,8 @@ const line = (sw: number) => ({ stroke: INK, strokeWidth: sw, strokeLinecap: "ro
 
 /** Props that follow the forearm direction get rotated; upright props don't. */
 export const PROP_FOLLOWS_ARM: Record<PropName, boolean> = {
-  clipboard: false, bat: true, coffee: false, box: false, marker: true, gadget: false, stamp: false, none: false,
+  clipboard: false, bat: true, coffee: false, box: false, marker: true, gadget: false, stamp: false,
+  laptop: false, phone: false, hammer: true, clicker: true, none: false,
 };
 
 export const Prop: React.FC<{ name: PropName } & PropProps> = ({ name, sw, angle, frame = 0 }) => {
@@ -87,6 +88,40 @@ const renderProp = (name: PropName, sw: number, frame: number) => {
         <g transform="translate(0,-40)">
           <rect x={-12} y={-40} width={24} height={40} rx={10} fill={ACCENT} {...line(sw)} />
           <rect x={-34} y={0} width={68} height={22} rx={4} fill={PAPER} {...line(sw)} />
+        </g>
+      );
+    case "laptop": {
+      const on = 0.75 + 0.25 * Math.sin(frame / 5);
+      return (
+        <g transform="translate(-10 -6)">
+          <path d="M -46 0 L 34 0 L 44 10 L -36 10 Z" fill="#B9C0CC" stroke={INK} strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          <path d="M -46 0 L -60 -58 L 22 -58 L 34 0 Z" fill="#2A2D34" stroke={INK} strokeWidth={sw * 0.8} strokeLinejoin="round" />
+          <path d="M -44 -5 L -55 -52 L 19 -52 L 29 -5 Z" fill="#1B2A44" />
+          {[0, 1, 2, 3].map((k) => (
+            <line key={k} x1={-48 + k * 2} x2={-10 + k * 6} y1={-44 + k * 10} y2={-44 + k * 10} stroke={k % 2 ? ACCENT : "#7CF3A0"} strokeWidth={3} opacity={on} strokeLinecap="round" />
+          ))}
+        </g>
+      );
+    }
+    case "phone":
+      return (
+        <g transform="translate(-9 -36)">
+          <rect x={0} y={0} width={20} height={38} rx={4} fill="#1E1F24" stroke={INK} strokeWidth={sw * 0.6} />
+          <rect x={3} y={4} width={14} height={28} rx={2} fill="#76ADDE" opacity={0.8} />
+        </g>
+      );
+    case "hammer":
+      return (
+        <g>
+          <rect x={-5} y={-6} width={10} height={70} rx={4} fill="#C99A62" stroke={INK} strokeWidth={sw * 0.7} />
+          <rect x={-24} y={58} width={48} height={20} rx={4} fill="#5A606B" stroke={INK} strokeWidth={sw * 0.7} />
+        </g>
+      );
+    case "clicker":
+      return (
+        <g>
+          <rect x={-6} y={-4} width={12} height={30} rx={5} fill="#2A2D34" stroke={INK} strokeWidth={sw * 0.6} />
+          <circle cx={0} cy={6} r={3} fill="#FF5A5A" />
         </g>
       );
     default:

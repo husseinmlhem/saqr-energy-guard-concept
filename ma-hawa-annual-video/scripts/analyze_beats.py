@@ -230,11 +230,29 @@ def find_quiet(bars, t, norm, period):
         after2 = mean_between(t, norm, a2, a2 + 2 * period)
         if before - after2 > 0.3 and not any(abs(x["t"] - a) < 1e-3 for x in breaks):
             breaks.append(dict(t=a, bar=i, strength=(before - after2) * 0.9))
+    # bass stops: the whole bar loses its low end while the bars around it keep it
+    lows = np.array([b["low"] for b in bars])
+    med_low = float(np.nanmedian(lows))
+    for i in range(1, len(bars) - 1):
+        drop_db = med_low - bars[i]["low"]
+        if drop_db > 18 and bars[i - 1]["low"] > med_low - 8:
+            strength = min(1.0, drop_db / 45)
+            if not any(abs(x["t"] - bars[i]["t"]) < 1e-3 for x in breaks):
+                breaks.append(dict(t=bars[i]["t"], bar=i, strength=strength))
     return quiet, breaks
 
 
 # --------------------------------------------------------------------------- segment
+def window_targets():
+    try:
+        mw = json.loads((ROOT / "config" / "video.json").read_text()).get("musicWindow", {})
+    except Exception:
+        mw = {}
+    return float(mw.get("duration", 60.0)), float(mw.get("breakAt", 0.13)), float(mw.get("dropAt", 0.84))
+
+
 def pick_segment(duration, target, bars, drops, quiet, breaks, t, norm, force_start=None):
+    _, BREAK_AT, DROP_AT = window_targets()
     starts = [b["t"] for b in bars]
     if duration <= target + 0.5:
         return 0.0, duration, {"reason": "track shorter than target – using all of it"}
@@ -251,18 +269,18 @@ def pick_segment(duration, target, bars, drops, quiet, breaks, t, norm, force_st
         drop_score = 0.0
         for d in drops:
             rel = (d["t"] - s) / target
-            if 0.6 <= rel <= 0.93:
-                drop_score = max(drop_score, d["strength"] * np.exp(-((rel - 0.84) ** 2) / (2 * 0.07 ** 2)))
+            if 0.6 <= rel <= 0.95:
+                drop_score = max(drop_score, d["strength"] * np.exp(-((rel - DROP_AT) ** 2) / (2 * 0.06 ** 2)))
         # 2) a quiet part / hard break early (CEO entrance ~13 %)
         q_score = 0.0
         for q in breaks:
             rel = (q["t"] - s) / target
-            if 0.06 <= rel <= 0.26:
-                q_score = max(q_score, min(1, q["strength"] * 2.5) * np.exp(-((rel - 0.13) ** 2) / (2 * 0.06 ** 2)))
+            if 0.05 <= rel <= 0.35:
+                q_score = max(q_score, min(1, q["strength"] * 2.5) * np.exp(-((rel - BREAK_AT) ** 2) / (2 * 0.05 ** 2)))
         for q in quiet:
             rel = (q["start"] - s) / target
-            if 0.06 <= rel <= 0.26:
-                q_score = max(q_score, 0.7 * np.exp(-((rel - 0.13) ** 2) / (2 * 0.06 ** 2)))
+            if 0.05 <= rel <= 0.35:
+                q_score = max(q_score, 0.7 * np.exp(-((rel - BREAK_AT) ** 2) / (2 * 0.05 ** 2)))
         # 3) strong ending (energy in the last 8 s), or a natural ending close to the window end
         end_e = mean_between(t, norm, e - 8, e)
         natural = 1.0 if duration - e < 1.5 else 0.0
@@ -273,7 +291,7 @@ def pick_segment(duration, target, bars, drops, quiet, breaks, t, norm, force_st
         build_score = np.clip(mid - early + 0.5, 0, 1)
         # 5) start on a phrase boundary (every 4 bars from the first loud bar)
         phrase = 1.0 if i % 4 == 0 else 0.0
-        score = 3.0 * drop_score + 1.2 * q_score + 1.0 * end_score + 0.6 * build_score + 0.3 * phrase
+        score = 3.0 * drop_score + 2.0 * q_score + 1.0 * end_score + 0.6 * build_score + 0.3 * phrase
         if best is None or score > best[0]:
             best = (score, s, e, dict(drop=r3(drop_score), quiet=r3(q_score), ending=r3(end_score),
                                       build=r3(build_score), phrase=phrase, total=r3(score)))
@@ -286,12 +304,14 @@ def pick_segment(duration, target, bars, drops, quiet, breaks, t, norm, force_st
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("audio")
-    ap.add_argument("--duration", type=float, default=60.0)
+    ap.add_argument("--duration", type=float, default=None, help="video length (default: config/video.json musicWindow.duration)")
     ap.add_argument("--start", type=float, default=None)
     ap.add_argument("--bpm", type=float, default=None)
     ap.add_argument("--fade-out", type=float, default=None)
     ap.add_argument("--out", default=str(OUT_JSON), help="where to write beats.json")
     args = ap.parse_args()
+    if args.duration is None:
+        args.duration = window_targets()[0]
 
     src = Path(args.audio).resolve()
     audio_dir = ASSETS / "audio"

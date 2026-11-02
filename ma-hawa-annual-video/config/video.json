@@ -1,27 +1,58 @@
 {
   "_help": [
-    "Scene order is fixed. 'target' = rough length in seconds; the solver in src/sync/timeline.ts snaps every cut to a downbeat in config/beats.json.",
-    "'minSeconds' protects a scene from being squeezed; Events also gets enough beats for one stamp per beat.",
-    "anchors: the CEO door lands on a quiet part / hard break near 'ceoTarget'; the hero shot lands on the biggest drop."
+    "Scene order is fixed. 'target' = rough length in seconds; src/sync/timeline.ts snaps every cut to a downbeat in config/beats.json.",
+    "anchor 'break': the scene starts on a hard break / quiet part (Michael's 'STOP PLAYING!'). The finale holds the hero shot on the biggest drop.",
+    "musicWindow: how long the video is and where the break / drop should sit — used by `npm run sync` to pick the window of a new song."
   ],
   "scenes": [
     {
-      "id": "playtime",
-      "title": "Playtime",
+      "id": "title",
+      "title": "Title",
+      "target": 2.5,
+      "minSeconds": 2
+    },
+    {
+      "id": "pump",
+      "title": "Pump party",
       "target": 10,
-      "minSeconds": 8
+      "minSeconds": 6
     },
     {
-      "id": "ceo",
-      "title": "CEO enters",
-      "target": 7.5,
-      "minSeconds": 5
-    },
-    {
-      "id": "huddle",
-      "title": "The huddle",
+      "id": "stop",
+      "title": "Stop playing!",
       "target": 5,
-      "minSeconds": 3.5
+      "minSeconds": 4,
+      "anchor": "break"
+    },
+    {
+      "id": "bonk",
+      "title": "I want ideas!",
+      "target": 2.5,
+      "minSeconds": 2
+    },
+    {
+      "id": "brainstorm",
+      "title": "Lots of ideas",
+      "target": 5,
+      "minSeconds": 4
+    },
+    {
+      "id": "moreCreative",
+      "title": "More creative!",
+      "target": 2.5,
+      "minSeconds": 2
+    },
+    {
+      "id": "creative",
+      "title": "Creative huddle",
+      "target": 5,
+      "minSeconds": 4
+    },
+    {
+      "id": "pitch",
+      "title": "The pitch",
+      "target": 5,
+      "minSeconds": 4
     },
     {
       "id": "cfo",
@@ -30,36 +61,36 @@
       "minSeconds": 4
     },
     {
-      "id": "hardwork",
-      "title": "Hard work",
-      "target": 5,
-      "minSeconds": 4
+      "id": "execute",
+      "title": "Making it happen",
+      "target": 7.5,
+      "minSeconds": 5
     },
     {
       "id": "events",
       "title": "Events",
-      "target": 12.5,
-      "minSeconds": 9
+      "target": 10,
+      "minSeconds": 8
     },
     {
       "id": "finale",
       "title": "Finale",
-      "target": 15,
+      "target": 12.6,
       "minSeconds": 7
     }
   ],
   "anchors": {
-    "ceoTarget": 10,
-    "ceoWindow": [
+    "breakTarget": 12.6,
+    "breakWindow": [
       6,
-      16
+      25
     ],
     "heroWindowFraction": [
-      0.55,
+      0.6,
       0.95
     ],
-    "finaleLeadIn": 5,
-    "logoSeconds": 4.2
+    "finaleLeadIn": 2.5,
+    "logoSeconds": 5
   },
   "events": [
     {
@@ -104,9 +135,12 @@
   "award": "ADNOC Onshore HSE — Best Exhibit Winner",
   "eventCount": 45,
   "lines": {
-    "ceo": "We need creative ideas!",
-    "budgetSign": "BUDGET?",
-    "finale": "Great work, guys!"
+    "stop": "STOP PLAYING!",
+    "bonk": "I WANT IDEAS!",
+    "moreCreative": "I WANT MORE CREATIVE IDEAS!",
+    "pitchOk": "EXCELLENT! MAKE IT HAPPEN!",
+    "budget": "WE NEED A BUDGET…",
+    "finale": "GREAT WORK, GUYS!"
   },
   "brand": {
     "name": "Ma Hawa",
@@ -121,5 +155,50 @@
     "musicVolume": 1.0,
     "sfx": true,
     "sfxVolume": 0.55
+  },
+  "musicWindow": {
+    "duration": 73.27,
+    "breakAt": 0.17,
+    "dropAt": 0.86
+  },
+  "ideas": [
+    "Pop-up booth",
+    "Giveaways",
+    "Social campaign",
+    "Photo wall",
+    "Contest",
+    "Merch",
+    "Launch party",
+    "Promo video"
+  ],
+  "pitchSlides": [
+    {
+      "title": "THE BIG IDEA",
+      "kind": "title"
+    },
+    {
+      "title": "IMMERSIVE BOOTH",
+      "kind": "booth"
+    },
+    {
+      "title": "INTERACTIVE EXPERIENCE",
+      "kind": "interactive"
+    },
+    {
+      "title": "LIVE SHOW",
+      "kind": "stage"
+    },
+    {
+      "title": "CONTENT CAMPAIGN",
+      "kind": "chart"
+    },
+    {
+      "title": "IMPACT",
+      "kind": "impact"
+    }
+  ],
+  "title": {
+    "main": "MA HAWA",
+    "sub": "ANNUAL MEETING"
   }
 }

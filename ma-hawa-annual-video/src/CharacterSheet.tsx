@@ -25,7 +25,7 @@ export const CharacterSheet: React.FC = () => {
         const x = 200 + i * 380;
         return (
           <React.Fragment key={id}>
-            <Character id={id} x={x} y={560} scale={0.95} pose={{ ...POSE_FOR[id], hipY: m.hipY, hipX: m.hipX }} expression="happy" headTilt={m.headTilt} goggles={id === "hussein" ? "eyes" : undefined} frame={frame} />
+            <Character id={id} x={x} y={560} scale={0.95} pose={{ ...POSE_FOR[id], hipY: m.hipY, hipX: m.hipX }} expression="happy" headTilt={m.headTilt} frame={frame} />
             <div style={{ position: "absolute", left: x - 150, width: 300, top: 572, textAlign: "center", fontWeight: 800, fontSize: 26, color: INK }}>{id}</div>
             <Character id={id} x={x - 90} y={1050} scale={0.62} pose={POSES.blow} expression="neutral" left="none" right="none" frame={frame} />
             <Character id={id} x={x + 90} y={1050} scale={0.62} pose={walkPose(POSES.relaxed, frame / 30 + i * 0.2)} expression="neutral" left="none" right="none" frame={frame} />
